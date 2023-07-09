@@ -10,6 +10,7 @@ import yaml
 from openpyxl import Workbook
 
 from cobralib.io import (
+    Logger,
     ReadKeyWords,
     read_csv_columns_by_headers,
     read_csv_columns_by_index,
@@ -240,6 +241,19 @@ def excel_file(tmp_path):
 @pytest.fixture
 def data():
     return {"name": "Alice", "age": 30}
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    # Code that will run before your test, for example:
+    yield
+    # Code that will run after your test, for example:
+    if os.path.exists("test.log"):
+        os.remove("test.log")
 
 
 # ==========================================================================================
@@ -601,6 +615,44 @@ def test_append_yaml_file(data):
 def test_write_yaml_file_nonexistent(data):
     file_path = "/path/to/nonexistent/output.yaml"
     pytest.raises(FileNotFoundError, write_yaml_file, file_path, data, append=True)
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+def test_logger_creation():
+    """Test Logger initialization"""
+    logger = Logger("test.log", "DEBUG", "DEBUG", 10)
+    assert logger.filename == "test.log"
+    assert logger.max_lines == 10
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_logger_logging():
+    """Test logging function"""
+    logger = Logger("test.log", "DEBUG", "DEBUG", 10)
+    logger.log("DEBUG", "Test message")
+    with open("test.log") as f:
+        log_content = f.read()
+        assert "Test message" in log_content
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_logger_log_trimming():
+    """Test that logs are correctly trimmed"""
+    logger = Logger("test.log", "DEBUG", "DEBUG", 10)
+    for i in range(20):  # Log more lines than max_lines
+        logger.log("DEBUG", f"Test message {i}")
+    with open("test.log") as f:
+        log_lines = f.readlines()
+        assert len(log_lines) == 10  # Only last 10 messages should be there
+        assert "Test message 19" in log_lines[-1]  # Last message should be last in file
+        assert "Test message 10" in log_lines[0]  # Messages before 10 should be trimmed
 
 
 # ==========================================================================================

@@ -950,6 +950,8 @@ headers are not on the first line.  For instance, assume the following csv file;
 </section>
 <section id="yaml-files">
 <h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading">¶</a></h2>
+<p>The following functions are wrappers arund pyyaml and can be used
+to read from and write to yaml files</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_yaml_file">
 <span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_yaml_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_yaml_file" title="Permalink to this definition">¶</a></dt>
@@ -1052,6 +1054,67 @@ the file or create a new one (default: False)</p></li>
 </dd></dl>
 
 </section>
+<section id="logger">
+<h2>Logger<a class="headerlink" href="#logger" title="Permalink to this heading">¶</a></h2>
+<p>This class is a wrapper around the logging module that adds the ability
+to truncate a log file to a user specified number of log values.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.io.Logger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">Logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">console_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lines</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#Logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom logging class that writes messages to both console and log file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – The name of the file to write logs to.</p></li>
+<li><p><strong>console_level</strong> – The minimum logging level for the console. Should be one
+of: ‘NOTSET’, ‘DEBUG’, ‘INFO’, ‘WARNING’, ‘ERROR’,
+‘CRITICAL’.</p></li>
+<li><p><strong>file_level</strong> – The minimum logging level for the log file. Should be one of:
+‘NOTSET’, ‘DEBUG’, ‘INFO’, ‘WARNING’, ‘ERROR’, ‘CRITICAL’.</p></li>
+<li><p><strong>max_lines</strong> – The maximum number of lines in the log file. When exceeded,
+the oldest entries are deleted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>console_level</cite> or <cite>file_level</cite> are not valid logging
+levels.</p></li>
+<li><p><strong>IOError</strong> – If an I/O error occurs when opening the file.</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Example usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create logger with filename=&#39;my_log.log&#39;, console_level=&#39;INFO&#39;, file_level=&#39;DEBUG&#39;, and max_lines=100</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="s1">&#39;my_log.log&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># log a DEBUG message</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;This is a debug message&#39;</span><span class="p">)</span>
+
+<span class="c1"># log an INFO message</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="s1">&#39;This is an info message&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.Logger.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#Logger.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.Logger.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a log entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> – The level of the log entry. Should be one of: ‘NOTSET’,
+‘DEBUG’, ‘INFO’, ‘WARNING’, ‘ERROR’, ‘CRITICAL’.</p></li>
+<li><p><strong>msg</strong> – The message to be logged.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <cite>level</cite> is not a valid logging level.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -1088,6 +1151,13 @@ the file or create a new one (default: False)</p></li>
 <li><a class="reference internal" href="#yaml-files">YAML Files</a><ul>
 <li><a class="reference internal" href="#cobralib.io.read_yaml_file"><code class="docutils literal notranslate"><span class="pre">read_yaml_file()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.write_yaml_file"><code class="docutils literal notranslate"><span class="pre">write_yaml_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logger">Logger</a><ul>
+<li><a class="reference internal" href="#cobralib.io.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a><ul>
+<li><a class="reference internal" href="#cobralib.io.Logger.log"><code class="docutils literal notranslate"><span class="pre">Logger.log()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -1,7 +1,10 @@
 # Import necessary packages here
 import json
+import logging
+import logging.handlers
 import os
 import xml.etree.ElementTree as ET
+from collections import deque
 from typing import Any, Union
 
 import pandas as pd
@@ -1310,6 +1313,120 @@ def write_yaml_file(file_path: str, data: dict, append: bool = False) -> None:
             yaml.safe_dump(data, file)
     except OSError as e:
         print(f"Error writing to file: {e}")
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+class Logger:
+    """
+    Custom logging class that writes messages to both console and log file.
+
+    :param filename: The name of the file to write logs to.
+    :param console_level: The minimum logging level for the console. Should be one
+                          of: 'NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR',
+                          'CRITICAL'.
+    :param file_level: The minimum logging level for the log file. Should be one of:
+                       'NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'.
+    :param max_lines: The maximum number of lines in the log file. When exceeded,
+                      the oldest entries are deleted.
+    :raises ValueError: If `console_level` or `file_level` are not valid logging
+                        levels.
+    :raises IOError: If an I/O error occurs when opening the file.
+
+    **Example usage:**
+
+    .. code-block:: python
+
+        # create logger with filename='my_log.log', console_level='INFO',
+        # file_level='DEBUG', and max_lines=100
+
+        logger = Logger('my_log.log', 'INFO', 'DEBUG', 100)
+
+        # log a DEBUG message
+        logger.log('DEBUG', 'This is a debug message')
+
+        # log an INFO message
+        logger.log('INFO', 'This is an info message')
+    """
+
+    def __init__(self, filename, console_level, file_level, max_lines):
+        self.filename = filename
+        self.max_lines = max_lines
+
+        # Creating logger
+        self.logger = logging.getLogger(filename)
+        self.logger.setLevel(logging.DEBUG)
+
+        # Creating console handler and setting its level
+        ch = logging.StreamHandler()
+        ch.setLevel(self._str_to_log_level(console_level))
+
+        # Creating file handler and setting its level
+        fh = logging.handlers.RotatingFileHandler(filename, backupCount=1)
+        fh.setLevel(self._str_to_log_level(file_level))
+
+        # Creating formatter
+        fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        formatter = logging.Formatter(fmt)
+
+        # Setting formatter for ch and fh
+        ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
+
+        # Adding ch and fh to logger
+        self.logger.addHandler(ch)
+        self.logger.addHandler(fh)
+
+    # ------------------------------------------------------------------------------------------
+
+    def _str_to_log_level(self, level):
+        """
+        Convert string representation of logging level to corresponding
+        logging module constants.
+
+        :param level: The string representation of the logging level.
+        :return: Corresponding logging level.
+        """
+        levels = {
+            "NOTSET": logging.NOTSET,
+            "DEBUG": logging.DEBUG,
+            "INFO": logging.INFO,
+            "WARNING": logging.WARNING,
+            "ERROR": logging.ERROR,
+            "CRITICAL": logging.CRITICAL,
+        }
+        return levels.get(level, logging.NOTSET)
+
+    # ------------------------------------------------------------------------------------------
+
+    def log(self, level, msg):
+        """
+        Write a log entry.
+
+        :param level: The level of the log entry. Should be one of: 'NOTSET',
+                      'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'.
+        :param msg: The message to be logged.
+        :raises ValueError: If `level` is not a valid logging level.
+        """
+        self.logger.log(self._str_to_log_level(level), msg)
+        self._trim_log_file()
+
+    def _trim_log_file(self):
+        """
+        Trims the log file to the last `max_lines` entries.
+
+        :raises IOError: If an I/O error occurs when trying to trim the file.
+        """
+        try:
+            with open(self.filename, "r+") as f:
+                lines = deque(f, self.max_lines)
+                f.seek(0)
+                f.writelines(lines)
+                f.truncate()
+        except OSError:
+            self.logger.exception("Error while trimming log file")
 
 
 # ==========================================================================================

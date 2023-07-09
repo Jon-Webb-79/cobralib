@@ -42,6 +42,9 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.handlers</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
@@ -1333,7 +1336,7 @@
 <span class="sd">       :language: text</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span> <span class="k">if</span> <span class="n">append</span> <span class="k">else</span> <span class="s2">&quot;w&quot;</span>
 
     <span class="k">if</span> <span class="n">append</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
@@ -1341,10 +1344,124 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
-                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># Add YAML document separator</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Add YAML document separator</span>
             <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error writing to file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+
+
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom logging class that writes messages to both console and log file.</span>
+
+<span class="sd">    :param filename: The name of the file to write logs to.</span>
+<span class="sd">    :param console_level: The minimum logging level for the console. Should be one</span>
+<span class="sd">                          of: &#39;NOTSET&#39;, &#39;DEBUG&#39;, &#39;INFO&#39;, &#39;WARNING&#39;, &#39;ERROR&#39;,</span>
+<span class="sd">                          &#39;CRITICAL&#39;.</span>
+<span class="sd">    :param file_level: The minimum logging level for the log file. Should be one of:</span>
+<span class="sd">                       &#39;NOTSET&#39;, &#39;DEBUG&#39;, &#39;INFO&#39;, &#39;WARNING&#39;, &#39;ERROR&#39;, &#39;CRITICAL&#39;.</span>
+<span class="sd">    :param max_lines: The maximum number of lines in the log file. When exceeded,</span>
+<span class="sd">                      the oldest entries are deleted.</span>
+<span class="sd">    :raises ValueError: If `console_level` or `file_level` are not valid logging</span>
+<span class="sd">                        levels.</span>
+<span class="sd">    :raises IOError: If an I/O error occurs when opening the file.</span>
+
+<span class="sd">    **Example usage:**</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # create logger with filename=&#39;my_log.log&#39;, console_level=&#39;INFO&#39;, file_level=&#39;DEBUG&#39;, and max_lines=100</span>
+<span class="sd">        logger = Logger(&#39;my_log.log&#39;, &#39;INFO&#39;, &#39;DEBUG&#39;, 100)</span>
+
+<span class="sd">        # log a DEBUG message</span>
+<span class="sd">        logger.log(&#39;DEBUG&#39;, &#39;This is a debug message&#39;)</span>
+
+<span class="sd">        # log an INFO message</span>
+<span class="sd">        logger.log(&#39;INFO&#39;, &#39;This is an info message&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">console_level</span><span class="p">,</span> <span class="n">file_level</span><span class="p">,</span> <span class="n">max_lines</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span> <span class="o">=</span> <span class="n">max_lines</span>
+
+        <span class="c1"># Creating logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="c1"># Creating console handler and setting its level</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_to_log_level</span><span class="p">(</span><span class="n">console_level</span><span class="p">))</span>
+
+        <span class="c1"># Creating file handler and setting its level</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">backupCount</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_to_log_level</span><span class="p">(</span><span class="n">file_level</span><span class="p">))</span>
+
+        <span class="c1"># Creating formatter</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+
+        <span class="c1"># Setting formatter for ch and fh</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+        <span class="c1"># Adding ch and fh to logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_str_to_log_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert string representation of logging level to corresponding</span>
+<span class="sd">        logging module constants.</span>
+
+<span class="sd">        :param level: The string representation of the logging level.</span>
+<span class="sd">        :return: Corresponding logging level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;NOTSET&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">,</span>
+            <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+            <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+            <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+            <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="s1">&#39;CRITICAL&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">levels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="Logger.log"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.Logger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write a log entry.</span>
+
+<span class="sd">        :param level: The level of the log entry. Should be one of: &#39;NOTSET&#39;,</span>
+<span class="sd">                      &#39;DEBUG&#39;, &#39;INFO&#39;, &#39;WARNING&#39;, &#39;ERROR&#39;, &#39;CRITICAL&#39;.</span>
+<span class="sd">        :param msg: The message to be logged.</span>
+<span class="sd">        :raises ValueError: If `level` is not a valid logging level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_str_to_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trim_log_file</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_trim_log_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trims the log file to the last `max_lines` entries.</span>
+
+<span class="sd">        :raises IOError: If an I/O error occurs when trying to trim the file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_lines</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error while trimming log file&quot;</span><span class="p">)</span></div>
+
+
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># eof</span>

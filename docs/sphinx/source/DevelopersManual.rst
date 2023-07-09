@@ -28,7 +28,17 @@ The following functions can be used to read columnar data from ``.txt``, ``.csv`
 
 YAML Files
 ==========
+The following functions are wrappers arund pyyaml and can be used
+to read from and write to yaml files
 
 .. autofunction:: cobralib.io.read_yaml_file
 
 .. autofunction:: cobralib.io.write_yaml_file
+
+Logger
+======
+This class is a wrapper around the logging module that adds the ability
+to truncate a log file to a user specified number of log values.
+
+.. autoclass:: cobralib.io.Logger
+   :members:
