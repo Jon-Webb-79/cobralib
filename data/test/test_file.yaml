@@ -1,0 +1,17 @@
+---
+- name: John Doe
+  age: 25
+  occupation: Developer
+  hobbies:
+    - Reading
+    - Coding
+    - Playing guitar
+
+---
+- name: Alice Smith
+  age: 30
+  occupation: Designer
+  hobbies:
+    - Painting
+    - Traveling
+    - Hiking

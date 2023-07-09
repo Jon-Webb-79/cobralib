@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Developers Manual &#8212; cobralib 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="py_util_lib Users Manual" href="UsersManual.html" />
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UsersManual.html" title="py_util_lib Users Manual"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Developers Manual</a></li>
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+
+  <section id="developers-manual">
+<h1>Developers Manual<a class="headerlink" href="#developers-manual" title="Permalink to this heading">¶</a></h1>
+<p>The various classes, methods and functions contained within this document enable
+easy implementation of utilities that are relevant to the average Python user.</p>
+<section id="readkeywords">
+<h2>ReadKeyWords<a class="headerlink" href="#readkeywords" title="Permalink to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code> class is mean to allow a user to read any ASCII based text
+file, look for keywords and read in the value to the right of th ekey word.  In
+essense this enables a user to use a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file as a basic configuration file.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadKeyWords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class can be used by a read to read a text based config file.  The methods
+will look for a specific key word that must begin on the first character of each
+line, and will read in the variable or variables just to the right of the
+keyword as a user specified data type.  The user can also print the object
+which will display the user specified number of lines on the screen.</p>
+<p>This class is cabale of reading files that contain text, json and xml
+data in one file.  In addition, this class can read files that are entirely
+compriesd of text, json, or xml data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – The file name to be read including the path length</p></li>
+<li><p><strong>print_lines</strong> – The number of lines to be printed to the screen if the
+user prints an instance of the class. Defaulted to 50</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist</p>
+</dd>
+</dl>
+<p>Example file titled test_key_words.txt</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Float Value: 4.387 # Comment line not to be read
+Double Value: 1.11111187 # Comment line not to be read
+integer: 6 # Comment not to be read
+String: Hello # Comment to be read
+Float List: 1.1 2.2 3.3 4.4
+Double List: 1.1, 2.2, 3.3, 4.4
+Integer List: 1, 2, 3, 4
+String List Hello World How are you
+JSON Data: {&quot;book&quot;: &quot;History of the World, &quot;Year&quot;: 1976}
+XML Data: &lt;root&gt;
+            &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;
+			&lt;Year&gt;1976&lt;/Year&gt;
+		  &lt;/root&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">,</span> <span class="n">print_lines</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Print the instance, displaying 2 lines</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">Float</span> <span class="n">Value</span><span class="p">:</span> <span class="mf">4.387</span> <span class="c1"># Comment line not to be read</span>
+<span class="o">&gt;&gt;</span> <span class="n">Double</span> <span class="n">Value</span><span class="p">:</span> <span class="mf">1.11111187</span> <span class="c1"># Comment line not to be read</span>
+</pre></div>
+</div>
+<p>The user can also adjust the print_lines attribute after instantiation
+if they wish to change the number of printed lines</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_list">
+<span class="sig-name descname"><span class="pre">read_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search each line for the specified keyword and read the values after the keyword
+as a list of the user-defined data type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyword</strong> – The keyword to search for in each line.</p></li>
+<li><p><strong>data_type</strong> – The data type to which the values should be transformed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of values after the keyword, transformed into the specified
+data type.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_list</span><span class="p">(</span><span class="s2">&quot;Float List:&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="p">[</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">4.4</span> <span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_string_variable">
+<span class="sig-name descname"><span class="pre">read_string_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_string_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_string_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search each line for the specified keyword and read the string variable
+to the right of the keyword.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in each line.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The string variable to the right of the keyword.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_variable</span><span class="p">(</span><span class="s2">&quot;String:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">Hello</span> <span class="c1"># Comment to be read</span>
+<span class="o">&gt;&gt;</span> <span class="nb">str</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_variable">
+<span class="sig-name descname"><span class="pre">read_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search each line for the specified keyword and read the variable to the
+right of the keyword as the specified data type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyword</strong> – The keyword to search for in each line.</p></li>
+<li><p><strong>data_type</strong> – The data type to be used in order to casy the variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The float variable to the right of the keyword.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the variable cannot
+be parsed as a float.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>import numpy as np
+# Instantiate the class
+reader = ReadKeyWords(&quot;test_key_words.txt&quot;)
+value = reader.read_variable(&quot;Double Value:&quot;, np.float32)
+print(value)
+print(type(value))
+
+&gt;&gt; 1.11111187
+&gt;&gt; &lt;class &#39;numpy.float32&#39;&gt;
+</pre></div>
+</div>
+<p>However, be carefult with strings.  This method will only read the first
+character array following the key word. In order to read in the entire
+line as a string, use the read_string_variable method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_variable</span><span class="p">(</span><span class="s2">&quot;String:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;</span> <span class="s2">&quot;Hello&quot;</span>
+<span class="o">&gt;&gt;</span> <span class="nb">str</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Developers Manual</a><ul>
+<li><a class="reference internal" href="#readkeywords">ReadKeyWords</a><ul>
+<li><a class="reference internal" href="#cobralib.io.ReadKeyWords"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code></a><ul>
+<li><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_list"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_list()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_string_variable"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_string_variable()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_variable"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_variable()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="UsersManual.html"
+                          title="previous chapter">py_util_lib Users Manual</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/DevelopersManual.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UsersManual.html" title="py_util_lib Users Manual"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Developers Manual</a></li>
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jonathan A. Webb.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>

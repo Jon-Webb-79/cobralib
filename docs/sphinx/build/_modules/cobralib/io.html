@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cobralib.io &#8212; cobralib 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cobralib.io</a></li>
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+
+  <h1>Source code for cobralib.io</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Import necessary packages here</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+
+<span class="c1"># File:    io.py</span>
+<span class="c1"># Date:    July 09, 2023</span>
+<span class="c1"># Author:  Jonathan A. Webb</span>
+<span class="c1"># Purpose: This file contains classes and functions that can be used to read and write</span>
+<span class="c1">#          to files</span>
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># Insert Code here</span>
+
+
+<div class="viewcode-block" id="ReadKeyWords"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords">[docs]</a><span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class can be used by a read to read a text based config file.  The methods</span>
+<span class="sd">    will look for a specific key word that must begin on the first character of each</span>
+<span class="sd">    line, and will read in the variable or variables just to the right of the</span>
+<span class="sd">    keyword as a user specified data type.  The user can also print the object</span>
+<span class="sd">    which will display the user specified number of lines on the screen.</span>
+
+<span class="sd">    This class is cabale of reading files that contain text, json and xml</span>
+<span class="sd">    data in one file.  In addition, this class can read files that are entirely</span>
+<span class="sd">    compriesd of text, json, or xml data.</span>
+
+<span class="sd">    :param file_name: The file name to be read including the path length</span>
+<span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
+<span class="sd">                        user prints an instance of the class. Defaulted to 50</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
+
+<span class="sd">    Example file titled test_key_words.txt</span>
+
+<span class="sd">    .. literalinclude:: ../../../data/test/text_key_words.txt</span>
+<span class="sd">       :language: text</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.txt&quot;, print_lines=2)</span>
+
+<span class="sd">        # Print the instance, displaying 2 lines</span>
+<span class="sd">        print(reader)</span>
+
+<span class="sd">        &gt;&gt; Float Value: 4.387 # Comment line not to be read</span>
+<span class="sd">        &gt;&gt; Double Value: 1.11111187 # Comment line not to be read</span>
+
+<span class="sd">    The user can also adjust the print_lines attribute after instantiation</span>
+<span class="sd">    if they wish to change the number of printed lines</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">print_lines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_lines</span> <span class="o">=</span> <span class="n">print_lines</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_variable"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search each line for the specified keyword and read the variable to the</span>
+<span class="sd">        right of the keyword as the specified data type</span>
+
+<span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :param data_type: The data type to be used in order to casy the variable</span>
+<span class="sd">        :return: The float variable to the right of the keyword.</span>
+<span class="sd">        :raises ValueError: If the keyword is not found or if the variable cannot</span>
+<span class="sd">                            be parsed as a float.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           import numpy as np</span>
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           value = reader.read_variable(&quot;Double Value:&quot;, np.float32)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           print(type(value))</span>
+
+<span class="sd">           &gt;&gt; 1.11111187</span>
+<span class="sd">           &gt;&gt; &lt;class &#39;numpy.float32&#39;&gt;</span>
+
+<span class="sd">        However, be carefult with strings.  This method will only read the first</span>
+<span class="sd">        character array following the key word. In order to read in the entire</span>
+<span class="sd">        line as a string, use the read_string_variable method.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           value = reader.read_variable(&quot;String:&quot;, str)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           print(type(value))</span>
+
+<span class="sd">           &gt;&gt; &quot;Hello&quot;</span>
+<span class="sd">           &gt;&gt; str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">value_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">data_type</span><span class="p">(</span><span class="n">value_str</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid float value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_string_variable"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_string_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search each line for the specified keyword and read the string variable</span>
+<span class="sd">        to the right of the keyword.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :return: The string variable to the right of the keyword.</span>
+<span class="sd">        :raises ValueError: If the keyword is not found.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           value = reader.read_variable(&quot;String:&quot;, str)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           print(type(value))</span>
+
+<span class="sd">           &gt;&gt; Hello # Comment to be read</span>
+<span class="sd">           &gt;&gt; str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_list"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_list">[docs]</a>    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search each line for the specified keyword and read the values after the keyword</span>
+<span class="sd">        as a list of the user-defined data type.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :param data_type: The data type to which the values should be transformed.</span>
+<span class="sd">        :return: The list of values after the keyword, transformed into the specified</span>
+<span class="sd">                 data type.</span>
+<span class="sd">        :raises ValueError: If the keyword is not found.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           value = reader.read_list(&quot;Float List:&quot;, float)</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">           &gt;&gt; [ 1.1, 2.2, 3.3, 4.4 ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>  <span class="c1"># Skip the keyword and colon</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_type</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">values</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid </span><span class="si">{</span><span class="n">data_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE methods</span>
+
+    <span class="k">def</span> <span class="nf">_read_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This private method will read in all lines from the text file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This private method determines how many of the lines are to be printed to</span>
+<span class="sd">        screen and pre-formats the data for printing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_lines</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">print_lines</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[:</span><span class="n">num_lines</span><span class="p">])</span></div>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># eof</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cobralib.io</a></li>
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Jonathan A. Webb.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>

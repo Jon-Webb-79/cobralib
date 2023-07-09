@@ -1,0 +1,13 @@
+Float Value: 4.387 # Comment line not to be read
+Double Value: 1.11111187 # Comment line not to be read
+integer: 6 # Comment not to be read
+String: Hello # Comment to be read
+Float List: 1.1 2.2 3.3 4.4
+Double List: 1.1, 2.2, 3.3, 4.4
+Integer List: 1, 2, 3, 4
+String List Hello World How are you
+JSON Data: {"book": "History of the World, "Year": 1976}
+XML Data: <root>
+            <book>"History of the World"</book>
+			<Year>1976</Year>
+		  </root>
