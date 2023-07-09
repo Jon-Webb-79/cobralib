@@ -34,8 +34,12 @@
 
   <h1>Source code for cobralib.io</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Import necessary packages here</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 
@@ -203,6 +207,225 @@
                         <span class="sa">f</span><span class="s2">&quot;Invalid </span><span class="si">{</span><span class="n">data_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_json"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search each line for the specified keyword and read the JSON data</span>
+<span class="sd">        to the right of the keyword until the termination of brackets.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :return: The JSON data as a dictionary.</span>
+<span class="sd">        :raises ValueError: If the keyword is not found or if the JSON data is not valid.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           value = reader.read_json(&quot;JSON Data:&quot;)</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">           &gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">json_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">json_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">json_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_full_json"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_full_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the entire contents of the file as JSON data.</span>
+<span class="sd">        If a keyword is provided, search for that keyword and return the nested</span>
+<span class="sd">        dictionaries beneath it.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in the file. If None,</span>
+<span class="sd">                        returns the entire JSON data.</span>
+<span class="sd">        :return: The JSON data as a dictionary or list.</span>
+<span class="sd">        :raises ValueError: If the keyword is specified but not found</span>
+<span class="sd">                            in the file.</span>
+
+<span class="sd">        Unlike the read_json method, this method assumes the entire file is</span>
+<span class="sd">        formatted as a .json file.  This method will allow a user to read</span>
+<span class="sd">        in the entire contents of the json file as a dictionary, or it</span>
+<span class="sd">        will read in the dictionaries nested under a specific key word.</span>
+<span class="sd">        If you assume the input file titled example.json has the following</span>
+<span class="sd">        format</span>
+
+<span class="sd">        .. code-block:: json</span>
+
+<span class="sd">           {</span>
+<span class="sd">            &quot;key1&quot;: &quot;value1&quot;,</span>
+<span class="sd">            &quot;key2&quot;: {</span>
+<span class="sd">                &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
+<span class="sd">                &quot;subkey2&quot;: {</span>
+<span class="sd">                    &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
+<span class="sd">                    &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
+<span class="sd">                 }</span>
+<span class="sd">              }</span>
+<span class="sd">           }</span>
+
+<span class="sd">        The code to extract data would look like:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           reader = ReadKeyWords(&quot;example.json&quot;)</span>
+<span class="sd">           value = reader.read_full_json()</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">           &gt;&gt; {</span>
+<span class="sd">               &quot;key1&quot;: &quot;value1&quot;,</span>
+<span class="sd">               &quot;key2&quot;: {</span>
+<span class="sd">                   &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
+<span class="sd">                   &quot;subkey2&quot;: {</span>
+<span class="sd">                       &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
+<span class="sd">                       &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
+<span class="sd">                   }</span>
+<span class="sd">               }</span>
+<span class="sd">           }</span>
+
+<span class="sd">           new_value = reader.read_full_json(&quot;subkey2&quot;)</span>
+<span class="sd">           print(new_value)</span>
+<span class="sd">           &gt;&gt; {&quot;subsubkey1&quot;: &quot;subsubvalue1&quot;, &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json_data</span>
+
+        <span class="k">def</span> <span class="nf">find_nested_dictionaries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">result</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">result</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the JSON data&quot;</span><span class="p">)</span></div>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_xml"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search each line for the specified keyword and read the XML data</span>
+<span class="sd">        to the right of the keyword until the termination of tags.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :return: The XML data as a dictionary.</span>
+<span class="sd">        :raises ValueError: If the keyword is not found or if the XML data is not valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">xml_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">xml_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">ParsingInterrupted</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadKeyWords.read_full_xml"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_full_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the XML data. If a keyword is provided, search for the specified</span>
+<span class="sd">        keyword in the XML data and return the nested elements beneath it.</span>
+<span class="sd">        If no keyword is provided, return the full XML data.</span>
+
+<span class="sd">        :param keyword: The keyword to search for in the XML data.</span>
+<span class="sd">        :return: The XML data as a dictionary object or the nested elements</span>
+<span class="sd">                 as an ElementTree object if a keyword is provided.</span>
+<span class="sd">        :raises ValueError: If the keyword is specified but not found in the XML data.</span>
+
+<span class="sd">        If you assume the input file titled example.xml has the following format:</span>
+
+<span class="sd">        .. code-block:: xml</span>
+
+<span class="sd">           &lt;root&gt;</span>
+<span class="sd">               &lt;key1&gt;value1&lt;/key1&gt;</span>
+<span class="sd">               &lt;key2&gt;</span>
+<span class="sd">                   &lt;subkey1&gt;subvalue1&lt;/subkey1&gt;</span>
+<span class="sd">                   &lt;subkey2&gt;</span>
+<span class="sd">                       &lt;subsubkey1&gt;subsubvalue1&lt;/subsubvalue1&gt;</span>
+<span class="sd">                       &lt;subsubkey2&gt;subsubvalue2&lt;/subsubvalue2&gt;</span>
+<span class="sd">                   &lt;/subkey2&gt;</span>
+<span class="sd">               &lt;/key2&gt;</span>
+<span class="sd">           &lt;/root&gt;</span>
+
+<span class="sd">        The code to extract data would look like:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           reader = ReadKeyWords(&quot;example.xml&quot;)</span>
+<span class="sd">           value = reader.read_full_xml()</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">           &gt;&gt; {</span>
+<span class="sd">               &quot;root&quot;: {</span>
+<span class="sd">                   &quot;key1&quot;: &quot;value1&quot;,</span>
+<span class="sd">                   &quot;key2&quot;: {</span>
+<span class="sd">                       &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
+<span class="sd">                       &quot;subkey2&quot;: {</span>
+<span class="sd">                           &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
+<span class="sd">                           &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
+<span class="sd">                       }</span>
+<span class="sd">                   }</span>
+<span class="sd">               }</span>
+<span class="sd">           }</span>
+
+<span class="sd">           new_value = reader.read_full_xml(&quot;subkey2&quot;)</span>
+<span class="sd">           print(new_value)</span>
+<span class="sd">           &gt;&gt; {</span>
+<span class="sd">               &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
+<span class="sd">               &quot;subkey2&quot;: {</span>
+<span class="sd">                   &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
+<span class="sd">                   &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
+<span class="sd">               }</span>
+<span class="sd">           }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xml_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="n">xml_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the XML data&quot;</span><span class="p">)</span></div>
     <span class="c1"># ==========================================================================================</span>
     <span class="c1"># PRIVATE-LIKE methods</span>
 

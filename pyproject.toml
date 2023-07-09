@@ -8,6 +8,7 @@ readme = "README.rst"
 [tool.poetry.dependencies]
 python = "^3.11"
 numpy = "^1.25.1"
+xmltodict = "^0.13.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -26,6 +27,7 @@ tox = "^4.6.4"
 pytest-cov = "^4.1.0"
 pyupgrade = "^3.9.0"
 pre-commit = "^3.3.3"
+sphinx = "^7.0.1"
 
 [build-system]
 requires = ["poetry-core"]

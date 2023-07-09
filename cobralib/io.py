@@ -1,6 +1,10 @@
 # Import necessary packages here
+import json
 import os
-from typing import Any
+import xml.etree.ElementTree as ET
+from typing import Any, Union
+
+import xmltodict
 
 # ==========================================================================================
 # ==========================================================================================
@@ -169,6 +173,226 @@ class ReadKeyWords:
                         f"Invalid {data_type.__name__} value found for {keyword}"
                     )
         raise ValueError(f"Keyword '{keyword}' not found in the file")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_json(self, keyword: str) -> dict:
+        """
+        Search each line for the specified keyword and read the JSON data
+        to the right of the keyword until the termination of brackets.
+
+        :param keyword: The keyword to search for in each line.
+        :return: The JSON data as a dictionary.
+        :raises ValueError: If the keyword is not found or if the JSON data is not valid.
+
+        .. code-block:: python
+
+           # Instantiate the class
+           reader = ReadKeyWords("test_key_words.txt")
+           value = reader.read_json("JSON Data:")
+           print(value)
+
+           >> {"book": "History of the World", "year": 1976}
+        """
+        found_keyword = False
+        json_data = ""
+        for line in self.__lines:
+            if line.startswith(keyword):
+                found_keyword = True
+                json_data += line.split(keyword)[-1].strip()
+                if json_data.startswith("{") and json_data.endswith("}"):
+                    try:
+                        return json.loads(json_data)
+                    except json.JSONDecodeError:
+                        raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
+
+        if not found_keyword:
+            raise ValueError(f"Keyword '{keyword}' not found in the file")
+        else:
+            raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_full_json(self, keyword: str = None) -> Union[dict, list]:
+        """
+        Read the entire contents of the file as JSON data.
+        If a keyword is provided, search for that keyword and return the nested
+        dictionaries beneath it.
+
+        :param keyword: The keyword to search for in the file. If None,
+                        returns the entire JSON data.
+        :return: The JSON data as a dictionary or list.
+        :raises ValueError: If the keyword is specified but not found
+                            in the file.
+
+        Unlike the read_json method, this method assumes the entire file is
+        formatted as a .json file.  This method will allow a user to read
+        in the entire contents of the json file as a dictionary, or it
+        will read in the dictionaries nested under a specific key word.
+        If you assume the input file titled example.json has the following
+        format
+
+        .. code-block:: json
+
+           {
+            "key1": "value1",
+            "key2": {
+                "subkey1": "subvalue1",
+                "subkey2": {
+                    "subsubkey1": "subsubvalue1",
+                    "subsubkey2": "subsubvalue2"
+                 }
+              }
+           }
+
+        The code to extract data would look like:
+
+        .. code-block:: python
+
+           reader = ReadKeyWords("example.json")
+           value = reader.read_full_json()
+           print(value)
+
+           >> {
+               "key1": "value1",
+               "key2": {
+                   "subkey1": "subvalue1",
+                   "subkey2": {
+                       "subsubkey1": "subsubvalue1",
+                       "subsubkey2": "subsubvalue2"
+                   }
+               }
+           }
+
+           new_value = reader.read_full_json("subkey2")
+           print(new_value)
+           >> {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"}
+        """
+        json_data = json.loads("\n".join(self.__lines))
+
+        if keyword is None:
+            return json_data
+
+        def find_nested_dictionaries(data, keyword):
+            if isinstance(data, dict):
+                if keyword in data:
+                    return data[keyword]
+                for value in data.values():
+                    result = find_nested_dictionaries(value, keyword)
+                    if result is not None:
+                        return result
+            elif isinstance(data, list):
+                for item in data:
+                    result = find_nested_dictionaries(item, keyword)
+                    if result is not None:
+                        return result
+            return None
+
+        result = find_nested_dictionaries(json_data, keyword)
+        if result is not None:
+            return result
+        else:
+            raise ValueError(f"Keyword '{keyword}' not found in the JSON data")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_xml(self, keyword: str) -> dict:
+        """
+        Search each line for the specified keyword and read the XML data
+        to the right of the keyword until the termination of tags.
+
+        :param keyword: The keyword to search for in each line.
+        :return: The XML data as a dictionary.
+        :raises ValueError: If the keyword is not found or if the XML data is not valid.
+        """
+        found_keyword = False
+        xml_data = ""
+        for line in self.__lines:
+            if line.startswith(keyword):
+                found_keyword = True
+                xml_data += line.split(keyword)[-1].strip()
+                if xml_data.startswith("<") and xml_data.endswith(">"):
+                    try:
+                        return xmltodict.parse(xml_data)
+                    except xmltodict.ParsingInterrupted:
+                        raise ValueError(f"Invalid XML data for keyword '{keyword}'")
+
+        if not found_keyword:
+            raise ValueError(f"Keyword '{keyword}' not found in the file")
+        else:
+            raise ValueError(f"Invalid XML data for keyword '{keyword}'")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_full_xml(self, keyword: str = None):
+        """
+        Read the XML data. If a keyword is provided, search for the specified
+        keyword in the XML data and return the nested elements beneath it.
+        If no keyword is provided, return the full XML data.
+
+        :param keyword: The keyword to search for in the XML data.
+        :return: The XML data as a dictionary object or the nested elements
+                 as an ElementTree object if a keyword is provided.
+        :raises ValueError: If the keyword is specified but not found in the XML data.
+
+        If you assume the input file titled example.xml has the following format:
+
+        .. code-block:: xml
+
+           <root>
+               <key1>value1</key1>
+               <key2>
+                   <subkey1>subvalue1</subkey1>
+                   <subkey2>
+                       <subsubkey1>subsubvalue1</subsubvalue1>
+                       <subsubkey2>subsubvalue2</subsubvalue2>
+                   </subkey2>
+               </key2>
+           </root>
+
+        The code to extract data would look like:
+
+        .. code-block:: python
+
+           reader = ReadKeyWords("example.xml")
+           value = reader.read_full_xml()
+           print(value)
+
+           >> {
+               "root": {
+                   "key1": "value1",
+                   "key2": {
+                       "subkey1": "subvalue1",
+                       "subkey2": {
+                           "subsubkey1": "subsubvalue1",
+                           "subsubkey2": "subsubvalue2"
+                       }
+                   }
+               }
+           }
+
+           new_value = reader.read_full_xml("subkey2")
+           print(new_value)
+           >> {
+               "subkey1": "subvalue1",
+               "subkey2": {
+                   "subsubkey1": "subsubvalue1",
+                   "subsubkey2": "subsubvalue2"
+               }
+           }
+        """
+        tree = ET.parse(self._file_name)
+        root = tree.getroot()
+        if keyword is None:
+            xml_string = ET.tostring(root, encoding="utf-8").decode()
+            return xmltodict.parse(xml_string)
+        else:
+            elements = root.findall(f".//{keyword}")
+            if elements:
+                xml_string = ET.tostring(elements[0], encoding="utf-8").decode()
+                return xmltodict.parse(xml_string)
+            else:
+                raise ValueError(f"Keyword '{keyword}' not found in the XML data")
 
     # ==========================================================================================
     # PRIVATE-LIKE methods

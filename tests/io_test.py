@@ -1,4 +1,6 @@
 # Import necessary packages here
+import json
+
 import numpy as np
 import pytest
 
@@ -51,12 +53,117 @@ def sample_file2(tmp_path):
     return str(file_path)
 
 
-# Insert Code here
+# ------------------------------------------------------------------------------------------
 
 
-def test_give_name_here():
-    # Add test here
-    pass
+@pytest.fixture
+def sample_file3(tmp_path):
+    file_path = tmp_path / "sample.txt"
+    file_content = (
+        "key1 value1\n"
+        "key2 value2\n"
+        "key3 value3\n"
+        "String Value: Hello World\n"
+        "JSON Data: {"
+        '"key1": "value1",'
+        '"key2": {'
+        '"subkey1": "subvalue1",'
+        '"subkey2": {'
+        '"subsubkey1": "subsubvalue1",'
+        '"subsubkey2": "subsubvalue2"'
+        "}"
+        "}"
+        "}\n"
+        "Nested JSON Data: {"
+        '"key1": "value1",'
+        '"key2": {'
+        '"subkey1": "subvalue1",'
+        '"subkey2": {'
+        '"subsubkey1": "subsubvalue1",'
+        '"subsubkey2": "subsubvalue2"'
+        "}"
+        "}"
+        "}\n"
+    )
+    file_path.write_text(file_content)
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def sample_file4(tmp_path):
+    file_path = tmp_path / "sample.json"
+    json_data = {
+        "key1": "value1",
+        "key2": {
+            "subkey1": "subvalue1",
+            "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
+        },
+    }
+    file_path.write_text(json.dumps(json_data))
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def xml_file3(tmp_path):
+    file_path = tmp_path / "sample.txt"
+    file_content = (
+        "key1 value1\n"
+        "key2 value2\n"
+        "key3 value3\n"
+        "String Value: Hello World\n"
+        "XML Data: <root>"
+        "<element1>"
+        "<subelement>Value1</subelement>"
+        "</element1>"
+        "<element2>"
+        "<subelement>Value2</subelement>"
+        "</element2>"
+        "<element3>"
+        "<subelement>Value3</subelement>"
+        "</element3>"
+        "</root>\n"
+        "Nested JSON Data: {"
+        '"key1": "value1",'
+        '"key2": {'
+        '"subkey1": "subvalue1",'
+        '"subkey2": {'
+        '"subsubkey1": "subsubvalue1",'
+        '"subsubkey2": "subsubvalue2"'
+        "}"
+        "}"
+        "}\n"
+    )
+    file_path.write_text(file_content)
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def sample_file5(tmp_path):
+    file_path = tmp_path / "sample.xml"
+    file_content = """
+        <root>
+            <element1>
+                <subelement>Value1</subelement>
+            </element1>
+            <element2>
+                <subelement>Value2</subelement>
+            </element2>
+            <element3>
+                <subelement>Value3</subelement>
+            </element3>
+        </root>
+    """
+    file_path.write_text(file_content)
+    return str(file_path)
 
 
 # ==========================================================================================
@@ -147,6 +254,107 @@ def test_read_list_existing_keyword(sample_file2):
     values = reader.read_list("Int List:", int)
     expected_values = [1, 2, 3, 4, 5]
     assert values == expected_values
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_json_variable_nested_values(sample_file3):
+    """
+    Test to ensure that the class will properly read in json data inserted after
+    a key word
+    """
+    reader = ReadKeyWords(sample_file3)
+    json_data = reader.read_json("JSON Data:")
+    expected_data = {
+        "key1": "value1",
+        "key2": {
+            "subkey1": "subvalue1",
+            "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
+        },
+    }
+    assert json_data == expected_data
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_full_json(sample_file4):
+    """
+    Ensure that the class will read in a .json file
+    """
+    reader = ReadKeyWords(sample_file4)
+    full_json = reader.read_full_json()
+    assert full_json == {
+        "key1": "value1",
+        "key2": {
+            "subkey1": "subvalue1",
+            "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
+        },
+    }
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_xml_variable_nested_values(xml_file3):
+    """
+    Test to ensure that the class will properly read in XML data inserted after
+    a keyword
+    """
+    reader = ReadKeyWords(xml_file3)
+    xml_data = reader.read_xml("XML Data:")
+    expected_data = {
+        "root": {
+            "element1": {"subelement": "Value1"},
+            "element2": {"subelement": "Value2"},
+            "element3": {"subelement": "Value3"},
+        }
+    }
+    assert xml_data == expected_data
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_xml_full_data(sample_file5):
+    """
+    Test to ensure the class can properly read in an entire XML file
+    """
+    reader = ReadKeyWords(sample_file5)
+    xml_data = reader.read_full_xml()
+    assert isinstance(xml_data, dict)
+    assert "root" in xml_data
+    root = xml_data["root"]
+    assert isinstance(root, dict)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_xml_by_keyword_existing(sample_file5):
+    """
+    Test to ensure that the class can read XML data under a specific keyword
+    """
+    reader = ReadKeyWords(sample_file5)
+    xml_data = reader.read_full_xml("element2")
+    assert isinstance(xml_data, dict)
+    assert "element2" in xml_data
+    element2 = xml_data["element2"]
+    assert isinstance(element2, dict)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_xml_by_keyword_nonexistent(sample_file5):
+    """
+    Test to ensure class fails properly when XML data is not properly formatted
+    """
+    reader = ReadKeyWords(sample_file5)
+    with pytest.raises(ValueError) as error:
+        reader.read_full_xml("nonexistent")
+    assert str(error.value) == "Keyword 'nonexistent' not found in the XML data"
 
 
 # ==========================================================================================
