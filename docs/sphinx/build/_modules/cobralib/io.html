@@ -39,8 +39,9 @@
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xmltodict</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
 
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
@@ -457,7 +458,7 @@
 <span class="c1"># READ COLUMNAR DATA</span>
 
 
-<span class="k">def</span> <span class="nf">read_csv_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_csv_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -505,6 +506,8 @@
 <span class="sd">    This file can be read via the following command</span>
 
 <span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       from cobralib.io import read_csv_columns_by_headers</span>
 
 <span class="sd">       &gt; file_name = &#39;test.csv&#39;</span>
 <span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -557,6 +560,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_csv_columns_by_headers</span>
+
 <span class="sd">       &gt; file_name = &#39;test1.csv&#39;</span>
 <span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
 <span class="sd">       &gt; dat = [int, str, float, int]</span>
@@ -572,13 +577,13 @@
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
     <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="c1"># ----------------------------------------------------------------------------</span>
 
 
-<span class="k">def</span> <span class="nf">read_csv_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_csv_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">col_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
@@ -628,6 +633,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_csv_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test.csv&#39;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -676,6 +683,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_csv_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test1.csv&#39;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -695,13 +704,13 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
         <span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<span class="k">def</span> <span class="nf">read_text_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_text_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
@@ -758,6 +767,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_text_columns_by_headers</span>
+
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
 <span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
 <span class="sd">       &gt; dat = [int, str, float, int]</span>
@@ -809,6 +820,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_text_columns_by_headers</span>
+
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
 <span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
 <span class="sd">       &gt; dat = [int, str, float, int]</span>
@@ -825,13 +838,13 @@
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
     <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="c1"># --------------------------------------------------------------------------------</span>
 
 
-<span class="k">def</span> <span class="nf">read_text_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_text_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">col_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
@@ -885,6 +898,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_text_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -937,6 +952,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_text_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -962,7 +979,7 @@
         <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span>
         <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">df</span></div>
 
 
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
@@ -1069,6 +1086,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_excel_columns_by_headers</span>
+
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &quot;primary&quot;</span>
 <span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
@@ -1150,6 +1169,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_excel_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &#39;primary&#39;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
@@ -1203,6 +1224,8 @@
 
 <span class="sd">    .. code-block:: python</span>
 
+<span class="sd">       from cobralib.io import read_excel_columns_by_index</span>
+
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &quot;primary&quot;</span>
 <span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
@@ -1232,6 +1255,51 @@
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
 
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># READ AND WRITE TO YAML</span>
+
+
+<div class="viewcode-block" id="read_yaml_file"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function can be used to read in the contents of a single yaml file, or</span>
+<span class="sd">    a yaml file with multiple documents.  In order to accomodate thea reading</span>
+<span class="sd">    of several documents, the contents are returned as a list, with each</span>
+<span class="sd">    index representing a different document.</span>
+
+<span class="sd">    :param file_name: The file name to be read including the path length</span>
+<span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
+<span class="sd">                        user prints an instance of the class. Defaulted to 50</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
+
+<span class="sd">    Example file titled test_file.yaml</span>
+
+<span class="sd">    .. literalinclude:: ../../../data/test/test_file.yaml</span>
+<span class="sd">       :language: text</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       from cobralib.io import read_yaml_file</span>
+
+<span class="sd">       data = read_yaml_file(&#39;test_file.yaml&#39;, safe=True)</span>
+<span class="sd">       print(data)</span>
+<span class="sd">       &gt;&gt; [{&#39;name&#39;: &#39;John Doe&#39;, &#39;age&#39;: 25, &#39;occupation&#39;: &#39;Developer&#39;, &#39;hobbies&#39;:</span>
+<span class="sd">          [&#39;Reading&#39;, &#39;Coding&#39;, &#39;Playing guitar&#39;]}, {&#39;name&#39;: &#39;Alice Smith&#39;,</span>
+<span class="sd">           &#39;age&#39;: 30, &#39;occupation&#39;: &#39;Designer&#39;, &#39;hobbies&#39;:</span>
+<span class="sd">           [&#39;Painting&#39;, &#39;Traveling&#39;, &#39;Hiking&#39;]}]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">safe</span><span class="p">:</span>
+                <span class="n">documents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load_all</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">documents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">doc</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">documents</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span></div>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># eof</span>

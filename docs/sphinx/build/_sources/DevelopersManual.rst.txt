@@ -25,3 +25,8 @@ The following functions can be used to read columnar data from ``.txt``, ``.csv`
 .. autofunction:: cobralib.io.read_text_columns_by_headers
 
 .. autofunction:: cobralib.io.read_text_columns_by_index
+
+YAML Files
+==========
+
+.. autofunction:: cobralib.io.read_yaml_file

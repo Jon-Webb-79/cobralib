@@ -6,6 +6,7 @@ from typing import Any, Union
 
 import pandas as pd
 import xmltodict
+import yaml
 
 # ==========================================================================================
 # ==========================================================================================
@@ -471,6 +472,8 @@ def read_csv_columns_by_headers(
 
     .. code-block:: python
 
+       from cobralib.io import read_csv_columns_by_headers
+
        > file_name = 'test.csv'
        > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
        > dat = [int, str, float, int]
@@ -521,6 +524,8 @@ def read_csv_columns_by_headers(
     This file can be read via the following command
 
     .. code-block:: python
+
+       from cobralib.io import read_csv_columns_by_headers
 
        > file_name = 'test1.csv'
        > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
@@ -593,6 +598,8 @@ def read_csv_columns_by_index(
 
     .. code-block:: python
 
+       from cobralib.io import read_csv_columns_by_index
+
        > file_name = 'test.csv'
        > headers = [0, 1, 2, 3]
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
@@ -640,6 +647,8 @@ def read_csv_columns_by_index(
     This file can be read via the following command
 
     .. code-block:: python
+
+       from cobralib.io import read_csv_columns_by_index
 
        > file_name = 'test1.csv'
        > headers = [0, 1, 2, 3]
@@ -723,6 +732,8 @@ def read_text_columns_by_headers(
 
     .. code-block:: python
 
+       from cobralib.io import read_text_columns_by_headers
+
        > file_name = 'test.txt'
        > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
        > dat = [int, str, float, int]
@@ -773,6 +784,8 @@ def read_text_columns_by_headers(
     This file can be read via the following command
 
     .. code-block:: python
+
+       from cobralib.io import read_text_columns_by_headers
 
        > file_name = 'test.txt'
        > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
@@ -850,6 +863,8 @@ def read_text_columns_by_index(
 
     .. code-block:: python
 
+       from cobralib.io import read_text_columns_by_index
+
        > file_name = 'test.txt'
        > headers = [0, 1, 2, 3]
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
@@ -901,6 +916,8 @@ def read_text_columns_by_index(
     This file can be read via the following command
 
     .. code-block:: python
+
+       from cobralib.io import read_text_columns_by_index
 
        > file_name = 'test.txt'
        > headers = [0, 1, 2, 3]
@@ -1034,6 +1051,8 @@ def read_excel_columns_by_headers(
 
     .. code-block:: python
 
+       from cobralib.io import read_excel_columns_by_headers
+
        > file_name = 'test.xls'
        > tab = "primary"
        > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
@@ -1115,6 +1134,8 @@ def read_excel_columns_by_index(
 
     .. code-block:: python
 
+       from cobralib.io import read_excel_columns_by_index
+
        > file_name = 'test.xls'
        > tab = 'primary'
        > headers = [0, 1, 2, 3]
@@ -1168,6 +1189,8 @@ def read_excel_columns_by_index(
 
     .. code-block:: python
 
+       from cobralib.io import read_excel_columns_by_index
+
        > file_name = 'test.xls'
        > tab = "primary"
        > headers = [0, 1, 2, 3]
@@ -1196,6 +1219,53 @@ def read_excel_columns_by_index(
         engine="openpyxl",
     )
     return df
+
+
+# ==========================================================================================
+# ==========================================================================================
+# READ AND WRITE TO YAML
+
+
+def read_yaml_file(file_path: str, safe: bool = False, **kwargs) -> list[Any]:
+    """
+    This function can be used to read in the contents of a single yaml file, or
+    a yaml file with multiple documents.  In order to accomodate thea reading
+    of several documents, the contents are returned as a list, with each
+    index representing a different document.  **NOTE** Under the hood, this
+    funtion is using the pyyaml library and has all of its attributes.
+
+    :param file_name: The file name to be read including the path length
+    :param print_lines: The number of lines to be printed to the screen if the
+                        user prints an instance of the class. Defaulted to 50
+    :raises FileNotFoundError: If the file does not exist
+
+    Example file titled test_file.yaml
+
+    .. literalinclude:: ../../../data/test/test_file.yaml
+       :language: text
+
+    .. code-block:: python
+
+       from cobralib.io import read_yaml_file
+
+       data = read_yaml_file('test_file.yaml', safe=True)
+       print(data)
+       >> [{'name': 'John Doe', 'age': 25, 'occupation': 'Developer', 'hobbies':
+          ['Reading', 'Coding', 'Playing guitar']}, {'name': 'Alice Smith',
+           'age': 30, 'occupation': 'Designer', 'hobbies':
+           ['Painting', 'Traveling', 'Hiking']}]
+
+    """
+
+    try:
+        with open(file_path) as file:
+            if safe:
+                documents = list(yaml.safe_load_all(file, **kwargs))
+            else:
+                documents = list(yaml.load_all(file, Loader=yaml.Loader, **kwargs))
+        return [doc for sublist in documents for doc in sublist]
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File '{file_path}' not found.")
 
 
 # ==========================================================================================

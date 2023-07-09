@@ -14,6 +14,7 @@ from cobralib.io import (
     read_excel_columns_by_index,
     read_text_columns_by_headers,
     read_text_columns_by_index,
+    read_yaml_file,
 )
 
 # ==========================================================================================
@@ -536,6 +537,29 @@ def test_read_excel_columns_by_index(excel_file):
     }
     expected_df = pd.DataFrame(expected_data)
     assert df.equals(expected_df)
+
+
+# ==========================================================================================
+# ==========================================================================================
+# TEST READ AND WRITE TO YAML FILES
+
+
+def test_yaml_file_reader():
+    # Test safe_load=True
+    reader = read_yaml_file("../data/test/test_file.yaml", safe=True)
+    # Access variables from the first document
+    document1 = reader[0]
+    assert document1["name"] == "John Doe"
+    assert document1["age"] == 25
+    assert document1["occupation"] == "Developer"
+    assert document1["hobbies"] == ["Reading", "Coding", "Playing guitar"]
+
+    # Access variables from the second document
+    document2 = reader[1]
+    assert document2["name"] == "Alice Smith"
+    assert document2["age"] == 30
+    assert document2["occupation"] == "Designer"
+    assert document2["hobbies"] == ["Painting", "Traveling", "Hiking"]
 
 
 # ==========================================================================================

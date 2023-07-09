@@ -1160,7 +1160,7 @@ tokenize-rt = ">=3.2.0"
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1562,4 +1562,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e3b86dbac2122cb2fdb648ad602bc1e79a4760995c40bf3493f640b70f3effc8"
+content-hash = "7725afabd1783a8f65915ff94d2a2529f3bc11d289013bf5ed89b72869d0e44b"
