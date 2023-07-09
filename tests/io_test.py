@@ -1,9 +1,12 @@
 # Import necessary packages here
 import json
+import os
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 from openpyxl import Workbook
 
 from cobralib.io import (
@@ -15,6 +18,7 @@ from cobralib.io import (
     read_text_columns_by_headers,
     read_text_columns_by_index,
     read_yaml_file,
+    write_yaml_file,
 )
 
 # ==========================================================================================
@@ -228,6 +232,14 @@ def excel_file(tmp_path):
         sheet.append(row)
     workbook.save(file_path)
     return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def data():
+    return {"name": "Alice", "age": 30}
 
 
 # ==========================================================================================
@@ -560,6 +572,35 @@ def test_yaml_file_reader():
     assert document2["age"] == 30
     assert document2["occupation"] == "Designer"
     assert document2["hobbies"] == ["Painting", "Traveling", "Hiking"]
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_append_yaml_file(data):
+    with TemporaryDirectory() as temp_dir:
+        file_path = os.path.join(temp_dir, "output.yaml")
+
+        write_yaml_file(file_path, data)
+
+        more_data = {"name": "Bob", "age": 35}
+        write_yaml_file(file_path, more_data, append=True)
+
+        with open(file_path) as file:
+            file_data = list(yaml.safe_load_all(file))
+
+        expected_data = []
+        expected_data.append(data)
+        expected_data.append(more_data)
+        assert file_data == expected_data
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_write_yaml_file_nonexistent(data):
+    file_path = "/path/to/nonexistent/output.yaml"
+    pytest.raises(FileNotFoundError, write_yaml_file, file_path, data, append=True)
 
 
 # ==========================================================================================

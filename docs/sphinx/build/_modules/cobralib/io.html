@@ -1266,7 +1266,8 @@
 <span class="sd">    This function can be used to read in the contents of a single yaml file, or</span>
 <span class="sd">    a yaml file with multiple documents.  In order to accomodate thea reading</span>
 <span class="sd">    of several documents, the contents are returned as a list, with each</span>
-<span class="sd">    index representing a different document.</span>
+<span class="sd">    index representing a different document.  **NOTE** Under the hood, this</span>
+<span class="sd">    funtion is using the pyyaml library and has all of its attributes.</span>
 
 <span class="sd">    :param file_name: The file name to be read including the path length</span>
 <span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
@@ -1300,6 +1301,50 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">doc</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">documents</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="write_yaml_file"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.write_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">write_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write or append data to a YAML file.</span>
+
+<span class="sd">    :param file_path: The path of the YAML file</span>
+<span class="sd">    :param data: The data to be written or appended as a dictionary</span>
+<span class="sd">    :param append: True to append data to the file, False to overwrite</span>
+<span class="sd">                   the file or create a new one (default: False)</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist in append mode</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       from corbalib.io import write_yaml_file</span>
+
+<span class="sd">       dict_file = {&#39;sports&#39; : [&#39;soccer&#39;, &#39;football&#39;, &#39;basketball&#39;,</span>
+<span class="sd">                    &#39;cricket&#39;, &#39;hockey&#39;, &#39;table tennis&#39;]},</span>
+<span class="sd">                    {&#39;countries&#39; : [&#39;Pakistan&#39;, &#39;USA&#39;, &#39;India&#39;,</span>
+<span class="sd">                    &#39;China&#39;, &#39;Germany&#39;, &#39;France&#39;, &#39;Spain&#39;]}</span>
+<span class="sd">       # Create new yaml file</span>
+<span class="sd">       write_yaml_file(&#39;new_file.yaml&#39;, data, dict_file, append=False)</span>
+
+<span class="sd">    This will create a file titled new_file.yaml with the following contents</span>
+
+<span class="sd">    .. literalinclude:: ../../../data/test/output.yaml</span>
+<span class="sd">       :language: text</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">append</span> <span class="k">else</span> <span class="s1">&#39;w&#39;</span>
+
+    <span class="k">if</span> <span class="n">append</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;---</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># Add YAML document separator</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error writing to file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># eof</span>

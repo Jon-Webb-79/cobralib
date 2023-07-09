@@ -30,3 +30,5 @@ YAML Files
 ==========
 
 .. autofunction:: cobralib.io.read_yaml_file
+
+.. autofunction:: cobralib.io.write_yaml_file

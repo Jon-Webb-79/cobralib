@@ -1268,6 +1268,50 @@ def read_yaml_file(file_path: str, safe: bool = False, **kwargs) -> list[Any]:
         raise FileNotFoundError(f"File '{file_path}' not found.")
 
 
+# ------------------------------------------------------------------------------------------
+
+
+def write_yaml_file(file_path: str, data: dict, append: bool = False) -> None:
+    """
+    Write or append data to a YAML file.
+
+    :param file_path: The path of the YAML file
+    :param data: The data to be written or appended as a dictionary
+    :param append: True to append data to the file, False to overwrite
+                   the file or create a new one (default: False)
+    :raises FileNotFoundError: If the file does not exist in append mode
+
+    .. code-block:: python
+
+       from corbalib.io import write_yaml_file
+
+       dict_file = {'sports' : ['soccer', 'football', 'basketball',
+                    'cricket', 'hockey', 'table tennis']},
+                    {'countries' : ['Pakistan', 'USA', 'India',
+                    'China', 'Germany', 'France', 'Spain']}
+       # Create new yaml file
+       write_yaml_file('new_file.yaml', data, dict_file, append=False)
+
+    This will create a file titled new_file.yaml with the following contents
+
+    .. literalinclude:: ../../../data/test/output.yaml
+       :language: text
+
+    """
+    mode = "a" if append else "w"
+
+    if append and not os.path.exists(file_path):
+        raise FileNotFoundError(f"File '{file_path}' not found.")
+
+    try:
+        with open(file_path, mode) as file:
+            if append:
+                file.write("---\n")  # Add YAML document separator
+            yaml.safe_dump(data, file)
+    except OSError as e:
+        print(f"Error writing to file: {e}")
+
+
 # ==========================================================================================
 # ==========================================================================================
 # eof

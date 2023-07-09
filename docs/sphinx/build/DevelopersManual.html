@@ -956,7 +956,8 @@ headers are not on the first line.  For instance, assume the following csv file;
 <dd><p>This function can be used to read in the contents of a single yaml file, or
 a yaml file with multiple documents.  In order to accomodate thea reading
 of several documents, the contents are returned as a list, with each
-index representing a different document.</p>
+index representing a different document.  <strong>NOTE</strong> Under the hood, this
+funtion is using the pyyaml library and has all of its attributes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1001,6 +1002,55 @@ user prints an instance of the class. Defaulted to 50</p></li>
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="cobralib.io.write_yaml_file">
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">write_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#write_yaml_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.write_yaml_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write or append data to a YAML file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – The path of the YAML file</p></li>
+<li><p><strong>data</strong> – The data to be written or appended as a dictionary</p></li>
+<li><p><strong>append</strong> – True to append data to the file, False to overwrite
+the file or create a new one (default: False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist in append mode</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">corbalib.io</span> <span class="kn">import</span> <span class="n">write_yaml_file</span>
+
+<span class="n">dict_file</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sports&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;soccer&#39;</span><span class="p">,</span> <span class="s1">&#39;football&#39;</span><span class="p">,</span> <span class="s1">&#39;basketball&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;cricket&#39;</span><span class="p">,</span> <span class="s1">&#39;hockey&#39;</span><span class="p">,</span> <span class="s1">&#39;table tennis&#39;</span><span class="p">]},</span>
+             <span class="p">{</span><span class="s1">&#39;countries&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Pakistan&#39;</span><span class="p">,</span> <span class="s1">&#39;USA&#39;</span><span class="p">,</span> <span class="s1">&#39;India&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;China&#39;</span><span class="p">,</span> <span class="s1">&#39;Germany&#39;</span><span class="p">,</span> <span class="s1">&#39;France&#39;</span><span class="p">,</span> <span class="s1">&#39;Spain&#39;</span><span class="p">]}</span>
+<span class="c1"># Create new yaml file</span>
+<span class="n">write_yaml_file</span><span class="p">(</span><span class="s1">&#39;new_file.yaml&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dict_file</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will create a file titled new_file.yaml with the following contents</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>- sports:
+
+  - soccer
+  - football
+  - basketball
+  - cricket
+  - hockey
+  - table tennis
+- countries:
+
+  - Pakistan
+  - USA
+  - India
+  - China
+  - Germany
+  - France
+  - Spain
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 </section>
 
@@ -1037,6 +1087,7 @@ user prints an instance of the class. Defaulted to 50</p></li>
 </li>
 <li><a class="reference internal" href="#yaml-files">YAML Files</a><ul>
 <li><a class="reference internal" href="#cobralib.io.read_yaml_file"><code class="docutils literal notranslate"><span class="pre">read_yaml_file()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.write_yaml_file"><code class="docutils literal notranslate"><span class="pre">write_yaml_file()</span></code></a></li>
 </ul>
 </li>
 </ul>
