@@ -9,6 +9,7 @@ readme = "README.rst"
 python = "^3.11"
 numpy = "^1.25.1"
 xmltodict = "^0.13.0"
+pandas = "^2.0.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -28,6 +29,7 @@ pytest-cov = "^4.1.0"
 pyupgrade = "^3.9.0"
 pre-commit = "^3.3.3"
 sphinx = "^7.0.1"
+openpyxl = "^3.1.2"
 
 [build-system]
 requires = ["poetry-core"]

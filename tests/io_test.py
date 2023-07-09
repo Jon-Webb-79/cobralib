@@ -2,9 +2,19 @@
 import json
 
 import numpy as np
+import pandas as pd
 import pytest
+from openpyxl import Workbook
 
-from cobralib.io import ReadKeyWords
+from cobralib.io import (
+    ReadKeyWords,
+    read_csv_columns_by_headers,
+    read_csv_columns_by_index,
+    read_excel_columns_by_headers,
+    read_excel_columns_by_index,
+    read_text_columns_by_headers,
+    read_text_columns_by_index,
+)
 
 # ==========================================================================================
 # ==========================================================================================
@@ -163,6 +173,59 @@ def sample_file5(tmp_path):
         </root>
     """
     file_path.write_text(file_content)
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def csv_file(tmp_path):
+    file_path = tmp_path / "test.csv"
+    file_content = """ID,Inventory,Weight_per,Number
+                      1,Shoes,1.5,5
+                      2,t-shirt,1.8,3
+                      3,coffee,2.1,15
+                      4,books,3.2,48"""
+    file_path.write_text(file_content)
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def text_file(tmp_path):
+    file_path = tmp_path / "test.txt"
+    file_content = """ID Inventory Weight_per Number
+                     1 Shoes 1.5 5
+                     2 t-shirt 1.8 3
+                     3 coffee 2.1 15
+                     4 books 3.2 48"""
+    file_path.write_text(file_content)
+    return str(file_path)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def excel_file(tmp_path):
+    file_path = tmp_path / "test.xlsx"
+    headers = ["ID", "Inventory", "Weight_per", "Number"]
+    data = [
+        [1, "Shoes", 1.5, 5],
+        [2, "T-shirt", 1.8, 3],
+        [3, "coffee", 2.1, 15],
+        [4, "books", 3.2, 48],
+    ]
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "primary"
+    sheet.append(headers)
+    for row in data:
+        sheet.append(row)
+    workbook.save(file_path)
     return str(file_path)
 
 
@@ -355,6 +418,124 @@ def test_read_xml_by_keyword_nonexistent(sample_file5):
     with pytest.raises(ValueError) as error:
         reader.read_full_xml("nonexistent")
     assert str(error.value) == "Keyword 'nonexistent' not found in the XML data"
+
+
+# ==========================================================================================
+# ==========================================================================================
+# TEST READ COLUMNAR DATA
+
+
+def test_read_csv_columns_by_headers(csv_file):
+    """
+    Test the read_csv_columns_by_headers function to ensure it properly reads in data
+    """
+    headers = ["ID", "Inventory", "Weight_per", "Number"]
+    data_type = [int, str, float, int]
+    df = read_csv_columns_by_headers(csv_file, headers, data_type)
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_csv_columns_by_index(csv_file):
+    """
+    Test the read_csv_columns_by_index function to ensure it properly reads in data
+    """
+    col_index = [0, 1, 2, 3]
+    data_type = [int, str, float, int]
+    col_names = ["ID", "Inventory", "Weight_per", "Number"]
+    df = read_csv_columns_by_index(csv_file, col_index, data_type, col_names, skip=1)
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_text_columns_by_headers(text_file):
+    headers = ["ID", "Inventory", "Weight_per", "Number"]
+    data_type = [int, str, float, int]
+    df = read_text_columns_by_headers(text_file, headers, data_type)
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_text_columns_by_index(text_file):
+    col_index = [0, 1, 2, 3]
+    data_type = [int, str, float, int]
+    col_names = ["ID", "Inventory", "Weight_per", "Number"]
+    df = read_text_columns_by_index(text_file, col_index, data_type, col_names, skip=1)
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_excel_columns_by_headers(excel_file):
+    #  excel_file = "../data/test/test.xlsx"
+    tab = "primary"
+    headers = ["ID", "Inventory", "Weight_per", "Number"]
+    data_type = [int, str, float, int]
+    df = read_excel_columns_by_headers(excel_file, tab, headers, data_type)
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "T-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_read_excel_columns_by_index(excel_file):
+    tab = "primary"
+    col_index = [0, 1, 2, 3]
+    col_names = ["ID", "Inventory", "Weight_per", "Number"]
+    data_type = [int, str, float, int]
+    df = read_excel_columns_by_index(
+        excel_file, tab, col_index, col_names, data_type, skip=1
+    )
+    expected_data = {
+        "ID": [1, 2, 3, 4],
+        "Inventory": ["Shoes", "T-shirt", "coffee", "books"],
+        "Weight_per": [1.5, 1.8, 2.1, 3.2],
+        "Number": [5, 3, 15, 48],
+    }
+    expected_df = pd.DataFrame(expected_data)
+    assert df.equals(expected_df)
 
 
 # ==========================================================================================
