@@ -42,3 +42,11 @@ to truncate a log file to a user specified number of log values.
 
 .. autoclass:: cobralib.io.Logger
    :members:
+
+Databases
+=========
+The cobralib module comes with serveral classes that can be used to connect with and
+query relational databases.
+
+.. autoclass:: cobralib.io.MySQLDB
+   :members:

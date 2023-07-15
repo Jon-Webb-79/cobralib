@@ -22,6 +22,8 @@ from cobralib.io import (
     write_yaml_file,
 )
 
+# from unittest.mock import MagicMock, patch
+
 # ==========================================================================================
 # ==========================================================================================
 # File:    test.py
@@ -243,8 +245,7 @@ def data():
     return {"name": "Alice", "age": 30}
 
 
-# ==========================================================================================
-# ==========================================================================================
+# ------------------------------------------------------------------------------------------
 
 
 @pytest.fixture(autouse=True)
@@ -254,6 +255,26 @@ def run_around_tests():
     # Code that will run after your test, for example:
     if os.path.exists("test.log"):
         os.remove("test.log")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+# @pytest.fixture(scope="module")
+# def mysql_connection():
+#     # Mock the MySQLDB class and its connection
+#     with patch("cobralib.io.MySQLDB._create_connection") as mock_connect:
+#         mock_connection = mock_connect.return_value
+#         # Initialize the mocked database connection
+#         db = MySQLDB(
+#             username="your_username",
+#             password="your_password",
+#             port=3306,
+#             hostname="localhost",
+#         )
+#         yield db
+#         # Teardown - close the connection
+#         db.close_connection()
 
 
 # ==========================================================================================
@@ -655,6 +676,52 @@ def test_logger_log_trimming():
         assert "Test message 10" in log_lines[0]  # Messages before 10 should be trimmed
 
 
+# ==========================================================================================
+# ==========================================================================================
+
+
+# def test_mysql_connection(mysql_connection):
+#     # Check if the connection is established
+#     assert mysql_connection.conn.is_connected()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+# def test_change_mysql_db(mysql_connection):
+#     # Set up
+#     new_db_name = 'new_database'
+
+#     # Act
+#     mysql_connection.change_db(new_db_name)
+
+#     # Assert
+#     assert mysql_connection.database == new_db_name
+
+
+# ------------------------------------------------------------------------------------------
+
+
+# def test_get_mysql_databases():
+#    pass
+# with patch.object(MySQLDB, "_create_connection"):
+#     # Initialize MySQLDB instance
+#     db_instance = MySQLDB('username', 'password', '3306', 'localhost')
+#     # Create a mock cursor
+#     mock_cursor = MagicMock()
+#     # Use setattr to add the cursor attribute to db_instance
+#     setattr(db_instance, 'conn', mock_cursor)
+
+#     # Mock the return values for execute and fetchall
+#     mock_cursor.execute.return_value = None
+#     mock_cursor.fetchall.return_value = [('database1',), ('database2',),
+#                                          ('database3',)]
+
+#     # Call get_databases and check the returned list of databases
+#     databases = db_instance.get_databases()
+#     assert isinstance(databases, list)
+#     assert len(databases) == 3
+#     assert set(databases) == {'database1', 'database2', 'database3'}
 # ==========================================================================================
 # ==========================================================================================
 # eof

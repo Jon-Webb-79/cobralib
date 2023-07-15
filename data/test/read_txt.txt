@@ -1,0 +1,5 @@
+Product Inventory
+Apples 5
+Banana 12
+Cucumber 20
+Peach 3
