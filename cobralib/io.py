@@ -1416,6 +1416,9 @@ class Logger:
 class MySQLDB:
     """
     A class for connecting to MySQL databases using mysql-connector-python.
+    The user can access the conn and cur variables, where conn is the
+    connection variable and cur is the connection.cursor() method to
+    expand the capability of this class beyond its methods.
 
     :param username: The username for the database connection.
     :param password: The password for the database connection.
@@ -1423,6 +1426,9 @@ class MySQLDB:
     :param hostname: The hostname for the database connection
                      (default is 'localhost').
     :raises ConnectionError: If a connection can not be established
+    :ivar conn: The connection attribute of the mysql-connector-python module.
+    :ivar cur: The cursor method for the mysql-connector-python module.
+    :ivar database: The name of the database currently being used.
     """
 
     def __init__(self, username, password, port=3306, hostname="localhost"):
@@ -1432,7 +1438,7 @@ class MySQLDB:
         self.hostname = hostname
         self.database = None
         self.conn = None
-        self.connection = None
+        self.cur = None
 
         self._create_connection(password)
 
@@ -1647,6 +1653,9 @@ class MySQLDB:
     def query_db(self, query: str, params: tuple = ()) -> pd.DataFrame:
         """
         Execute a query with placeholders and return the result as a Pandas DataFrame.
+        The user of this class should ensure that when applicable they parameteratize
+        the inputs to this method to minimize the potential for an injection
+        attack
 
         :param query: The query with placeholders.
         :param params: The values to be substituted into the placeholders

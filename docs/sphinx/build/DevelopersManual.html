@@ -375,14 +375,12 @@ to the right of the keyword until the termination of tags.</p>
 <code class="docutils literal notranslate"><span class="pre">.xls</span></code>, and <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> files.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_csv_columns_by_headers">
-<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_csv_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_csv_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_csv_columns_by_headers" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_csv_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_csv_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_csv_columns_by_headers" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> – The file name to include path-link</p></li>
-<li><p><strong>headers</strong> – A list of the names of the headers that contain
-columns which will be read</p></li>
-<li><p><strong>data_type</strong> – A list containing the data type of each column.  Data
+<li><p><strong>headers</strong> – A dictionary of column names and their data types.
 types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
 <li><p><strong>skip</strong> – The number of lines to be skipped before reading data</p></li>
@@ -441,9 +439,8 @@ Assume we have a .csv file titled <code class="docutils literal notranslate"><sp
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_csv_columns_by_headers</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.csv&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="o">.</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -504,9 +501,8 @@ headers are not on the first line.  For instance, assume the following csv file;
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_csv_columns_by_headers</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test1.csv&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -519,14 +515,12 @@ headers are not on the first line.  For instance, assume the following csv file;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_csv_columns_by_index">
-<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_csv_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_csv_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_csv_columns_by_index" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_csv_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_csv_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_csv_columns_by_index" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> – The file name to include path-link</p></li>
-<li><p><strong>col_index</strong> – A list of the columns to be read by number,
-starting with column 0 as the far left column</p></li>
-<li><p><strong>data_type</strong> – A list containing the data type of each column.  Data
+<li><p><strong>headers</strong> – A dictionary of column index and their data types.
 types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
 <li><p><strong>col_names</strong> – A list containing the names to be given to
@@ -580,10 +574,9 @@ file titled <code class="docutils literal notranslate"><span class="pre">test.cs
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_csv_columns_by_index</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.csv&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
 <span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -639,11 +632,10 @@ headers are not on the first line.  For instance, assume the following csv file;
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_csv_columns_by_index</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test1.csv&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+ <span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
 <span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
 <span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span>
-                                 <span class="n">dat</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                 <span class="n">names</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -656,14 +648,12 @@ headers are not on the first line.  For instance, assume the following csv file;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_text_columns_by_headers">
-<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_text_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\s+'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_text_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_text_columns_by_headers" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_text_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\s+'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_text_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_text_columns_by_headers" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> – The file name to include path-link</p></li>
-<li><p><strong>headers</strong> – A list of the names of the headers that contain
-columns which will be read</p></li>
-<li><p><strong>data_type</strong> – A list containing the data type of each column.  Data
+<li><p><strong>headers</strong> – A dictionary of column names and their data types.
 types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
 <li><p><strong>skip</strong> – The number of lines to be skipped before reading data</p></li>
@@ -726,9 +716,8 @@ format.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_text_columns_by_headers</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.txt&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -789,10 +778,8 @@ headers are not on the first line.  For instance, assume the following csv file;
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_text_columns_by_headers</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.txt&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span>
-                                    <span class="n">dat</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -805,14 +792,12 @@ headers are not on the first line.  For instance, assume the following csv file;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_text_columns_by_index">
-<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_text_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\s+'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_text_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_text_columns_by_index" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_text_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\s+'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_text_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_text_columns_by_index" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> – The file name to include path-link</p></li>
-<li><p><strong>col_index</strong> – A list of the columns to be read by number,
-starting with column 0 as the far left column</p></li>
-<li><p><strong>data_type</strong> – A list containing the data type of each column.  Data
+<li><p><strong>headers</strong> – A dictionary of column index` and their data types.
 types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
 <li><p><strong>col_names</strong> – A list containing the names to be given to
@@ -868,10 +853,9 @@ should be a .csv file extension.</p></li>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_text_columns_by_index</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.txt&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -932,11 +916,10 @@ headers are not on the first line.  For instance, assume the following csv file;
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_text_columns_by_index</span>
 
 <span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.txt&#39;</span>
-<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
 <span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
-<span class="o">&gt;</span> <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
 <span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_text_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span>
-                                 <span class="n">dat</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                  <span class="n">names</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
  <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
@@ -1124,7 +1107,10 @@ query relational databases.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.MySQLDB">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">MySQLDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3306</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'localhost'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class for connecting to MySQL databases using mysql-connector-python.</p>
+<dd><p>A class for connecting to MySQL databases using mysql-connector-python.
+The user can access the conn and cur variables, where conn is the
+connection variable and cur is the connection.cursor() method to
+expand the capability of this class beyond its methods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1137,6 +1123,13 @@ query relational databases.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ConnectionError</strong> – If a connection can not be established</p>
+</dd>
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conn</strong> – The connection attribute of the mysql-connector-python module.</p></li>
+<li><p><strong>cur</strong> – The cursor method for the mysql-connector-python module.</p></li>
+<li><p><strong>database</strong> – The name of the database currently being used.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -1171,7 +1164,7 @@ query relational databases.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>txt_file</strong> – The path to the CSV file.</p></li>
+<li><p><strong>txt_file</strong> – The path to the CSV file or TXT file.</p></li>
 <li><p><strong>table_name</strong> – The name of the table.</p></li>
 <li><p><strong>txt_columns</strong> – The names of the columns in the TXT file.</p></li>
 <li><p><strong>table_columns</strong> – The names of the columns in the table (default is None,
@@ -1280,8 +1273,71 @@ a table with no entries that has columns for <code class="docutils literal notra
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_columns">
-<span class="sig-name descname"><span class="pre">get_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_columns" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_db_tables">
+<span class="sig-name descname"><span class="pre">get_db_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_db_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_db_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the names of all tables within the current database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db</strong> – Database name, defaulted to currently selected database or None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas dataframe of table names with a header of Tables</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If no database is currently selected.</p></li>
+<li><p><strong>ConnectionError</strong> – If program is not able to get tables</p></li>
+</ul>
+</dd>
+</dl>
+<p>Assuming the user has a database titled <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> which had the
+tables <code class="docutils literal notranslate"><span class="pre">Names</span></code>, <code class="docutils literal notranslate"><span class="pre">Product</span></code>, <code class="docutils literal notranslate"><span class="pre">Sales</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_db_tables</span><span class="p">(</span><span class="s2">&quot;Inventory&quot;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Tables</span>
+   <span class="mi">0</span>      <span class="n">Names</span>
+   <span class="mi">1</span>      <span class="n">Product</span>
+   <span class="mi">2</span>      <span class="n">Sales</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_dbs">
+<span class="sig-name descname"><span class="pre">get_dbs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_dbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_dbs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the names of all databases available to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas dataframe of database names with a header of Databases</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If program fails to retrive database</p>
+</dd>
+</dl>
+<p>If you assume the server has three databases available to the username, and
+those databases were <code class="docutils literal notranslate"><span class="pre">Inventory</span></code>, <code class="docutils literal notranslate"><span class="pre">Address</span></code>, <code class="docutils literal notranslate"><span class="pre">project_data</span></code>, you
+could use this class with the following commands.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_dbs</span><span class="p">()</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Databases</span>
+   <span class="mi">0</span>      <span class="n">Address</span>
+   <span class="mi">1</span>      <span class="n">Inventory</span>
+   <span class="mi">2</span>      <span class="n">project_data</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_table_columns">
+<span class="sig-name descname"><span class="pre">get_table_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_table_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_table_columns" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Retrieve the names and data types of the columns within the specified table.</p>
 <dl class="field-list simple">
@@ -1348,72 +1404,12 @@ into a database</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_db_tables">
-<span class="sig-name descname"><span class="pre">get_db_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_db_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_db_tables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the names of all tables within the current database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db</strong> – Database name, defaulted to currently selected database or None</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pandas dataframe of table names with a header of Tables</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ValueError</strong> – If no database is currently selected.</p></li>
-<li><p><strong>ConnectionError</strong> – If program is not able to get tables</p></li>
-</ul>
-</dd>
-</dl>
-<p>Assuming the user has a database titled <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> which had the
-tables <code class="docutils literal notranslate"><span class="pre">Names</span></code>, <code class="docutils literal notranslate"><span class="pre">Product</span></code>, <code class="docutils literal notranslate"><span class="pre">Sales</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
-
-<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_db_tables</span><span class="p">(</span><span class="s2">&quot;Inventory&quot;</span><span class="p">)</span>
-<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Tables</span>
-   <span class="mi">0</span>      <span class="n">Names</span>
-   <span class="mi">1</span>      <span class="n">Product</span>
-   <span class="mi">2</span>      <span class="n">Sales</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.MySQLDB.get_dbs">
-<span class="sig-name descname"><span class="pre">get_dbs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.get_dbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.get_dbs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the names of all databases available to the user.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A pandas dataframe of database names with a header of Databases</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ConnectionError</strong> – If program fails to retrive database</p>
-</dd>
-</dl>
-<p>If you assume the server has three databases available to the username, and
-those databases were <code class="docutils literal notranslate"><span class="pre">Inventory</span></code>, <code class="docutils literal notranslate"><span class="pre">Address</span></code>, <code class="docutils literal notranslate"><span class="pre">project_data</span></code>, you
-could use this class with the following commands.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
-
-<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_dbs</span><span class="p">()</span>
-<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Databases</span>
-   <span class="mi">0</span>      <span class="n">Address</span>
-   <span class="mi">1</span>      <span class="n">Inventory</span>
-   <span class="mi">2</span>      <span class="n">project_data</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cobralib.io.MySQLDB.query_db">
 <span class="sig-name descname"><span class="pre">query_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#MySQLDB.query_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.MySQLDB.query_db" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute a query with placeholders and return the result as a Pandas DataFrame.</p>
+<dd><p>Execute a query with placeholders and return the result as a Pandas DataFrame.
+The user of this class should ensure that when applicable they parameteratize
+the inputs to this method to minimize the potential for an injection
+attack</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1513,9 +1509,9 @@ could use this class with the following commands.</p>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.close_conn"><code class="docutils literal notranslate"><span class="pre">MySQLDB.close_conn()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.csv_to_table"><code class="docutils literal notranslate"><span class="pre">MySQLDB.csv_to_table()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.excel_to_table"><code class="docutils literal notranslate"><span class="pre">MySQLDB.excel_to_table()</span></code></a></li>
-<li><a class="reference internal" href="#cobralib.io.MySQLDB.get_columns"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_columns()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.get_db_tables"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_db_tables()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.get_dbs"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_dbs()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.MySQLDB.get_table_columns"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_table_columns()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.MySQLDB.query_db"><code class="docutils literal notranslate"><span class="pre">MySQLDB.query_db()</span></code></a></li>
 </ul>
 </li>

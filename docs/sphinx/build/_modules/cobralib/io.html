@@ -38,17 +38,22 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">logging.handlers</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">mysql.connector</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DatabaseError</span><span class="p">,</span>
+    <span class="n">Error</span><span class="p">,</span>
+    <span class="n">InterfaceError</span><span class="p">,</span>
+    <span class="n">ProgrammingError</span><span class="p">,</span>
+    <span class="n">connect</span><span class="p">,</span>
+<span class="p">)</span>
 
-
-<span class="kn">import</span> <span class="nn">mysql.connector</span>
-<span class="kn">from</span> <span class="nn">mysql.connector</span> <span class="kn">import</span> <span class="n">connect</span><span class="p">,</span> <span class="n">Error</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 
@@ -465,16 +470,14 @@
 
 
 <div class="viewcode-block" id="read_csv_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_headers</span><span class="p">(</span>
-    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param file_name: The file name to include path-link</span>
-<span class="sd">    :param headers: A list of the names of the headers that contain</span>
-<span class="sd">                    columns which will be read</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
+<span class="sd">    :param headers: A dictionary of column names and their data types.</span>
+<span class="sd">                    types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                    and ``str``</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
 <span class="sd">    :return df: A pandas dataframe containing all relevant information</span>
 <span class="sd">    :raises FileNotFoundError: If the file is found to not exist</span>
@@ -516,9 +519,8 @@
 <span class="sd">       from cobralib.io import read_csv_columns_by_headers</span>
 
 <span class="sd">       &gt; file_name = &#39;test.csv&#39;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_csv_columns_by_headers(file_name, headers, dat)</span>
+<span class="sd">       &gt; headers = {&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float. &#39;Number&#39;: int}</span>
+<span class="sd">       &gt; df = read_csv_columns_by_headers(file_name, headers)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -569,9 +571,8 @@
 <span class="sd">       from cobralib.io import read_csv_columns_by_headers</span>
 
 <span class="sd">       &gt; file_name = &#39;test1.csv&#39;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_csv_columns_by_headers(file_name, headers, dat, skip=2)</span>
+<span class="sd">       &gt; headers = {&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float, &#39;Number&#39;: int}</span>
+<span class="sd">       &gt; df = read_csv_columns_by_headers(file_name, headers, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -581,8 +582,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">head</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
@@ -591,18 +592,15 @@
 
 <div class="viewcode-block" id="read_csv_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">col_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-    <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param file_name: The file name to include path-link</span>
-<span class="sd">    :param col_index: A list of the columns to be read by number,</span>
-<span class="sd">                      starting with column 0 as the far left column</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
+<span class="sd">    :param headers: A dictionary of column index and their data types.</span>
+<span class="sd">                    types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                    and ``str``</span>
 <span class="sd">    :param col_names: A list containing the names to be given to</span>
 <span class="sd">                      each column</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
@@ -642,10 +640,9 @@
 <span class="sd">       from cobralib.io import read_csv_columns_by_index</span>
 
 <span class="sd">       &gt; file_name = &#39;test.csv&#39;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
+<span class="sd">       &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_csv_columns_by_index(file_name, headers, dat, names)</span>
+<span class="sd">       &gt; df = read_csv_columns_by_index(file_name, headers, names)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -692,11 +689,10 @@
 <span class="sd">       from cobralib.io import read_csv_columns_by_index</span>
 
 <span class="sd">       &gt; file_name = &#39;test1.csv&#39;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
+<span class="sd">        &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
 <span class="sd">       &gt; df = read_csv_columns_by_index(file_name, headers,</span>
-<span class="sd">                                        dat, names, skip=2)</span>
+<span class="sd">                                        names, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -706,9 +702,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">col_index</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
+    <span class="n">col_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-        <span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span>
+        <span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
@@ -718,19 +714,16 @@
 
 <div class="viewcode-block" id="read_text_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param file_name: The file name to include path-link</span>
-<span class="sd">    :param headers: A list of the names of the headers that contain</span>
-<span class="sd">                    columns which will be read</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
+<span class="sd">    :param headers: A dictionary of column names and their data types.</span>
+<span class="sd">                    types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                    and ``str``</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
 <span class="sd">    :param delimiter: The type of delimiter separating data in the text file.</span>
 <span class="sd">                Defaulted to space delimited, where a space is one or</span>
@@ -776,9 +769,8 @@
 <span class="sd">       from cobralib.io import read_text_columns_by_headers</span>
 
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_text_columns_by_headers(file_name, headers, dat)</span>
+<span class="sd">       &gt; headers = {&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float, &#39;Number&#39;: int}</span>
+<span class="sd">       &gt; df = read_text_columns_by_headers(file_name, headers)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -829,10 +821,8 @@
 <span class="sd">       from cobralib.io import read_text_columns_by_headers</span>
 
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_text_columns_by_headers(file_name, headers,</span>
-<span class="sd">                                           dat, skip=2)</span>
+<span class="sd">       &gt; headers = {&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float, &#39;Number&#39;: int}</span>
+<span class="sd">       &gt; df = read_text_columns_by_headers(file_name, headers, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -842,8 +832,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">head</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
@@ -852,8 +842,7 @@
 
 <div class="viewcode-block" id="read_text_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">col_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-    <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span>
@@ -861,11 +850,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param file_name: The file name to include path-link</span>
-<span class="sd">    :param col_index: A list of the columns to be read by number,</span>
-<span class="sd">                      starting with column 0 as the far left column</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
+<span class="sd">    :param headers: A dictionary of column index` and their data types.</span>
+<span class="sd">                    types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                    and ``str``</span>
 <span class="sd">    :param col_names: A list containing the names to be given to</span>
 <span class="sd">                      each column</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
@@ -907,10 +894,9 @@
 <span class="sd">       from cobralib.io import read_text_columns_by_index</span>
 
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
-<span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_text_columns_by_index(file_name, headers, dat, names)</span>
+<span class="sd">       &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
+<span class="sd">       &gt; names = [ headers = {&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
+<span class="sd">       &gt; df = read_text_columns_by_index(file_name, headers, names)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -961,11 +947,10 @@
 <span class="sd">       from cobralib.io import read_text_columns_by_index</span>
 
 <span class="sd">       &gt; file_name = &#39;test.txt&#39;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
+<span class="sd">       &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
 <span class="sd">       &gt; df = read_text_columns_by_index(file_name, headers,</span>
-<span class="sd">                                        dat, names, skip=2)</span>
+<span class="sd">                                         names, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -976,12 +961,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">col_index</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
         <span class="n">file_name</span><span class="p">,</span>
-        <span class="n">usecols</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span>
+        <span class="n">usecols</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
         <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
         <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span>
         <span class="n">sep</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
     <span class="p">)</span>
@@ -992,18 +977,16 @@
 
 
 <span class="k">def</span> <span class="nf">read_excel_columns_by_headers</span><span class="p">(</span>
-    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tab</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tab</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param file_name: The file name to include path-link.  Must be an</span>
 <span class="sd">                      .xls file format.  This code will **not** read .xlsx</span>
 <span class="sd">    :param tab: The tab or sheet name that data will be read from</span>
-<span class="sd">    :param headers: A list of the names of the headers that contain</span>
-<span class="sd">                    columns which will be read</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
+<span class="sd">    :param headers: A dictionary of column names and their data types.</span>
+<span class="sd">                    types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                    and ``str``</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
 <span class="sd">    :return df: A pandas dataframe containing all relevant information</span>
 <span class="sd">    :raises FileNotFoundError: If the file is found to not exist</span>
@@ -1042,9 +1025,8 @@
 
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &quot;primary&quot;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_excel_columns_by_headers(file_name, tab, headers, dat)</span>
+<span class="sd">       &gt; headers = {&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float, &#39;Number&#39;: int}</span>
+<span class="sd">       &gt; df = read_excel_columns_by_headers(file_name, tab, headers)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -1096,10 +1078,9 @@
 
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &quot;primary&quot;</span>
-<span class="sd">       &gt; headers = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
+<span class="sd">       &gt; headers = [&#39;ID&#39;: int, &#39;Inventory&#39;: str, &#39;Weight_per&#39;: float, &#39;Number&#39;: int]</span>
 <span class="sd">       &gt; df = read_excel_columns_by_headers(file_name, tab,</span>
-<span class="sd">                                            headers, dat, skip=2)</span>
+<span class="sd">                                            headers, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -1109,12 +1090,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
         <span class="n">file_name</span><span class="p">,</span>
         <span class="n">sheet_name</span><span class="o">=</span><span class="n">tab</span><span class="p">,</span>
-        <span class="n">usecols</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span>
+        <span class="n">usecols</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
         <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span>
         <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1127,9 +1108,8 @@
 <span class="k">def</span> <span class="nf">read_excel_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">tab</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">col_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">col_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">data_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">],</span>
     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1137,13 +1117,11 @@
 <span class="sd">    :param file_name: The file name to include path-link.  Must be an</span>
 <span class="sd">                      .xls file format.  This code will **not** read .xlsx</span>
 <span class="sd">    :param tab: The tab or sheet name that data will be read from</span>
-<span class="sd">    :param col_index: A list of the columns to be read by number,</span>
-<span class="sd">                      starting with column 0 as the far left column</span>
+<span class="sd">    :param col_index: A dictionary of column index` and their data types.</span>
+<span class="sd">                     types are limited to ``numpy.int64``, ``numpy.float64``,</span>
+<span class="sd">                     and ``str``</span>
 <span class="sd">    :param col_names: A list containing the names to be given to</span>
 <span class="sd">                      each column</span>
-<span class="sd">    :param data_type: A list containing the data type of each column.  Data</span>
-<span class="sd">                      types are limited to ``numpy.int64``, ``numpy.float64``,</span>
-<span class="sd">                      and ``str``</span>
 <span class="sd">    :param skip: The number of lines to be skipped before reading data</span>
 <span class="sd">    :return df: A pandas dataframe containing all relevant information</span>
 <span class="sd">    :raises FileNotFoundError: If the file is found to not exist</span>
@@ -1179,10 +1157,9 @@
 
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &#39;primary&#39;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
+<span class="sd">       &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
-<span class="sd">       &gt; df = read_excel_columns_by_index(file_name, tab, headers, names, dat)</span>
+<span class="sd">       &gt; df = read_excel_columns_by_index(file_name, tab, headers, names)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -1234,11 +1211,10 @@
 
 <span class="sd">       &gt; file_name = &#39;test.xls&#39;</span>
 <span class="sd">       &gt; tab = &quot;primary&quot;</span>
-<span class="sd">       &gt; headers = [0, 1, 2, 3]</span>
+<span class="sd">       &gt; headers = {0: int, 1: str, 2: float, 3: int}</span>
 <span class="sd">       &gt; names = [&#39;ID&#39;, &#39;Inventory&#39;, &#39;Weight_per&#39;, &#39;Number&#39;]</span>
-<span class="sd">       &gt; dat = [int, str, float, int]</span>
 <span class="sd">       &gt; df = read_excel_columns_by_index(file_name, tab, headers,</span>
-<span class="sd">                                          names, dat, skip=2)</span>
+<span class="sd">                                          names, skip=2)</span>
 <span class="sd">       &gt; print(df)</span>
 <span class="sd">           ID Inventory Weight_per Number</span>
 <span class="sd">        0  1  shoes     1.5        5</span>
@@ -1248,13 +1224,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">col_index</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">col_index</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
         <span class="n">file_name</span><span class="p">,</span>
         <span class="n">sheet_name</span><span class="o">=</span><span class="n">tab</span><span class="p">,</span>
-        <span class="n">usecols</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span>
+        <span class="n">usecols</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
         <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">col_index</span><span class="p">,</span>
         <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span>
         <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">,</span>
@@ -1475,6 +1451,9 @@
 <div class="viewcode-block" id="MySQLDB"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB">[docs]</a><span class="k">class</span> <span class="nc">MySQLDB</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for connecting to MySQL databases using mysql-connector-python.</span>
+<span class="sd">    The user can access the conn and cur variables, where conn is the</span>
+<span class="sd">    connection variable and cur is the connection.cursor() method to</span>
+<span class="sd">    expand the capability of this class beyond its methods.</span>
 
 <span class="sd">    :param username: The username for the database connection.</span>
 <span class="sd">    :param password: The password for the database connection.</span>
@@ -1482,20 +1461,23 @@
 <span class="sd">    :param hostname: The hostname for the database connection</span>
 <span class="sd">                     (default is &#39;localhost&#39;).</span>
 <span class="sd">    :raises ConnectionError: If a connection can not be established</span>
+<span class="sd">    :ivar conn: The connection attribute of the mysql-connector-python module.</span>
+<span class="sd">    :ivar cur: The cursor method for the mysql-connector-python module.</span>
+<span class="sd">    :ivar database: The name of the database currently being used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
-
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="MySQLDB.change_db"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.change_db">[docs]</a>    <span class="k">def</span> <span class="nf">change_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1506,12 +1488,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USE </span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USE </span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+        <span class="k">except</span> <span class="n">ProgrammingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to non-existing databases or insufficient permissions.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to change database due to ProgrammingError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to change database due to InterfaceError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to change database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="MySQLDB.close_conn"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.close_conn">[docs]</a>    <span class="k">def</span> <span class="nf">close_conn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1520,11 +1511,13 @@
 <span class="sd">        :raises ConnectionError: If the connection does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_connected</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">is_connected</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to close the connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="MySQLDB.get_dbs"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.get_dbs">[docs]</a>    <span class="k">def</span> <span class="nf">get_dbs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1552,13 +1545,17 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW DATABASES;&quot;</span><span class="p">)</span>
-            <span class="n">databases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">databases</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Databases&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SHOW DATABASES;&quot;</span><span class="p">)</span>
+            <span class="n">databases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">databases</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Databases&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch databases due to InterfaceError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve databases: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch databases: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="MySQLDB.get_db_tables"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.get_db_tables">[docs]</a>    <span class="k">def</span> <span class="nf">get_db_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1591,96 +1588,109 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No database is currently selected.&quot;</span><span class="p">)</span>
-
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to fetch tables from </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHOW TABLES FROM </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Tables&#39;</span><span class="p">])</span>
+            <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Tables&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; due to InterfaceError </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve tables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch tables from </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.get_columns"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.get_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.get_table_columns"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.get_table_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve the names and data types of the columns within the specified table.</span>
+<span class="sd">         Retrieve the names and data types of the columns within the specified table.</span>
 
-<span class="sd">        :param table_name: The name of the table.</span>
-<span class="sd">        :param db: The database name, defaulted to currently selected database</span>
-<span class="sd">                   or None</span>
-<span class="sd">        :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,</span>
-<span class="sd">                 and Extra</span>
-<span class="sd">        :raises ValueError: If the database is not selected at the class level</span>
-<span class="sd">        :raises ConnectionError: If the columns cannot be retrieved.</span>
+<span class="sd">         :param table_name: The name of the table.</span>
+<span class="sd">         :param db: The database name, defaulted to currently selected database</span>
+<span class="sd">                    or None</span>
+<span class="sd">         :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,</span>
+<span class="sd">                  and Extra</span>
+<span class="sd">         :raises ValueError: If the database is not selected at the class level</span>
+<span class="sd">         :raises ConnectionError: If the columns cannot be retrieved.</span>
 
-<span class="sd">        This example shows a scenario where the database analyst has navigated</span>
-<span class="sd">        into a database</span>
+<span class="sd">         This example shows a scenario where the database analyst has navigated</span>
+<span class="sd">         into a database</span>
 
-<span class="sd">        .. highlight:: python</span>
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">         .. highlight:: python</span>
+<span class="sd">         .. code-block:: python</span>
 
-<span class="sd">           from cobralib.io import MySQLDB</span>
+<span class="sd">            from cobralib.io import MySQLDB</span>
 
-<span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">           db.change_db(&#39;Address&#39;)</span>
-<span class="sd">           query = &#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
-<span class="sd">               name_id INTEGER AUTO_INCREMENT,</span>
-<span class="sd">               FirstName VARCHAR(20) NOT NULL,</span>
-<span class="sd">               MiddleName VARCHAR(20),</span>
-<span class="sd">               LastName VARCHAR(20) NOT NULL,</span>
-<span class="sd">               PRIMARY KEY (name_id)</span>
-<span class="sd">           );</span>
-<span class="sd">           &#39;&#39;&#39;</span>
-<span class="sd">           db.query_db(query)</span>
-<span class="sd">           cols = db.get_columns(&#39;Names&#39;)</span>
-<span class="sd">           db.close_conn()</span>
-<span class="sd">           print(cols)</span>
-<span class="sd">           &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
-<span class="sd">              0     name_id    Integer     True   Primary  False   auto_increment</span>
-<span class="sd">              1     FirstName  Varchar(20) False  NA       False   None</span>
-<span class="sd">              2     MiddleName Varchar(20) True   NA       False   None</span>
-<span class="sd">              3     LastName   Varchar(20) False  NA       False   None</span>
+<span class="sd">            db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
+<span class="sd">            db.change_db(&#39;Address&#39;)</span>
+<span class="sd">            query = &#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
+<span class="sd">                name_id INTEGER AUTO_INCREMENT,</span>
+<span class="sd">                FirstName VARCHAR(20) NOT NULL,</span>
+<span class="sd">                MiddleName VARCHAR(20),</span>
+<span class="sd">                LastName VARCHAR(20) NOT NULL,</span>
+<span class="sd">                PRIMARY KEY (name_id)</span>
+<span class="sd">            );</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+<span class="sd">            db.query_db(query)</span>
+<span class="sd">            cols = db.get_columns(&#39;Names&#39;)</span>
+<span class="sd">            db.close_conn()</span>
+<span class="sd">            print(cols)</span>
+<span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
+<span class="sd">               0     name_id    Integer     True   Primary  False   auto_increment</span>
+<span class="sd">               1     FirstName  Varchar(20) False  NA       False   None</span>
+<span class="sd">               2     MiddleName Varchar(20) True   NA       False   None</span>
+<span class="sd">               3     LastName   Varchar(20) False  NA       False   None</span>
 
-<span class="sd">       However, this code can also be executed when not in the database</span>
+<span class="sd">        However, this code can also be executed when not in the database</span>
 
-<span class="sd">        .. code-block:: python</span>
+<span class="sd">         .. code-block:: python</span>
 
-<span class="sd">           from cobralib.io import MySQLDB</span>
+<span class="sd">            from cobralib.io import MySQLDB</span>
 
-<span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">           cols = db.get_columns(&#39;Names&#39;, &#39;Address&#39;)</span>
-<span class="sd">           db.close_conn()</span>
-<span class="sd">           print(cols)</span>
-<span class="sd">           &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
-<span class="sd">              0     name_id    Integer     True   Primary  False   auto_increment</span>
-<span class="sd">              1     FirstName  Varchar(20) False  NA       False   None</span>
-<span class="sd">              2     MiddleName Varchar(20) True   NA       False   None</span>
-<span class="sd">              3     LastName   Varchar(20) False  NA       False   None</span>
+<span class="sd">            db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
+<span class="sd">            cols = db.get_columns(&#39;Names&#39;, &#39;Address&#39;)</span>
+<span class="sd">            db.close_conn()</span>
+<span class="sd">            print(cols)</span>
+<span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
+<span class="sd">               0     name_id    Integer     True   Primary  False   auto_increment</span>
+<span class="sd">               1     FirstName  Varchar(20) False  NA       False   None</span>
+<span class="sd">               2     MiddleName Varchar(20) True   NA       False   None</span>
+<span class="sd">               3     LastName   Varchar(20) False  NA       False   None</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
             <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
 
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to fetch columns from </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No database is currently selected.&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHOW COLUMNS FROM </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">columns_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns_info</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Field&#39;</span><span class="p">,</span> <span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="s1">&#39;Null&#39;</span><span class="p">,</span> <span class="s1">&#39;Key&#39;</span><span class="p">,</span>
-                                                     <span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="s1">&#39;Extra&#39;</span><span class="p">])</span>
+            <span class="n">columns_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">columns_info</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;Key&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Extra&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; fue to InterfaceError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to get column data for </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch columns from </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="MySQLDB.query_db"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.query_db">[docs]</a>    <span class="k">def</span> <span class="nf">query_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute a query with placeholders and return the result as a Pandas DataFrame.</span>
+<span class="sd">        The user of this class should ensure that when applicable they parameteratize</span>
+<span class="sd">        the inputs to this method to minimize the potential for an injection</span>
+<span class="sd">        attack</span>
 
 <span class="sd">        :param query: The query with placeholders.</span>
 <span class="sd">        :param params: The values to be substituted into the placeholders</span>
@@ -1720,34 +1730,47 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The number of placeholders in the query does not &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;match the number of parameters.&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No database is currently selected.&quot;</span><span class="p">)</span>
+        <span class="n">num_placeholders</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_placeholders</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
-                <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+                <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">df</span>
-            <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute query: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute query: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-
-<div class="viewcode-block" id="MySQLDB.csv_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.csv_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">txt_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-                     <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">delemeter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
-                     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.csv_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.csv_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">txt_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">txt_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delemeter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read data from a CSV or TXT file and insert it into the specified table.</span>
 
-<span class="sd">        :param txt_file: The path to the CSV file.</span>
+<span class="sd">        :param txt_file: The path to the CSV file or TXT file.</span>
 <span class="sd">        :param table_name: The name of the table.</span>
 <span class="sd">        :param txt_columns: The names of the columns in the TXT file.</span>
 <span class="sd">        :param table_columns: The names of the columns in the table (default is None,</span>
@@ -1811,28 +1834,43 @@
             <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">table_columns</span> <span class="o">=</span> <span class="n">txt_columns</span>
 
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
+            <span class="p">]</span>
+
             <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
                 <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">txt_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                     <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-                <span class="n">placeholders</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_columns</span><span class="p">)</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
                 <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>  <span class="c1"># Commit changes</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>  <span class="c1"># Commit changes</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.excel_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.excel_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">excel_to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excel_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">excel_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-                       <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                       <span class="n">sheet_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Sheet1&#39;</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="MySQLDB.excel_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.MySQLDB.excel_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">excel_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">excel_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">excel_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sheet_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sheet1&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read data from an Excel file and insert it into the specified table.</span>
 
@@ -1876,32 +1914,40 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Excel column names are required.&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span>
-                                       <span class="n">usecols</span><span class="o">=</span><span class="n">excel_columns</span><span class="p">,</span>
-                                       <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
+            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+                <span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">excel_columns</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">table_columns</span> <span class="o">=</span> <span class="n">excel_columns</span>
 
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
+            <span class="p">]</span>
             <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">excel_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
                 <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">excel_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                     <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-                <span class="n">placeholders</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_columns</span><span class="p">)</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
                 <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-<span class="c1"># ==========================================================================================</span>
-<span class="c1"># PRIVATE-LIKE METHOD</span>
+
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE METHOD</span>
 
     <span class="k">def</span> <span class="nf">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">passwd</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1910,15 +1956,38 @@
 <span class="sd">        :return: The MySQL connection object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span>
-                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
-                <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
-                <span class="n">password</span><span class="o">=</span><span class="n">passwd</span><span class="p">,</span>
-                <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">passwd</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to InterfaceError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">ProgrammingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle programming errors.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to ProgrammingError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle other database-related errors.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to DatabaseError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create a connection </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create a connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_sanitize_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitize column names to include only alphanumeric characters and underscores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># eof</span>
