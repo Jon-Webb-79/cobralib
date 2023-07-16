@@ -111,6 +111,13 @@ no_implicit_optional = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 console_output_style = "progress"
+markers = [
+    "readkeywords: Marks tests that involve ReadKeyWords class",
+	"read_columnar: Marks tests that read columnar data",
+	"read_yaml: Marks tests for read_yaml functions",
+	"logger: Marks tests for logger",
+	"mysql: tests for MySQLDB class"
+]
 
 [project.urls]
 "Homepage" = "https://github.com/Jon-Webb-79/cobralib"

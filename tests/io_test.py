@@ -24,8 +24,6 @@ from cobralib.io import (
     write_yaml_file,
 )
 
-# from unittest.mock import MagicMock, patch
-
 # ==========================================================================================
 # ==========================================================================================
 # File:    test.py
@@ -264,6 +262,7 @@ def run_around_tests():
 # Test ReadKeyWords class
 
 
+@pytest.mark.readkeywords
 def test_read_keywords_instantiation(sample_file1):
     """
     Test to ensure correct instantiation of class
@@ -276,6 +275,7 @@ def test_read_keywords_instantiation(sample_file1):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_keywords_printing(sample_file1, capsys):
     """
     Test to ensure proper print out when object is printed
@@ -290,6 +290,7 @@ def test_read_keywords_printing(sample_file1, capsys):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_variable_existing_keyword(sample_file2):
     """
     Test to ensure the class can properly read in a float variable
@@ -302,6 +303,7 @@ def test_read_variable_existing_keyword(sample_file2):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_variable_nonexistent_keyword(sample_file2):
     """
     Test to ensure class fails properly when a value is not found
@@ -315,6 +317,7 @@ def test_read_variable_nonexistent_keyword(sample_file2):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_variable_double(sample_file2):
     """
     Test to ensure class can handle numpy data types
@@ -327,6 +330,7 @@ def test_read_variable_double(sample_file2):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_string_variable_existing_keyword(sample_file1):
     """
     Test to ensure that the read_string_variable method properly reads in a string
@@ -339,6 +343,7 @@ def test_read_string_variable_existing_keyword(sample_file1):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_list_existing_keyword(sample_file2):
     """
     Test to ensure that the class will properly read in a list
@@ -352,6 +357,7 @@ def test_read_list_existing_keyword(sample_file2):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_json_variable_nested_values(sample_file3):
     """
     Test to ensure that the class will properly read in json data inserted after
@@ -372,6 +378,7 @@ def test_read_json_variable_nested_values(sample_file3):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_full_json(sample_file4):
     """
     Ensure that the class will read in a .json file
@@ -390,6 +397,7 @@ def test_read_full_json(sample_file4):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_xml_variable_nested_values(xml_file3):
     """
     Test to ensure that the class will properly read in XML data inserted after
@@ -410,6 +418,7 @@ def test_read_xml_variable_nested_values(xml_file3):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_xml_full_data(sample_file5):
     """
     Test to ensure the class can properly read in an entire XML file
@@ -425,6 +434,7 @@ def test_read_xml_full_data(sample_file5):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_xml_by_keyword_existing(sample_file5):
     """
     Test to ensure that the class can read XML data under a specific keyword
@@ -440,6 +450,7 @@ def test_read_xml_by_keyword_existing(sample_file5):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.readkeywords
 def test_read_xml_by_keyword_nonexistent(sample_file5):
     """
     Test to ensure class fails properly when XML data is not properly formatted
@@ -455,6 +466,7 @@ def test_read_xml_by_keyword_nonexistent(sample_file5):
 # TEST READ COLUMNAR DATA
 
 
+@pytest.mark.read_columnar
 def test_read_csv_columns_by_headers(csv_file):
     """
     Test the read_csv_columns_by_headers function to ensure it properly reads in data
@@ -474,6 +486,7 @@ def test_read_csv_columns_by_headers(csv_file):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_columnar
 def test_read_csv_columns_by_index(csv_file):
     """
     Test the read_csv_columns_by_index function to ensure it properly reads in data
@@ -494,6 +507,7 @@ def test_read_csv_columns_by_index(csv_file):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_columnar
 def test_read_text_columns_by_headers(text_file):
     headers = {"ID": int, "Inventory": str, "Weight_per": float, "Number": int}
     df = read_text_columns_by_headers(text_file, headers)
@@ -510,6 +524,7 @@ def test_read_text_columns_by_headers(text_file):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_columnar
 def test_read_text_columns_by_index(text_file):
     col_index = {0: int, 1: str, 2: float, 3: int}
     col_names = ["ID", "Inventory", "Weight_per", "Number"]
@@ -527,6 +542,7 @@ def test_read_text_columns_by_index(text_file):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_columnar
 def test_read_excel_columns_by_headers(excel_file):
     #  excel_file = "../data/test/test.xlsx"
     tab = "primary"
@@ -545,6 +561,7 @@ def test_read_excel_columns_by_headers(excel_file):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_columnar
 def test_read_excel_columns_by_index(excel_file):
     tab = "primary"
     col_index = {0: int, 1: str, 2: float, 3: int}
@@ -565,6 +582,7 @@ def test_read_excel_columns_by_index(excel_file):
 # TEST READ AND WRITE TO YAML FILES
 
 
+@pytest.mark.read_yaml
 def test_yaml_file_reader():
     # Test safe_load=True
     reader = read_yaml_file("../data/test/test_file.yaml", safe=True)
@@ -586,6 +604,7 @@ def test_yaml_file_reader():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_yaml
 def test_append_yaml_file(data):
     with TemporaryDirectory() as temp_dir:
         file_path = os.path.join(temp_dir, "output.yaml")
@@ -607,6 +626,7 @@ def test_append_yaml_file(data):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.read_yaml
 def test_write_yaml_file_nonexistent(data):
     file_path = "/path/to/nonexistent/output.yaml"
     pytest.raises(FileNotFoundError, write_yaml_file, file_path, data, append=True)
@@ -616,6 +636,7 @@ def test_write_yaml_file_nonexistent(data):
 # ==========================================================================================
 
 
+@pytest.mark.logger
 def test_logger_creation():
     """Test Logger initialization"""
     logger = Logger("test.log", "DEBUG", "DEBUG", 10)
@@ -626,6 +647,7 @@ def test_logger_creation():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.logger
 def test_logger_logging():
     """Test logging function"""
     logger = Logger("test.log", "DEBUG", "DEBUG", 10)
@@ -638,6 +660,7 @@ def test_logger_logging():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.logger
 def test_logger_log_trimming():
     """Test that logs are correctly trimmed"""
     logger = Logger("test.log", "DEBUG", "DEBUG", 10)
@@ -662,6 +685,7 @@ def no_requests(monkeypatch):
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_mysql_connection():
     # Create mock connection and cursor
     mock_conn = MagicMock()
@@ -684,6 +708,7 @@ def test_mysql_connection():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_mysql_connect_fail():
     with pytest.raises(ConnectionError):
         MySQLDB("username", "password", port=3306, hostname="localhost")
@@ -692,6 +717,7 @@ def test_mysql_connect_fail():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_change_mysql_db():
     # Create mock connection and cursor
     mock_conn = MagicMock()
@@ -714,6 +740,7 @@ def test_change_mysql_db():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_get_mysql_dbs():
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -735,6 +762,7 @@ def test_get_mysql_dbs():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_get_mysql_db_tables():
     # Create the mock connection and cursor
     mock_conn = MagicMock()
@@ -769,6 +797,7 @@ def test_get_mysql_db_tables():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_get_mysql_table_columns():
     mock_conn = MagicMock()
 
@@ -800,6 +829,7 @@ def test_get_mysql_table_columns():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_mysql_csv_to_table():
     mock_conn = MagicMock()
 
@@ -839,6 +869,7 @@ def test_mysql_csv_to_table():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_query_mysql_db():
     mock_conn = MagicMock()
 
@@ -864,6 +895,7 @@ def test_query_mysql_db():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_mysql_excel_to_table():
     mock_conn = MagicMock()
 
@@ -904,6 +936,7 @@ def test_mysql_excel_to_table():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.mysql
 def test_mysql_txt_to_table():
     mock_conn = MagicMock()
 
