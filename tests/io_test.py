@@ -477,9 +477,8 @@ def test_read_csv_columns_by_headers(csv_file):
     """
     Test the read_csv_columns_by_headers function to ensure it properly reads in data
     """
-    headers = ["ID", "Inventory", "Weight_per", "Number"]
-    data_type = [int, str, float, int]
-    df = read_csv_columns_by_headers(csv_file, headers, data_type)
+    headers = {"ID": int, "Inventory": str, "Weight_per": float, "Number": int}
+    df = read_csv_columns_by_headers(csv_file, headers)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
@@ -497,10 +496,9 @@ def test_read_csv_columns_by_index(csv_file):
     """
     Test the read_csv_columns_by_index function to ensure it properly reads in data
     """
-    col_index = [0, 1, 2, 3]
-    data_type = [int, str, float, int]
+    col_index = {0: int, 1: str, 2: float, 3: int}
     col_names = ["ID", "Inventory", "Weight_per", "Number"]
-    df = read_csv_columns_by_index(csv_file, col_index, data_type, col_names, skip=1)
+    df = read_csv_columns_by_index(csv_file, col_index, col_names, skip=1)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
@@ -515,9 +513,8 @@ def test_read_csv_columns_by_index(csv_file):
 
 
 def test_read_text_columns_by_headers(text_file):
-    headers = ["ID", "Inventory", "Weight_per", "Number"]
-    data_type = [int, str, float, int]
-    df = read_text_columns_by_headers(text_file, headers, data_type)
+    headers = {"ID": int, "Inventory": str, "Weight_per": float, "Number": int}
+    df = read_text_columns_by_headers(text_file, headers)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
@@ -532,10 +529,9 @@ def test_read_text_columns_by_headers(text_file):
 
 
 def test_read_text_columns_by_index(text_file):
-    col_index = [0, 1, 2, 3]
-    data_type = [int, str, float, int]
+    col_index = {0: int, 1: str, 2: float, 3: int}
     col_names = ["ID", "Inventory", "Weight_per", "Number"]
-    df = read_text_columns_by_index(text_file, col_index, data_type, col_names, skip=1)
+    df = read_text_columns_by_index(text_file, col_index, col_names, skip=1)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "t-shirt", "coffee", "books"],
@@ -552,9 +548,8 @@ def test_read_text_columns_by_index(text_file):
 def test_read_excel_columns_by_headers(excel_file):
     #  excel_file = "../data/test/test.xlsx"
     tab = "primary"
-    headers = ["ID", "Inventory", "Weight_per", "Number"]
-    data_type = [int, str, float, int]
-    df = read_excel_columns_by_headers(excel_file, tab, headers, data_type)
+    headers = {"ID": int, "Inventory": str, "Weight_per": float, "Number": int}
+    df = read_excel_columns_by_headers(excel_file, tab, headers)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "T-shirt", "coffee", "books"],
@@ -570,12 +565,9 @@ def test_read_excel_columns_by_headers(excel_file):
 
 def test_read_excel_columns_by_index(excel_file):
     tab = "primary"
-    col_index = [0, 1, 2, 3]
+    col_index = {0: int, 1: str, 2: float, 3: int}
     col_names = ["ID", "Inventory", "Weight_per", "Number"]
-    data_type = [int, str, float, int]
-    df = read_excel_columns_by_index(
-        excel_file, tab, col_index, col_names, data_type, skip=1
-    )
+    df = read_excel_columns_by_index(excel_file, tab, col_index, col_names, skip=1)
     expected_data = {
         "ID": [1, 2, 3, 4],
         "Inventory": ["Shoes", "T-shirt", "coffee", "books"],

@@ -428,16 +428,14 @@ class ReadKeyWords:
 
 
 def read_csv_columns_by_headers(
-    file_name: str, headers: list[str], data_type: list[type], skip: int = 0
+    file_name: str, headers: dict[str, type], skip: int = 0
 ) -> pd.DataFrame:
     """
 
     :param file_name: The file name to include path-link
-    :param headers: A list of the names of the headers that contain
-                    columns which will be read
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
+    :param headers: A dictionary of column names and their data types.
+                    types are limited to ``numpy.int64``, ``numpy.float64``,
+                    and ``str``
     :param skip: The number of lines to be skipped before reading data
     :return df: A pandas dataframe containing all relevant information
     :raises FileNotFoundError: If the file is found to not exist
@@ -479,9 +477,8 @@ def read_csv_columns_by_headers(
        from cobralib.io import read_csv_columns_by_headers
 
        > file_name = 'test.csv'
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_csv_columns_by_headers(file_name, headers, dat)
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float. 'Number': int}
+       > df = read_csv_columns_by_headers(file_name, headers)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -532,9 +529,8 @@ def read_csv_columns_by_headers(
        from cobralib.io import read_csv_columns_by_headers
 
        > file_name = 'test1.csv'
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_csv_columns_by_headers(file_name, headers, dat, skip=2)
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int}
+       > df = read_csv_columns_by_headers(file_name, headers, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -544,8 +540,8 @@ def read_csv_columns_by_headers(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(headers, data_type))
-    df = pd.read_csv(file_name, usecols=headers, dtype=dat, skiprows=skip)
+    head = list(headers.keys())
+    df = pd.read_csv(file_name, usecols=head, dtype=headers, skiprows=skip)
     return df
 
 
@@ -554,18 +550,15 @@ def read_csv_columns_by_headers(
 
 def read_csv_columns_by_index(
     file_name: str,
-    col_index: list[int],
-    data_type: list[type],
+    headers: dict[int, type],
     col_names: list[str],
     skip: int = 0,
 ) -> pd.DataFrame:
     """
     :param file_name: The file name to include path-link
-    :param col_index: A list of the columns to be read by number,
-                      starting with column 0 as the far left column
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
+    :param headers: A dictionary of column index and their data types.
+                    types are limited to ``numpy.int64``, ``numpy.float64``,
+                    and ``str``
     :param col_names: A list containing the names to be given to
                       each column
     :param skip: The number of lines to be skipped before reading data
@@ -605,10 +598,9 @@ def read_csv_columns_by_index(
        from cobralib.io import read_csv_columns_by_index
 
        > file_name = 'test.csv'
-       > headers = [0, 1, 2, 3]
+       > headers = {0: int, 1: str, 2: float, 3: int}
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_csv_columns_by_index(file_name, headers, dat, names)
+       > df = read_csv_columns_by_index(file_name, headers, names)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -655,11 +647,10 @@ def read_csv_columns_by_index(
        from cobralib.io import read_csv_columns_by_index
 
        > file_name = 'test1.csv'
-       > headers = [0, 1, 2, 3]
+        > headers = {0: int, 1: str, 2: float, 3: int}
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
        > df = read_csv_columns_by_index(file_name, headers,
-                                        dat, names, skip=2)
+                                        names, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -669,9 +660,9 @@ def read_csv_columns_by_index(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(col_index, data_type))
+    col_index = list(headers.keys())
     df = pd.read_csv(
-        file_name, usecols=col_index, names=col_names, dtype=dat, skiprows=skip
+        file_name, usecols=col_index, names=col_names, dtype=headers, skiprows=skip
     )
     return df
 
@@ -681,19 +672,16 @@ def read_csv_columns_by_index(
 
 def read_text_columns_by_headers(
     file_name: str,
-    headers: list[str],
-    data_type: list[type],
+    headers: dict[str, type],
     skip: int = 0,
     delimiter=r"\s+",
 ) -> pd.DataFrame:
     """
 
     :param file_name: The file name to include path-link
-    :param headers: A list of the names of the headers that contain
-                    columns which will be read
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
+    :param headers: A dictionary of column names and their data types.
+                    types are limited to ``numpy.int64``, ``numpy.float64``,
+                    and ``str``
     :param skip: The number of lines to be skipped before reading data
     :param delimiter: The type of delimiter separating data in the text file.
                 Defaulted to space delimited, where a space is one or
@@ -739,9 +727,8 @@ def read_text_columns_by_headers(
        from cobralib.io import read_text_columns_by_headers
 
        > file_name = 'test.txt'
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_text_columns_by_headers(file_name, headers, dat)
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int}
+       > df = read_text_columns_by_headers(file_name, headers)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -792,10 +779,8 @@ def read_text_columns_by_headers(
        from cobralib.io import read_text_columns_by_headers
 
        > file_name = 'test.txt'
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_text_columns_by_headers(file_name, headers,
-                                           dat, skip=2)
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int}
+       > df = read_text_columns_by_headers(file_name, headers, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -805,8 +790,8 @@ def read_text_columns_by_headers(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(headers, data_type))
-    df = pd.read_csv(file_name, usecols=headers, dtype=dat, skiprows=skip, sep=delimiter)
+    head = list(headers.keys())
+    df = pd.read_csv(file_name, usecols=head, dtype=headers, skiprows=skip, sep=delimiter)
     return df
 
 
@@ -815,8 +800,7 @@ def read_text_columns_by_headers(
 
 def read_text_columns_by_index(
     file_name: str,
-    col_index: list[int],
-    data_type: list[type],
+    headers: dict[int, type],
     col_names: list[str],
     skip: int = 0,
     delimiter=r"\s+",
@@ -824,11 +808,9 @@ def read_text_columns_by_index(
     """
 
     :param file_name: The file name to include path-link
-    :param col_index: A list of the columns to be read by number,
-                      starting with column 0 as the far left column
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
+    :param headers: A dictionary of column index` and their data types.
+                    types are limited to ``numpy.int64``, ``numpy.float64``,
+                    and ``str``
     :param col_names: A list containing the names to be given to
                       each column
     :param skip: The number of lines to be skipped before reading data
@@ -870,10 +852,9 @@ def read_text_columns_by_index(
        from cobralib.io import read_text_columns_by_index
 
        > file_name = 'test.txt'
-       > headers = [0, 1, 2, 3]
-       > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_text_columns_by_index(file_name, headers, dat, names)
+       > headers = {0: int, 1: str, 2: float, 3: int}
+       > names = [ headers = {'ID', 'Inventory', 'Weight_per', 'Number']
+       > df = read_text_columns_by_index(file_name, headers, names)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -924,11 +905,10 @@ def read_text_columns_by_index(
        from cobralib.io import read_text_columns_by_index
 
        > file_name = 'test.txt'
-       > headers = [0, 1, 2, 3]
+       > headers = {0: int, 1: str, 2: float, 3: int}
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
        > df = read_text_columns_by_index(file_name, headers,
-                                        dat, names, skip=2)
+                                         names, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -939,12 +919,12 @@ def read_text_columns_by_index(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(col_index, data_type))
+    head = list(headers.keys())
     df = pd.read_csv(
         file_name,
-        usecols=col_index,
+        usecols=head,
         names=col_names,
-        dtype=dat,
+        dtype=headers,
         skiprows=skip,
         sep=delimiter,
     )
@@ -955,18 +935,16 @@ def read_text_columns_by_index(
 
 
 def read_excel_columns_by_headers(
-    file_name: str, tab: str, headers: list[str], data_type: list[type], skip: int = 0
+    file_name: str, tab: str, headers: dict[str, type], skip: int = 0
 ) -> pd.DataFrame:
     """
 
     :param file_name: The file name to include path-link.  Must be an
                       .xls file format.  This code will **not** read .xlsx
     :param tab: The tab or sheet name that data will be read from
-    :param headers: A list of the names of the headers that contain
-                    columns which will be read
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
+    :param headers: A dictionary of column names and their data types.
+                    types are limited to ``numpy.int64``, ``numpy.float64``,
+                    and ``str``
     :param skip: The number of lines to be skipped before reading data
     :return df: A pandas dataframe containing all relevant information
     :raises FileNotFoundError: If the file is found to not exist
@@ -1005,9 +983,8 @@ def read_excel_columns_by_headers(
 
        > file_name = 'test.xls'
        > tab = "primary"
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_excel_columns_by_headers(file_name, tab, headers, dat)
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int}
+       > df = read_excel_columns_by_headers(file_name, tab, headers)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -1059,10 +1036,9 @@ def read_excel_columns_by_headers(
 
        > file_name = 'test.xls'
        > tab = "primary"
-       > headers = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
+       > headers = ['ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int]
        > df = read_excel_columns_by_headers(file_name, tab,
-                                            headers, dat, skip=2)
+                                            headers, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -1072,12 +1048,12 @@ def read_excel_columns_by_headers(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(headers, data_type))
+    head = list(headers.keys())
     df = pd.read_excel(
         file_name,
         sheet_name=tab,
-        usecols=headers,
-        dtype=dat,
+        usecols=head,
+        dtype=headers,
         skiprows=skip,
         engine="openpyxl",
     )
@@ -1090,9 +1066,8 @@ def read_excel_columns_by_headers(
 def read_excel_columns_by_index(
     file_name: str,
     tab: str,
-    col_index: list[int],
+    col_index: dict[int, str],
     col_names: list[str],
-    data_type: list[type],
     skip: int = 0,
 ) -> pd.DataFrame:
     """
@@ -1100,13 +1075,11 @@ def read_excel_columns_by_index(
     :param file_name: The file name to include path-link.  Must be an
                       .xls file format.  This code will **not** read .xlsx
     :param tab: The tab or sheet name that data will be read from
-    :param col_index: A list of the columns to be read by number,
-                      starting with column 0 as the far left column
+    :param col_index: A dictionary of column index` and their data types.
+                     types are limited to ``numpy.int64``, ``numpy.float64``,
+                     and ``str``
     :param col_names: A list containing the names to be given to
                       each column
-    :param data_type: A list containing the data type of each column.  Data
-                      types are limited to ``numpy.int64``, ``numpy.float64``,
-                      and ``str``
     :param skip: The number of lines to be skipped before reading data
     :return df: A pandas dataframe containing all relevant information
     :raises FileNotFoundError: If the file is found to not exist
@@ -1142,10 +1115,9 @@ def read_excel_columns_by_index(
 
        > file_name = 'test.xls'
        > tab = 'primary'
-       > headers = [0, 1, 2, 3]
+       > headers = {0: int, 1: str, 2: float, 3: int}
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
-       > df = read_excel_columns_by_index(file_name, tab, headers, names, dat)
+       > df = read_excel_columns_by_index(file_name, tab, headers, names)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -1197,11 +1169,10 @@ def read_excel_columns_by_index(
 
        > file_name = 'test.xls'
        > tab = "primary"
-       > headers = [0, 1, 2, 3]
+       > headers = {0: int, 1: str, 2: float, 3: int}
        > names = ['ID', 'Inventory', 'Weight_per', 'Number']
-       > dat = [int, str, float, int]
        > df = read_excel_columns_by_index(file_name, tab, headers,
-                                          names, dat, skip=2)
+                                          names, skip=2)
        > print(df)
            ID Inventory Weight_per Number
         0  1  shoes     1.5        5
@@ -1211,13 +1182,13 @@ def read_excel_columns_by_index(
     """
     if not os.path.isfile(file_name):
         raise FileNotFoundError(f"File '{file_name}' not found")
-    dat = dict(zip(col_index, data_type))
+    head = list(col_index.keys())
     df = pd.read_excel(
         file_name,
         sheet_name=tab,
-        usecols=col_index,
+        usecols=head,
         names=col_names,
-        dtype=dat,
+        dtype=col_index,
         skiprows=skip,
         header=None,
         engine="openpyxl",
