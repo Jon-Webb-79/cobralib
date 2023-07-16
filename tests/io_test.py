@@ -2,6 +2,7 @@
 import json
 import os
 from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ from openpyxl import Workbook
 
 from cobralib.io import (
     Logger,
+    MySQLDB,
     ReadKeyWords,
     read_csv_columns_by_headers,
     read_csv_columns_by_index,
@@ -255,26 +257,6 @@ def run_around_tests():
     # Code that will run after your test, for example:
     if os.path.exists("test.log"):
         os.remove("test.log")
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.fixture(scope="module")
-# def mysql_connection():
-#     # Mock the MySQLDB class and its connection
-#     with patch("cobralib.io.MySQLDB._create_connection") as mock_connect:
-#         mock_connection = mock_connect.return_value
-#         # Initialize the mocked database connection
-#         db = MySQLDB(
-#             username="your_username",
-#             password="your_password",
-#             port=3306,
-#             hostname="localhost",
-#         )
-#         yield db
-#         # Teardown - close the connection
-#         db.close_connection()
 
 
 # ==========================================================================================
@@ -672,48 +654,293 @@ def test_logger_log_trimming():
 # ==========================================================================================
 
 
-# def test_mysql_connection(mysql_connection):
-#     # Check if the connection is established
-#     assert mysql_connection.conn.is_connected()
+@pytest.fixture(autouse=True)
+def no_requests(monkeypatch):
+    monkeypatch.delattr("mysql.connector.connect")
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# def test_change_mysql_db(mysql_connection):
-#     # Set up
-#     new_db_name = 'new_database'
+def test_mysql_connection():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
 
-#     # Act
-#     mysql_connection.change_db(new_db_name)
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
 
-#     # Assert
-#     assert mysql_connection.database == new_db_name
+    # Mock mysql.connector.connect to return the mock connection
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+    # Test close_conn method
+    db.close_conn()
+    mock_conn.close.assert_called_once()
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# def test_get_mysql_databases():
-#    pass
-# with patch.object(MySQLDB, "_create_connection"):
-#     # Initialize MySQLDB instance
-#     db_instance = MySQLDB('username', 'password', '3306', 'localhost')
-#     # Create a mock cursor
-#     mock_cursor = MagicMock()
-#     # Use setattr to add the cursor attribute to db_instance
-#     setattr(db_instance, 'conn', mock_cursor)
+def test_mysql_connect_fail():
+    with pytest.raises(ConnectionError):
+        MySQLDB("username", "password", port=3306, hostname="localhost")
 
-#     # Mock the return values for execute and fetchall
-#     mock_cursor.execute.return_value = None
-#     mock_cursor.fetchall.return_value = [('database1',), ('database2',),
-#                                          ('database3',)]
 
-#     # Call get_databases and check the returned list of databases
-#     databases = db_instance.get_databases()
-#     assert isinstance(databases, list)
-#     assert len(databases) == 3
-#     assert set(databases) == {'database1', 'database2', 'database3'}
+# ------------------------------------------------------------------------------------------
+
+
+def test_change_mysql_db():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Mock mysql.connector.connect to return the mock connection
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+        # Simulate changing the database
+        db.change_db("new_db")
+        mock_cursor.execute.assert_called_once_with("USE new_db")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_get_mysql_dbs():
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_conn.cursor.return_value = mock_cursor
+    mock_dbs = [["db1"], ["db2"], ["db3"]]  # use list of lists
+    mock_cursor.fetchall.return_value = mock_dbs
+
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+
+        dbs = db.get_dbs()
+
+        mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
+        assert list(dbs["Databases"]) == ["db1", "db2", "db3"]
+        assert dbs.equals(pd.DataFrame(mock_dbs, columns=["Databases"]))
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_get_mysql_db_tables():
+    # Create the mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Assign the mock cursor to the mock connection
+    mock_conn.cursor.return_value = mock_cursor
+    mock_tables = [["Table1"], ["Table2"]]
+    # Mock the fetchall method to return known tables
+    mock_cursor.fetchall.return_value = mock_tables
+
+    # Mocking the connect method
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        # Create an instance of the class
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+
+        # Change to the specified DB
+        db.change_db("DB_Name")
+
+        # Invoke the method
+        tables = db.get_db_tables()
+        # Check the result
+        assert list(tables["Tables"]) == ["Table1", "Table2"]
+
+    # Verify the cursor method was called
+    mock_conn.cursor.assert_called_once()
+
+    # Verify fetchall method was called
+    mock_cursor.fetchall.assert_called_once()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_get_mysql_table_columns():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("DB_Name")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [
+            ("Column1", "Integer", "YES", "MUL", None, ""),
+            ("Column2", "Varchar(50)", "NO", "", None, ""),
+            ("Column3", "Datetime", "YES", "", None, ""),
+        ]
+        db.cur.fetchall.return_value = mock_return
+
+        # Invoke the method
+        columns = db.get_table_columns("Table1")
+
+        # Create expected DataFrame for comparison
+        expected_df = pd.DataFrame(
+            mock_return, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
+        )
+
+        # Check the result
+        pd.testing.assert_frame_equal(columns, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_mysql_csv_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.query_db(query)
+
+        db.csv_to_table(
+            "../data/test/read_csv.csv",
+            "Inventory",
+            ["Product", "Inventory"],
+            ["Prd", "Inv"],
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.query_db(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_query_mysql_db():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("names")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Jon", "Fred"), ("Webb", "Smith")]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("FirstName",), ("LastName",)]
+        expected_df = pd.DataFrame(mock_return, columns=["FirstName", "LastName"])
+
+        query = "SELECT * FROM names;"
+        result = db.query_db(query)
+
+        # Check the result
+        pd.testing.assert_frame_equal(result, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_mysql_excel_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.query_db(query)
+
+        db.excel_to_table(
+            "../data/test/read_xls.xlsx",
+            "Inventory",
+            ["Product", "Inventory"],
+            ["Prd", "Inv"],
+            "test",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.query_db(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def test_mysql_txt_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.io.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.query_db(query)
+
+        db.csv_to_table(
+            "../data/test/read_txt.txt",
+            "Inventory",
+            ["Product", "Inventory"],
+            ["Prd", "Inv"],
+            delemeter=r"\s+",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.query_db(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
 # ==========================================================================================
 # ==========================================================================================
 # eof

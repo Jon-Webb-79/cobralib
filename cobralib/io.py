@@ -3,6 +3,7 @@ import json
 import logging
 import logging.handlers
 import os
+import re
 import xml.etree.ElementTree as ET
 from collections import deque
 from typing import Any, Union
@@ -10,7 +11,13 @@ from typing import Any, Union
 import pandas as pd
 import xmltodict
 import yaml
-from mysql.connector import Error, connect
+from mysql.connector import (
+    DatabaseError,
+    Error,
+    InterfaceError,
+    ProgrammingError,
+    connect,
+)
 
 # ==========================================================================================
 # ==========================================================================================
@@ -1425,6 +1432,7 @@ class MySQLDB:
         self.hostname = hostname
         self.database = None
         self.conn = None
+        self.connection = None
 
         self._create_connection(password)
 
@@ -1439,9 +1447,18 @@ class MySQLDB:
         """
         try:
             self.conn.database = db_name
-            self.conn.execute(f"USE {db_name}")
+            self.cur.execute(f"USE {db_name}")
             self.database = db_name
+        except ProgrammingError as e:
+            # Handle errors related to non-existing databases or insufficient permissions.
+            raise ConnectionError(
+                f"Failed to change database due to ProgrammingError: {e}"
+            )
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ConnectionError(f"Failed to change database due to InterfaceError: {e}")
         except Error as e:
+            # Generic error handler for any other exceptions.
             raise ConnectionError(f"Failed to change database: {e}")
 
     # ------------------------------------------------------------------------------------------
@@ -1453,9 +1470,10 @@ class MySQLDB:
         :raises ConnectionError: If the connection does not exist.
         """
         try:
-            if self.conn and self.connection.is_connected():
+            if self.conn and self.conn.is_connected():
                 self.conn.close()
         except Error as e:
+            # Generic error handler for any other exceptions.
             raise ConnectionError(f"Failed to close the connection: {e}")
 
     # ------------------------------------------------------------------------------------------
@@ -1486,11 +1504,15 @@ class MySQLDB:
 
         """
         try:
-            self.conn.execute("SHOW DATABASES;")
-            databases = self.conn.fetchall()
+            self.cur.execute("SHOW DATABASES;")
+            databases = self.cur.fetchall()
             return pd.DataFrame(databases, columns=["Databases"])
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ConnectionError(f"Failed to fetch databases due to InterfaceError: {e}")
         except Error as e:
-            raise ConnectionError(f"Failed to retrieve databases: {e}")
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch databases: {e}")
 
     # ------------------------------------------------------------------------------------------
 
@@ -1525,17 +1547,22 @@ class MySQLDB:
 
         if not db:
             raise ValueError("No database is currently selected.")
-
+        msg = f"Failed to fetch tables from {db}"
         try:
             self.conn.execute(f"SHOW TABLES FROM {db}")
-            tables = self.conn.fetchall()
+            tables = self.cur.fetchall()
             return pd.DataFrame(tables, columns=["Tables"])
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            msg += f" due to InterfaceError {e}"
+            raise ConnectionError(msg)
         except Error as e:
-            raise ConnectionError(f"Failed to retrieve tables: {e}")
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch tables from {db}: {e}")
 
     # ------------------------------------------------------------------------------------------
 
-    def get_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
         """
          Retrieve the names and data types of the columns within the specified table.
 
@@ -1594,22 +1621,26 @@ class MySQLDB:
         """
 
         if db is None:
-            print(self.database)
             db = self.database
 
+        msg = f"Failed to fetch columns from {table_name}"
         if not db:
             raise ValueError("No database is currently selected.")
 
         try:
             self.conn.execute(f"SHOW COLUMNS FROM {db}.{table_name}")
-            columns_info = self.conn.fetchall()
+            columns_info = self.cur.fetchall()
             df = pd.DataFrame(
                 columns_info, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
             )
             return df
-        except Error as e:
-            msg = f"Failed to get column data for {db}.{table_name}: {e}"
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            msg += f" fue to InterfaceError: {e}"
             raise ConnectionError(msg)
+        except Error as e:
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch columns from {table_name}: {e}")
 
     # ------------------------------------------------------------------------------------------
 
@@ -1655,21 +1686,29 @@ class MySQLDB:
 
         """
 
+        msg = "The number of placeholders in the query does not "
+        msg += "match the number of parameters."
         if not self.database:
             raise ValueError("No database is currently selected.")
+        num_placeholders = query.count("%s")
+        if num_placeholders != len(params):
+            raise ValueError(msg)
 
         try:
             if len(params) == 0:
-                self.conn.execute(query)
+                self.cur.execute(query)
             else:
-                self.conn.execute(query, params)
-            rows = self.conn.fetchall()
+                self.cur.execute(query, params)
+            rows = self.cur.fetchall()
             if rows:
-                column_names = [desc[0] for desc in self.conn.description]
+                column_names = [desc[0] for desc in self.cur.description]
                 df = pd.DataFrame(rows, columns=column_names)
                 return df
             else:
                 return pd.DataFrame()
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ConnectionError(f"Failed to execute query: {e}")
         except Error as e:
             raise ConnectionError(f"Failed to execute query: {e}")
 
@@ -1687,7 +1726,7 @@ class MySQLDB:
         """
         Read data from a CSV or TXT file and insert it into the specified table.
 
-        :param txt_file: The path to the CSV file.
+        :param txt_file: The path to the CSV file or TXT file.
         :param table_name: The name of the table.
         :param txt_columns: The names of the columns in the TXT file.
         :param table_columns: The names of the columns in the table (default is None,
@@ -1751,6 +1790,10 @@ class MySQLDB:
             if table_columns is None:
                 table_columns = txt_columns
 
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
+
             for _, row in csv_data.iterrows():
                 insert_data = {}
                 for i, column in enumerate(table_columns):
@@ -1759,14 +1802,18 @@ class MySQLDB:
 
                 placeholders = ", ".join(["%s"] * len(insert_data))
                 if table_columns is not None:
-                    columns = ", ".join(table_columns)
+                    columns = ", ".join(sanitized_columns)
                 else:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.conn.execute(query, values)
-            self.connection.commit()  # Commit changes
+                self.cur.execute(query, values)
+            self.conn.commit()  # Commit changes
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
         except Error as e:
+            # Generic error handler for any other exceptions.
             raise Error(f"Failed to insert data into the table: {e}")
 
     # ------------------------------------------------------------------------------------------
@@ -1829,6 +1876,9 @@ class MySQLDB:
             if table_columns is None:
                 table_columns = excel_columns
 
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
             for _, row in excel_data.iterrows():
                 insert_data = {}
                 for i, column in enumerate(table_columns):
@@ -1837,15 +1887,19 @@ class MySQLDB:
 
                 placeholders = ", ".join(["%s"] * len(insert_data))
                 if table_columns is not None:
-                    columns = ", ".join(table_columns)
+                    columns = ", ".join(sanitized_columns)
                 else:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.conn.execute(query, values)
+                self.cur.execute(query, values)
 
-            self.connection.commit()
+            self.conn.commit()
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
         except Error as e:
+            # Generic error handler for any other exceptions.
             raise Error(f"Failed to insert data into the table: {e}")
 
     # ==========================================================================================
@@ -1858,12 +1912,36 @@ class MySQLDB:
         :return: The MySQL connection object.
         """
         try:
-            self.connection = connect(
+            self.conn = connect(
                 host=self.hostname, user=self.username, password=passwd, port=self.port
             )
-            self.conn = self.connection.cursor()
+            self.cur = self.conn.cursor()
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ConnectionError(
+                f"Failed to create a connection due to InterfaceError: {e}"
+            )
+        except ProgrammingError as e:
+            # Handle programming errors.
+            raise ConnectionError(
+                f"Failed to create a connection due to ProgrammingError: {e}"
+            )
+        except DatabaseError as e:
+            # Handle other database-related errors.
+            raise ConnectionError(
+                f"Failed to create a connection due to DatabaseError: {e}"
+            )
         except Error as e:
-            raise ConnectionError(f"Failed to create a connection {e}")
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to create a connection: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def _sanitize_column_name(self, name: str) -> str:
+        """
+        Sanitize column names to include only alphanumeric characters and underscores.
+        """
+        return re.sub(r"\W|^(?=\d)", "_", name)
 
 
 # ==========================================================================================
