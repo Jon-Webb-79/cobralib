@@ -35,22 +35,32 @@ class MySQLDB:
     :param port: The port number for the database connection. Defaulted to 3306
     :param hostname: The hostname for the database connection
                      (default is 'localhost').
+    :param database: The database you wish to connect to, defaulted to None
     :raises ConnectionError: If a connection can not be established
     :ivar conn: The connection attribute of the mysql-connector-python module.
     :ivar cur: The cursor method for the mysql-connector-python module.
     :ivar database: The name of the database currently being used.
     """
 
-    def __init__(self, username, password, port=3306, hostname="localhost"):
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        port: int = 3306,
+        hostname: str = "localhost",
+        database: str = None,
+    ):
         self.username = username
         self.password = password
         self.port = port
         self.hostname = hostname
-        self.database = None
+        self.database = database
         self.conn = None
         self.cur = None
 
         self._create_connection(password)
+        if self.database is not None:
+            self.change_db(database)
 
     # ------------------------------------------------------------------------------------------
 

@@ -48,5 +48,5 @@ Databases
 The cobralib module comes with serveral classes that can be used to connect with and
 query relational databases.
 
-.. autoclass:: cobralib.io.MySQLDB
+.. autoclass:: cobralib.db.MySQLDB
    :members:
