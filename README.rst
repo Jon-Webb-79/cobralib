@@ -71,5 +71,5 @@ In order to download this repository from github, follow these instructions
      will not be able to use the underlying functionality for these to DBMS's.
    - If the user only has MySQL server installed locally, type ``poetry add mysql-connector-python --extras "mysql"``
    - If the user only has PostGreSQL installed locally, type ``poetry add pygresql --extras "postgresql"``
-   - If the user has both MySQL and PostGreSQL installed locally, type ``poetry add mysql-connector-python pygresql --extras "mysql postgresql"``
+   - If the user has both MySQL and PostGreSQL installed locally, run both of the above commands seperately to install them.
 #. In the future this repository may also be available on PyPi
