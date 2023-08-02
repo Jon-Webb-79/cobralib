@@ -14,9 +14,8 @@ pyyaml = "^6.0"
 pyodbc = "^4.0.39"
 
 [tool.poetry.extras]
-postgressql = ["pygresql^5.2.4"]
-mysql = ["mysql-connector-python=^8.0.33"]
-
+postgresql = ["pygresql^5.2"]
+mysql = ["mysql-connector-python^8.0"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
