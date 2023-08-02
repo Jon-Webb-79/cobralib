@@ -65,6 +65,7 @@ In order to download this repository from github, follow these instructions
 #. Install packages.  This library uses underlying packages to manage MySQL and PostGreSQL; however, each
    of these libraries requires that the user have MySQL and PostGreSQL servers installed locally
    on their machine
+
    - If the user does not have MySQL or PostGreSQL server installed on their machine type ``poetry install``. This will
      install all packages other than the libraries for these two database management systems (DBMSs).  Note, you
      will not be able to use the underlying functionality for these to DBMS's.
