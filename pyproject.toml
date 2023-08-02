@@ -12,6 +12,8 @@ xmltodict = "^0.13.0"
 pandas = "^2.0.3"
 pyyaml = "^6.0"
 pyodbc = "^4.0.39"
+mysql-connector-python = {version = "^8.1.0", extras = ["mysql"]}
+pygresql = {version = "^5.2.4", extras = ["postgresql"]}
 
 [tool.poetry.extras]
 postgresql = ["pygresql"]
