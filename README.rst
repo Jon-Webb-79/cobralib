@@ -57,8 +57,18 @@ In order to download this repository from github, follow these instructions
    `Poetry <https://python-poetry.org/docs/>`_ website
 #. Set the poetry virtual environment with the following command ``poetry config virtualenvs.in-project true``
 #. Ensure you have .git installed on your computer.
-#. At your desired location create a directory titled ``cobralib``
-#. Open a terminal (Bash, zsh or DOS) and cd to the ``cobralib`` directory
+#. Open a terminal (Bash, zsh or DOS) and ``cd`` to the directory where you want to install the cobralib library
 #. Type ``git clone https://github.com/Jon-Webb-79/cobralib.git``
-#. Install packages with ``poetry install``
+#. ``cd`` into the cobralib directory
+#. Create a virtual environment with the command ``python3 -m venv .venv``
+#. Activate the virtual environment with the command ``source .venv/bin/activate``
+#. Install packages.  This library uses underlying packages to manage MySQL and PostGreSQL; however, each
+   of these libraries requires that the user have MySQL and PostGreSQL servers installed locally
+   on their machine
+   - If the user does not have MySQL or PostGreSQL server installed on their machine type ``poetry install``. This will
+     install all packages other than the libraries for these two database management systems (DBMSs).  Note, you
+     will not be able to use the underlying functionality for these to DBMS's.
+   - If the user only has MySQL server installed locally, type ``poetry add mysql-connector-python --extras "mysql"``
+   - If the user only has PostGreSQL installed locally, type ``poetry add pygresql --extras "postgresql"``
+   - If the user has both MySQL and PostGreSQL installed locally, type ``poetry add mysql-connector-python pygresql --extras "mysql postgresql"``
 #. In the future this repository may also be available on PyPi
