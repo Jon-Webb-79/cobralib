@@ -2,13 +2,20 @@
 import re
 
 import pandas as pd
-from mysql.connector import (
-    DatabaseError,
-    Error,
-    InterfaceError,
-    ProgrammingError,
-    connect,
-)
+
+try:
+    from mysql.connector import (
+        DatabaseError,
+        Error,
+        InterfaceError,
+        ProgrammingError,
+        connect,
+    )
+except ImportError:
+    msg = "Warning: mysql-connector-python package is not installed. "
+    msg += "Some features may not work."
+    # Handle the case when mysql-connector is not available
+    print(msg)
 
 # ==========================================================================================
 # ==========================================================================================
