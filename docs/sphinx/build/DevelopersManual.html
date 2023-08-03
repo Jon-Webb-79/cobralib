@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Developers Manual &#8212; cobralib 0.1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=89b800e6" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
 
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -930,6 +930,367 @@ headers are not on the first line.  For instance, assume the following csv file;
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="cobralib.io.read_pdf_columns_by_headers">
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_pdf_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_pdf_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_pdf_columns_by_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a table from a PDF document and save user-specified columns into a pandas
+DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – The file name to include the path-link to the PDF file.</p></li>
+<li><p><strong>headers</strong> – A dictionary of column names and their data types.
+Data types are limited to <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+<li><p><strong>table_idx</strong> – Index of the table to extract from the page (default: 0).</p></li>
+<li><p><strong>page_num</strong> – Page number from which to extract the table (default: 0).</p></li>
+<li><p><strong>skip</strong> – The number of lines to be skipped before reading data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return df<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas DataFrame containing the specified columns from the table.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – If the PDF file is found to not exist.</p>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_pdf_columns_by_headers</span>
+
+<span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.pdf&#39;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_pdf_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">table_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">page_num</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cobralib.io.read_pdf_columns_by_index">
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_pdf_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_pdf_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_pdf_columns_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a table from a PDF document and save user-specified columns into a pandas
+DataFrame based on their column index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – The file name to include the path-link to the PDF file.</p></li>
+<li><p><strong>headers</strong> – A dictionary of column index and their data types.
+Data types are limited to <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p></li>
+<li><p><strong>col_names</strong> – A list containing the names to be given to each column.</p></li>
+<li><p><strong>table_idx</strong> – Index of the table to extract from the page (default: 0).</p></li>
+<li><p><strong>skip_rows</strong> – Number of rows to skip before reading the header row (default: 0).</p></li>
+<li><p><strong>page_num</strong> – Page number from which to extract the table (default: 0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return df<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas DataFrame containing the specified columns from the table.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – If the PDF file is found to not exist.</p>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_pdf_columns_by_index</span>
+
+<span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.pdf&#39;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>  <span class="c1"># Column names</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_pdf_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span>
+                                 <span class="n">table_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">skip_rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">page_num</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cobralib.io.read_excel_columns_by_headers">
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_excel_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_excel_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_excel_columns_by_headers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – The file name to include path-link.  Must be an
+.xls file format.  This code will <strong>not</strong> read .xlsx</p></li>
+<li><p><strong>tab</strong> – The tab or sheet name that data will be read from</p></li>
+<li><p><strong>headers</strong> – A dictionary of column names and their data types.
+types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
+<li><p><strong>skip</strong> – The number of lines to be skipped before reading data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return df<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas dataframe containing all relevant information</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – If the file is found to not exist</p>
+</dd>
+</dl>
+<p>Assume we have a .xls file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format
+in a tab titled <code class="docutils literal notranslate"><span class="pre">primary</span></code>.</p>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 21.4%" />
+<col style="width: 35.7%" />
+<col style="width: 21.4%" />
+<col style="width: 21.4%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Inventory</p></th>
+<th class="head"><p>Weight_per</p></th>
+<th class="head"><p>Number</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Shoes</p></td>
+<td><p>1.5</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>t-shirt</p></td>
+<td><p>1.8</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>coffee</p></td>
+<td><p>2.1</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>books</p></td>
+<td><p>3.2</p></td>
+<td><p>48</p></td>
+</tr>
+</tbody>
+</table>
+<p>This file can be read via the following command</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.xls&#39;</span>
+<span class="o">&gt;</span> <span class="n">tab</span> <span class="o">=</span> <span class="s2">&quot;primary&quot;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_excel_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+<p>This function can also use the <cite>skip</cite> attributed read data when the
+headers are not on the first line.  For instance, assume the following csv file;</p>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 47.1%" />
+<col style="width: 23.5%" />
+<col style="width: 14.7%" />
+<col style="width: 14.7%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>This line is used to provide metadata for the csv file</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>This line is as well</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ID</p></td>
+<td><p>Inventory</p></td>
+<td><p>Weight_per</p></td>
+<td><p>Number</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Shoes</p></td>
+<td><p>1.5</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>t-shirt</p></td>
+<td><p>1.8</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>coffee</p></td>
+<td><p>2.1</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>books</p></td>
+<td><p>3.2</p></td>
+<td><p>48</p></td>
+</tr>
+</tbody>
+</table>
+<p>This file can be read via the following command</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_excel_columns_by_headers</span>
+
+<span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.xls&#39;</span>
+<span class="o">&gt;</span> <span class="n">tab</span> <span class="o">=</span> <span class="s2">&quot;primary&quot;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_excel_columns_by_headers</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span>
+                                     <span class="n">headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cobralib.io.read_excel_columns_by_index">
+<span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_excel_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_excel_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_excel_columns_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> – The file name to include path-link.  Must be an
+.xls file format.  This code will <strong>not</strong> read .xlsx</p></li>
+<li><p><strong>tab</strong> – The tab or sheet name that data will be read from</p></li>
+<li><p><strong>col_index</strong> – A dictionary of column index` and their data types.
+types are limited to <code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.float64</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
+<li><p><strong>col_names</strong> – A list containing the names to be given to
+each column</p></li>
+<li><p><strong>skip</strong> – The number of lines to be skipped before reading data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return df<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas dataframe containing all relevant information</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – If the file is found to not exist</p>
+</dd>
+</dl>
+<p>Assume we have a .txt file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format.</p>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 21.4%" />
+<col style="width: 35.7%" />
+<col style="width: 21.4%" />
+<col style="width: 21.4%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Shoes</p></td>
+<td><p>1.5</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>t-shirt</p></td>
+<td><p>1.8</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>coffee</p></td>
+<td><p>2.1</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>books</p></td>
+<td><p>3.2</p></td>
+<td><p>48</p></td>
+</tr>
+</tbody>
+</table>
+<p>This file can be read via the following command</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_excel_columns_by_index</span>
+
+<span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.xls&#39;</span>
+<span class="o">&gt;</span> <span class="n">tab</span> <span class="o">=</span> <span class="s1">&#39;primary&#39;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_excel_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+<p>This function can also use the <cite>skip</cite> attributed read data when the
+headers are not on the first line.  For instance, assume the following csv file;</p>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 47.1%" />
+<col style="width: 23.5%" />
+<col style="width: 14.7%" />
+<col style="width: 14.7%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>This line is used to provide metadata for the csv file</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>This line is as well</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ID</p></td>
+<td><p>Inventory</p></td>
+<td><p>Weight_per</p></td>
+<td><p>Number</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Shoes</p></td>
+<td><p>1.5</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>t-shirt</p></td>
+<td><p>1.8</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>coffee</p></td>
+<td><p>2.1</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>books</p></td>
+<td><p>3.2</p></td>
+<td><p>48</p></td>
+</tr>
+</tbody>
+</table>
+<p>This file can be read via the following command</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">read_excel_columns_by_index</span>
+
+<span class="o">&gt;</span> <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;test.xls&#39;</span>
+<span class="o">&gt;</span> <span class="n">tab</span> <span class="o">=</span> <span class="s2">&quot;primary&quot;</span>
+<span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight_per&#39;</span><span class="p">,</span> <span class="s1">&#39;Number&#39;</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">df</span> <span class="o">=</span> <span class="n">read_excel_columns_by_index</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span>
+                                   <span class="n">names</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">ID</span> <span class="n">Inventory</span> <span class="n">Weight_per</span> <span class="n">Number</span>
+ <span class="mi">0</span>  <span class="mi">1</span>  <span class="n">shoes</span>     <span class="mf">1.5</span>        <span class="mi">5</span>
+ <span class="mi">1</span>  <span class="mi">2</span>  <span class="n">t</span><span class="o">-</span><span class="n">shirt</span>   <span class="mf">1.8</span>        <span class="mi">3</span>
+ <span class="mi">2</span>  <span class="mi">3</span>  <span class="n">coffee</span>    <span class="mf">2.1</span>        <span class="mi">15</span>
+ <span class="mi">3</span>  <span class="mi">4</span>  <span class="n">books</span>     <span class="mf">3.2</span>        <span class="mi">40</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 <section id="yaml-files">
 <h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading">¶</a></h2>
@@ -1490,6 +1851,10 @@ attack</p>
 <li><a class="reference internal" href="#cobralib.io.read_csv_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_csv_columns_by_index()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.read_text_columns_by_headers"><code class="docutils literal notranslate"><span class="pre">read_text_columns_by_headers()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.io.read_text_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_text_columns_by_index()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.read_pdf_columns_by_headers"><code class="docutils literal notranslate"><span class="pre">read_pdf_columns_by_headers()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.read_pdf_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_pdf_columns_by_index()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.read_excel_columns_by_headers"><code class="docutils literal notranslate"><span class="pre">read_excel_columns_by_headers()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.io.read_excel_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_excel_columns_by_index()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#yaml-files">YAML Files</a><ul>
@@ -1563,8 +1928,8 @@ attack</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2023, Jonathan A. Webb.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 2023, Jonathan A. Webb.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
