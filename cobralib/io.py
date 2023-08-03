@@ -8,6 +8,7 @@ from collections import deque
 from typing import Any, Union
 
 import pandas as pd
+import pdfplumber
 import xmltodict
 import yaml
 
@@ -1192,6 +1193,154 @@ def read_excel_columns_by_index(
         header=None,
         engine="openpyxl",
     )
+    return df
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def read_pdf_columns_by_headers(
+    file_name: str,
+    headers: dict[str, type],
+    table_idx: int = 0,
+    page_num: int = 0,
+    skip: int = 0,
+) -> pd.DataFrame:
+    """
+    Read a table from a PDF document and save user-specified columns into a pandas
+    DataFrame.
+
+    :param file_name: The file name to include the path-link to the PDF file.
+    :param headers: A dictionary of column names and their data types.
+                    Data types are limited to ``int``, ``float``, and ``str``.
+    :param table_idx: Index of the table to extract from the page (default: 0).
+    :param page_num: Page number from which to extract the table (default: 0).
+    :param skip: The number of lines to be skipped before reading data
+    :return df: A pandas DataFrame containing the specified columns from the table.
+    :raises FileNotFoundError: If the PDF file is found to not exist.
+
+    Example usage:
+
+    .. code-block:: python
+
+       from cobralib.io import read_pdf_columns_by_headers
+
+       > file_name = 'test.pdf'
+       > headers = {'ID': int, 'Inventory': str, 'Weight_per': float, 'Number': int}
+       > df = read_pdf_columns_by_headers(file_name, headers, table_idx=0, page_num=1)
+       > print(df)
+           ID Inventory Weight_per Number
+        0  1  shoes     1.5        5
+        1  2  t-shirt   1.8        3
+        2  3  coffee    2.1        15
+        3  4  books     3.2        40
+    """
+    if not os.path.isfile(file_name):
+        raise FileNotFoundError(f"File '{file_name}' not found")
+
+    # Extract tables from the specified page of the PDF using pdfplumber
+    with pdfplumber.open(file_name) as pdf:
+        page = pdf.pages[page_num]
+        table = page.extract_tables()
+
+    if table_idx >= len(table):
+        raise ValueError(f"Table index {table_idx} out of range.")
+
+    # Convert the table to a pandas DataFrame
+    df = pd.DataFrame(table[table_idx][1:], columns=table[table_idx][0])
+
+    # Skip specified number of rows before reading the header
+    df = df.iloc[skip:]
+
+    # Filter out columns based on user-specified headers
+    selected_columns = [column for column in headers.keys() if column in df.columns]
+    df = df[selected_columns]
+
+    # Rename the columns to match the user-specified headers
+    df.columns = list(headers.keys())
+
+    # Convert the columns to the specified data types
+    for column, dtype in headers.items():
+        df[column] = df[column].astype(dtype)
+
+    return df
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def read_pdf_columns_by_index(
+    file_name: str,
+    headers: dict[int, type],
+    col_names: list[str],
+    table_idx: int = 0,
+    skip_rows: int = 0,
+    page_num: int = 0,
+) -> pd.DataFrame:
+    """
+    Read a table from a PDF document and save user-specified columns into a pandas
+    DataFrame based on their column index.
+
+    :param file_name: The file name to include the path-link to the PDF file.
+    :param headers: A dictionary of column index and their data types.
+                    Data types are limited to ``int``, ``float``, and ``str``.
+    :param col_names: A list containing the names to be given to each column.
+    :param table_idx: Index of the table to extract from the page (default: 0).
+    :param skip_rows: Number of rows to skip before reading the header row (default: 0).
+    :param page_num: Page number from which to extract the table (default: 0).
+    :return df: A pandas DataFrame containing the specified columns from the table.
+    :raises FileNotFoundError: If the PDF file is found to not exist.
+
+    Example usage:
+
+    .. code-block:: python
+
+       from cobralib.io import read_pdf_columns_by_index
+
+       > file_name = 'test.pdf'
+       > headers = {0: int, 1: str, 2: float, 3: int}
+       > col_names = ['ID', 'Inventory', 'Weight_per', 'Number']  # Column names
+       > df = read_pdf_columns_by_index(file_name, headers, col_names,
+                                        table_idx=0, skip_rows=2, page_num=1)
+       > print(df)
+           ID Inventory Weight_per Number
+        0  1  shoes     1.5        5
+        1  2  t-shirt   1.8        3
+        2  3  coffee    2.1        15
+        3  4  books     3.2        40
+    """
+    if not os.path.isfile(file_name):
+        raise FileNotFoundError(f"File '{file_name}' not found")
+
+    # Extract tables from the specified page of the PDF using pdfplumber
+    with pdfplumber.open(file_name) as pdf:
+        page = pdf.pages[page_num]
+        table = page.extract_tables()
+
+    if table_idx >= len(table):
+        raise ValueError(f"Table index {table_idx} out of range.")
+
+    # Convert the table to a pandas DataFrame
+    df = pd.DataFrame(table[table_idx][1:], columns=table[table_idx][0])
+
+    # Skip specified number of rows before reading the header
+    df = df.iloc[skip_rows:]
+
+    # Filter out columns based on user-specified column indices
+    selected_columns = [
+        col_idx for col_idx in headers.keys() if col_idx < len(df.columns)
+    ]
+    df = df.iloc[:, selected_columns]
+
+    # Rename the columns with user-specified column names
+    df.columns = col_names[: len(selected_columns)]
+
+    dat_type = list(headers.values())
+    name_dict = dict(zip(col_names, dat_type))
+    # Convert the columns to the specified data types
+    for column, dtype in name_dict.items():
+        df[column] = df[column].astype(dtype)
+
     return df
 
 

@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 import yaml
 from openpyxl import Workbook
+from pandas.testing import assert_frame_equal
 
 from cobralib.io import (
     Logger,
@@ -16,6 +17,8 @@ from cobralib.io import (
     read_csv_columns_by_index,
     read_excel_columns_by_headers,
     read_excel_columns_by_index,
+    read_pdf_columns_by_headers,
+    read_pdf_columns_by_index,
     read_text_columns_by_headers,
     read_text_columns_by_index,
     read_yaml_file,
@@ -573,6 +576,39 @@ def test_read_excel_columns_by_index(excel_file):
     }
     expected_df = pd.DataFrame(expected_data)
     assert df.equals(expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.read_columnar
+def test_read_pdf_columns_by_header():
+    file = "../data/test/pdf_tables.pdf"
+    number = 2
+    dat_type = {"Term": str, "Undergraduate": int}
+    df = read_pdf_columns_by_headers(file, dat_type, number)
+
+    col_names = ["Term", "Undergraduate"]
+    vals = [["Fall 2019", 19886], ["Winter 2020", 19660], ["Spring 2020", 19593]]
+    expected_df = pd.DataFrame(vals, columns=col_names)
+    assert_frame_equal(df, expected_df)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.read_columnar
+def test_read_pdf_columns_by_index():
+    file = "../data/test/pdf_tables.pdf"
+    number = 2
+    dat_type = {0: str, 1: int}
+    cols = ["Term", "Undergraduate"]
+    df = read_pdf_columns_by_index(file, dat_type, cols, number)
+
+    col_names = ["Term", "Undergraduate"]
+    vals = [["Fall 2019", 19886], ["Winter 2020", 19660], ["Spring 2020", 19593]]
+    expected_df = pd.DataFrame(vals, columns=col_names)
+    assert_frame_equal(df, expected_df)
 
 
 # ==========================================================================================
