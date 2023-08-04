@@ -52,6 +52,12 @@
     <span class="c1"># Handle the case when mysql-connector is not available</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">read_excel_columns_by_headers</span><span class="p">,</span>
+    <span class="n">read_pdf_columns_by_headers</span><span class="p">,</span>
+    <span class="n">read_text_columns_by_headers</span><span class="p">,</span>
+<span class="p">)</span>
+
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 
@@ -217,7 +223,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No database is currently selected.&quot;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to fetch tables from </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHOW TABLES FROM </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHOW TABLES FROM </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Tables&quot;</span><span class="p">])</span>
         <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -387,23 +393,24 @@
 
 <div class="viewcode-block" id="MySQLDB.csv_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.csv_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">txt_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">csv_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">txt_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">delemeter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+        <span class="n">csv_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
         <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read data from a CSV or TXT file and insert it into the specified table.</span>
 
-<span class="sd">        :param txt_file: The path to the CSV file or TXT file.</span>
+<span class="sd">        :param csv_file: The path to the CSV file or TXT file.</span>
 <span class="sd">        :param table_name: The name of the table.</span>
-<span class="sd">        :param txt_columns: The names of the columns in the TXT file.</span>
-<span class="sd">        :param table_columns: The names of the columns in the table (default is None,</span>
+<span class="sd">        :param csv_headers: The names of the columns in the TXT file and datatypes</span>
+<span class="sd">                            as a dictionary.</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
 <span class="sd">                              assumes CSV column names and table column names</span>
 <span class="sd">                              are the same).</span>
-<span class="sd">        :param delemeter: The seperating delimeter in the text file.  Defaulted to</span>
+<span class="sd">        :param delimiter: The seperating delimeter in the text file.  Defaulted to</span>
 <span class="sd">                          &#39;,&#39; for a CSV file, but can work with other delimeters</span>
 <span class="sd">        :param skip: The number of rows to be skipped if metadata exists before</span>
 <span class="sd">                     the header definition.  Defaulted to 0</span>
@@ -422,7 +429,8 @@
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
 <span class="sd">           db.change_db(&#39;Names&#39;)</span>
-<span class="sd">           db.csv_to_table(&#39;csv_file.csv&#39;, &#39;FirstLastName&#39;, [&#39;FirstName&#39;, &#39;LastName&#39;],</span>
+<span class="sd">           db.csv_to_table(&#39;csv_file.csv&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           [&#39;FirstName&#39;: str, &#39;LastName&#39;: str],</span>
 <span class="sd">                           [&#39;First&#39;, &#39;Last&#39;])</span>
 <span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
 <span class="sd">           result = db.query_db(query)</span>
@@ -442,7 +450,8 @@
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
 <span class="sd">           db.change_db(&#39;Names&#39;)</span>
-<span class="sd">           db.csv_to_table(&#39;txt_file.txt&#39;, &#39;FirstLastName&#39;, [&#39;FirstName&#39;, &#39;LastName&#39;],</span>
+<span class="sd">           db.csv_to_table(&#39;txt_file.txt&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           [&#39;FirstName&#39;: str, &#39;LastName&#39;: str],</span>
 <span class="sd">                           [&#39;First&#39;, &#39;Last&#39;], delemeter=r&quot;\\s+&quot;, skip=2)</span>
 <span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
 <span class="sd">           result = db.query_db(query)</span>
@@ -452,27 +461,31 @@
 <span class="sd">              1      2       Fred    Smith</span>
 <span class="sd">              2      3       Jillian Webb</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">txt_columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CSV column names are required.&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">csv_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">txt_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">delemeter</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
+            <span class="n">csv_data</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span>
+                <span class="n">csv_file</span><span class="p">,</span> <span class="n">csv_headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span>
+            <span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">table_columns</span> <span class="o">=</span> <span class="n">txt_columns</span>
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
             <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
             <span class="p">]</span>
+
+            <span class="n">csv_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
             <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
                 <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">txt_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_headers</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">csv_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                     <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
                 <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -493,8 +506,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">excel_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">excel_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">excel_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sheet_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sheet1&quot;</span><span class="p">,</span>
         <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -503,8 +516,9 @@
 
 <span class="sd">        :param excel_file: The path to the Excel file.</span>
 <span class="sd">        :param table_name: The name of the table.</span>
-<span class="sd">        :param excel_columns: The names of the columns in the Excel file.</span>
-<span class="sd">        :param table_columns: The names of the columns in the table (default is None,</span>
+<span class="sd">        :param excel_headers: The names of the columns in the Excel file and their</span>
+<span class="sd">                              data types as a dictionary</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
 <span class="sd">                              assumes Excel column names and table column names are</span>
 <span class="sd">                              the same).</span>
 <span class="sd">        :param sheet_name: The name of the sheet in the Excel file</span>
@@ -527,7 +541,8 @@
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
 <span class="sd">           db.change_db(&#39;Names&#39;)</span>
-<span class="sd">           db.csv_to_table(&#39;excel_file.xlsx&#39;, &#39;FirstLastName&#39;, [&#39;FirstName&#39;, &#39;LastName&#39;],</span>
+<span class="sd">           db.csv_to_table(&#39;excel_file.xlsx&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           {&#39;FirstName&#39;: str, &#39;LastName&#39;: str},</span>
 <span class="sd">                           [&#39;First&#39;, &#39;Last&#39;])</span>
 <span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
 <span class="sd">           result = db.query_db(query)</span>
@@ -537,30 +552,102 @@
 <span class="sd">              1      2       Fred    Smith</span>
 <span class="sd">              2      3       Jillian Webb</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">excel_columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">excel_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Excel column names are required.&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
-                <span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">excel_columns</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span>
+            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">read_excel_columns_by_headers</span><span class="p">(</span>
+                <span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">excel_headers</span><span class="p">,</span> <span class="n">skip</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
+            <span class="p">]</span>
+
+            <span class="n">excel_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">excel_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_headers</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">excel_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="MySQLDB.pdf_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.pdf_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">pdf_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pdf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pdf_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">table_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">page_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read a table from a PDF file and insert it into the specified MySQL table.</span>
+
+<span class="sd">        :param pdf_file: The path to the PDF file.</span>
+<span class="sd">        :param table_name: The name of the MySQL table.</span>
+<span class="sd">        :param pdf_headers: A dictionary of column names in the PDF and their data</span>
+<span class="sd">                            types.</span>
+<span class="sd">        :param table_columns: The names of the columns in the MySQL table</span>
+<span class="sd">                              (default is None, assumes PDF column names and MySQL</span>
+<span class="sd">                              column names are the same).</span>
+<span class="sd">        :param table_idx: Index of the table in the PDF (default: 0).</span>
+<span class="sd">        :param page_num: Page number from which to extract the table (default: 0).</span>
+<span class="sd">        :param skip: The number of rows to skip in the PDF table.</span>
+<span class="sd">        :raises ValueError: If the PDF file, table name, or sheet name is not</span>
+<span class="sd">                            provided, or if the number of PDF headers and table</span>
+<span class="sd">                            columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;PDF headers are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Read the table from the PDF file</span>
+            <span class="n">pdf_data</span> <span class="o">=</span> <span class="n">read_pdf_columns_by_headers</span><span class="p">(</span>
+                <span class="n">pdf_file</span><span class="p">,</span> <span class="n">pdf_headers</span><span class="p">,</span> <span class="n">table_idx</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="p">)</span>
+
             <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">table_columns</span> <span class="o">=</span> <span class="n">excel_columns</span>
+                <span class="n">table_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
             <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
             <span class="p">]</span>
-            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">excel_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">pdf_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">pdf_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
                 <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">excel_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">pdf_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                     <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
                 <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
                 <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
