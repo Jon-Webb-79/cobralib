@@ -73,11 +73,11 @@ class MySQLDB:
 
         self._create_connection(password)
         if self.database is not None:
-            self.change_db(database)
+            self.change_database(database)
 
     # ------------------------------------------------------------------------------------------
 
-    def change_db(self, db_name) -> None:
+    def change_database(self, db_name) -> None:
         """
         Change to the specified database within the server.
 
@@ -102,7 +102,7 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def close_conn(self) -> None:
+    def close_connection(self) -> None:
         """
         Close the connection to the server.
 
@@ -117,7 +117,7 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_dbs(self) -> pd.DataFrame:
+    def get_databases(self) -> pd.DataFrame:
         """
         Retrieve the names of all databases available to the user.
 
@@ -155,7 +155,7 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_db_tables(self, db: str = None) -> pd.DataFrame:
+    def get_database_tables(self, db: str = None) -> pd.DataFrame:
         """
         Retrieve the names of all tables within the current database.
 
@@ -283,7 +283,7 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def query_db(self, query: str, params: tuple = ()) -> pd.DataFrame:
+    def execute_query(self, query: str, params: tuple = ()) -> pd.DataFrame:
         """
         Execute a query with placeholders and return the result as a Pandas DataFrame.
         The user of this class should ensure that when applicable they parameteratize

@@ -58,7 +58,7 @@ def test_mysql_connection():
         assert db.cur == mock_cursor
 
     # Test close_conn method
-    db.close_conn()
+    db.close_connection()
     mock_conn.close.assert_called_once()
 
 
@@ -90,7 +90,7 @@ def test_change_mysql_db():
         assert db.cur == mock_cursor
 
         # Simulate changing the database
-        db.change_db("new_db")
+        db.change_database("new_db")
         mock_cursor.execute.assert_called_once_with("USE new_db")
 
 
@@ -109,7 +109,7 @@ def test_get_mysql_dbs():
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
 
-        dbs = db.get_dbs()
+        dbs = db.get_databases()
 
         mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
         assert list(dbs["Databases"]) == ["db1", "db2", "db3"]
@@ -137,10 +137,10 @@ def test_get_mysql_db_tables():
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
 
         # Change to the specified DB
-        db.change_db("DB_Name")
+        db.change_database("DB_Name")
 
         # Invoke the method
-        tables = db.get_db_tables()
+        tables = db.get_database_tables()
         # Check the result
         assert list(tables["Tables"]) == ["Table1", "Table2"]
 
@@ -161,7 +161,7 @@ def test_get_mysql_table_columns():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("DB_Name")
+        db.change_database("DB_Name")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [
@@ -193,7 +193,7 @@ def test_mysql_csv_to_table():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("Inventory")
+        db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
@@ -209,7 +209,7 @@ def test_mysql_csv_to_table():
             Inv INT NOT NULL,
             PRIMARY KEY (product_id);
         """
-        db.query_db(query)
+        db.execute_query(query)
 
         db.csv_to_table(
             "../data/test/read_csv.csv",
@@ -218,7 +218,7 @@ def test_mysql_csv_to_table():
             ["Prd", "Inv"],
         )
         query = "SELECT Prd, Inv FROM Inventory;"
-        inventory = db.query_db(query)
+        inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
@@ -233,7 +233,7 @@ def test_query_mysql_db():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("names")
+        db.change_database("names")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [("Jon", "Fred"), ("Webb", "Smith")]
@@ -243,7 +243,7 @@ def test_query_mysql_db():
         expected_df = pd.DataFrame(mock_return, columns=["FirstName", "LastName"])
 
         query = "SELECT * FROM names;"
-        result = db.query_db(query)
+        result = db.execute_query(query)
 
         # Check the result
         pd.testing.assert_frame_equal(result, expected_df, check_dtype=False)
@@ -259,7 +259,7 @@ def test_mysql_excel_to_table():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("Inventory")
+        db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
@@ -275,7 +275,7 @@ def test_mysql_excel_to_table():
             Inv INT NOT NULL,
             PRIMARY KEY (product_id);
         """
-        db.query_db(query)
+        db.execute_query(query)
 
         db.excel_to_table(
             "../data/test/read_xls.xlsx",
@@ -285,7 +285,7 @@ def test_mysql_excel_to_table():
             "test",
         )
         query = "SELECT Prd, Inv FROM Inventory;"
-        inventory = db.query_db(query)
+        inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
@@ -300,7 +300,7 @@ def test_mysql_txt_to_table():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("Inventory")
+        db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
@@ -316,7 +316,7 @@ def test_mysql_txt_to_table():
             Inv INT NOT NULL,
             PRIMARY KEY (product_id);
         """
-        db.query_db(query)
+        db.execute_query(query)
 
         db.csv_to_table(
             "../data/test/read_txt.txt",
@@ -326,7 +326,7 @@ def test_mysql_txt_to_table():
             delimiter=r"\s+",
         )
         query = "SELECT Prd, Inv FROM Inventory;"
-        inventory = db.query_db(query)
+        inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
@@ -341,7 +341,7 @@ def test_mysql_pdf_to_table():
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
         db = MySQLDB("username", "password", port=3306, hostname="localhost")
-        db.change_db("CollegeAdmissions")
+        db.change_database("CollegeAdmissions")
 
         # Mock the fetchall method to return known columns and their metadata
         mock_return = [("Fall 2019", 3441), ("Winter 2020", 3499), ("Spring 2020", 3520)]
@@ -357,7 +357,7 @@ def test_mysql_pdf_to_table():
             Graduate INT NOT NULL,
             PRIMARY KEY (product_id);
         """
-        db.query_db(query)
+        db.execute_query(query)
 
         db.pdf_to_table(
             "../data/test/pdf_tables.pdf",
@@ -366,7 +366,7 @@ def test_mysql_pdf_to_table():
             table_idx=2,
         )
         query = "SELECT Prd, Inv FROM Admissions;"
-        inventory = db.query_db(query)
+        inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
@@ -385,16 +385,16 @@ def test_mysql_pdf_to_table():
 #     """
 #     file = "../data/test/read_xls.xlsx"
 #     csv_headers = {"Product": str, "Inventory": int}
-#     obj.query_db(qry)
-#     tables = obj.get_db_tables()
+#     obj.execute_query(qry)
+#     tables = obj.get_database_tables()
 #     print(tables)
 #     obj.excel_to_table(
 #             file, "Inventory", csv_headers, table_headers=["Prd", "Inv"],
 #             sheet_name="test"
 #     )
-#     dat = obj.query_db("SELECT * FROM Inventory;")
+#     dat = obj.execute_query("SELECT * FROM Inventory;")
 #     print(dat)
-#     obj.close_conn()
+#     obj.close_connection()
 
 
 # ==========================================================================================
