@@ -38,6 +38,7 @@ pyupgrade = "^3.9.0"
 pre-commit = "^3.3.3"
 sphinx = "^7.0.1"
 openpyxl = "^3.1.2"
+pypdf2 = "^3.0.1"
 
 [build-system]
 requires = ["poetry-core"]

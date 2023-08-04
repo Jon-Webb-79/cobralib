@@ -331,6 +331,67 @@ def test_mysql_txt_to_table():
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
 
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mysql
+def test_mysql_pdf_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("cobralib.db.connect", return_value=mock_conn):
+        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db.change_db("CollegeAdmissions")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Fall 2019", 3441), ("Winter 2020", 3499), ("Spring 2020", 3520)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Term",), ("Graduate",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Term", "Graduate"])
+
+        # Create table
+        query = """CREATE TABLE Admissions (
+            term_id INTEGER AUTO_INCREMENT
+            Term VARCHAR(20) NOT NULL,
+            Graduate INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.query_db(query)
+
+        db.pdf_to_table(
+            "../data/test/pdf_tables.pdf",
+            "Admissions",
+            {"Term": str, "Graduate": int},
+            table_idx=2,
+        )
+        query = "SELECT Prd, Inv FROM Admissions;"
+        inventory = db.query_db(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+# def test_implementation():
+#     obj = MySQLDB("root", "GrandCanyon12#$", database = "ZillowHousing")
+#     qry = """CREATE TABLE IF NOT EXISTS College (
+#         college_id INTEGER AUTO_INCREMENT,
+#         Term VARCHAR(20),
+#         Graduate INT,
+#         PRIMARY KEY (college_id)
+#     )
+#     """
+#     file = "../data/test/pdf_tables.pdf"
+#     pdf_headers = {"Term": str, "Graduate": int}
+#     obj.query_db(qry)
+#     tables = obj.get_db_tables()
+#     print(tables)
+#     obj.pdf_to_table(file, "College", pdf_headers, table_idx=2)
+#     dat = obj.query_db("SELECT * FROM College;")
+#     print(dat)
+#     obj.close_conn()
 # ==========================================================================================
 # ==========================================================================================
 # eof

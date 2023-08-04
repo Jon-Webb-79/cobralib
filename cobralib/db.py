@@ -17,6 +17,8 @@ except ImportError:
     # Handle the case when mysql-connector is not available
     print(msg)
 
+from cobralib.io import read_pdf_columns_by_headers
+
 # ==========================================================================================
 # ==========================================================================================
 
@@ -182,7 +184,7 @@ class MySQLDB:
             raise ValueError("No database is currently selected.")
         msg = f"Failed to fetch tables from {db}"
         try:
-            self.conn.execute(f"SHOW TABLES FROM {db}")
+            self.cur.execute(f"SHOW TABLES FROM {db}")
             tables = self.cur.fetchall()
             return pd.DataFrame(tables, columns=["Tables"])
         except InterfaceError as e:
@@ -526,6 +528,75 @@ class MySQLDB:
                     columns = ", ".join(sanitized_columns)
                 else:
                     columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+
+            self.conn.commit()
+        except InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
+        except Error as e:
+            # Generic error handler for any other exceptions.
+            raise Error(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def pdf_to_table(
+        self,
+        pdf_file: str,
+        table_name: str,
+        pdf_headers: dict[str, type],
+        table_columns: list = None,
+        table_idx: int = 0,
+        page_num: int = 0,
+        skip: int = 0,
+    ) -> None:
+        """
+        Read a table from a PDF file and insert it into the specified MySQL table.
+
+        :param pdf_file: The path to the PDF file.
+        :param table_name: The name of the MySQL table.
+        :param pdf_headers: A dictionary of column names in the PDF and their data
+                            types.
+        :param table_columns: The names of the columns in the MySQL table
+                              (default is None, assumes PDF column names and MySQL
+                              column names are the same).
+        :param table_idx: Index of the table in the PDF (default: 0).
+        :param page_num: Page number from which to extract the table (default: 0).
+        :param skip: The number of rows to skip in the PDF table.
+        :raises ValueError: If the PDF file, table name, or sheet name is not
+                            provided, or if the number of PDF headers and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+
+        if len(pdf_headers) == 0:
+            raise ValueError("PDF headers are required.")
+
+        try:
+            # Read the table from the PDF file
+            pdf_data = read_pdf_columns_by_headers(
+                pdf_file, pdf_headers, table_idx, page_num, skip
+            )
+
+            if table_columns is None:
+                table_columns = list(pdf_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
+            pdf_header_keys = list(pdf_headers.keys())
+
+            for _, row in pdf_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_columns):
+                    value = row[pdf_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["%s"] * len(insert_data))
+                columns = ", ".join(sanitized_columns)
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
                 self.cur.execute(query, values)
