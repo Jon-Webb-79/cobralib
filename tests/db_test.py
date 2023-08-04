@@ -374,24 +374,28 @@ def test_mysql_pdf_to_table():
 # ------------------------------------------------------------------------------------------
 
 
-# def test_implementation():
-#     obj = MySQLDB("root", "GrandCanyon12#$", database = "ZillowHousing")
-#     qry = """CREATE TABLE IF NOT EXISTS College (
-#         college_id INTEGER AUTO_INCREMENT,
-#         Term VARCHAR(20),
-#         Graduate INT,
-#         PRIMARY KEY (college_id)
-#     )
-#     """
-#     file = "../data/test/pdf_tables.pdf"
-#     pdf_headers = {"Term": str, "Graduate": int}
-#     obj.query_db(qry)
-#     tables = obj.get_db_tables()
-#     print(tables)
-#     obj.pdf_to_table(file, "College", pdf_headers, table_idx=2)
-#     dat = obj.query_db("SELECT * FROM College;")
-#     print(dat)
-#     obj.close_conn()
+def test_implementation():
+    obj = MySQLDB("root", "nopwd", database="ZillowHousing")
+    qry = """CREATE TABLE IF NOT EXISTS College (
+        college_id INTEGER AUTO_INCREMENT,
+        Term VARCHAR(20),
+        Graduate INT,
+        PRIMARY KEY (college_id)
+    )
+    """
+    file = "../data/test/pdf_tables.pdf"
+    pdf_headers = {"Term": str, "Undergraduate": int}
+    obj.query_db(qry)
+    tables = obj.get_db_tables()
+    print(tables)
+    obj.pdf_to_table(
+        file, "College", pdf_headers, table_columns=["Term", "Graduate"], table_idx=2
+    )
+    dat = obj.query_db("SELECT * FROM College;")
+    print(dat)
+    obj.close_conn()
+
+
 # ==========================================================================================
 # ==========================================================================================
 # eof
