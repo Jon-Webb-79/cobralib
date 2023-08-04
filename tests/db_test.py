@@ -214,7 +214,7 @@ def test_mysql_csv_to_table():
         db.csv_to_table(
             "../data/test/read_csv.csv",
             "Inventory",
-            ["Product", "Inventory"],
+            {"Product": str, "Inventory": int},
             ["Prd", "Inv"],
         )
         query = "SELECT Prd, Inv FROM Inventory;"
@@ -280,7 +280,7 @@ def test_mysql_excel_to_table():
         db.excel_to_table(
             "../data/test/read_xls.xlsx",
             "Inventory",
-            ["Product", "Inventory"],
+            {"Product": str, "Inventory": int},
             ["Prd", "Inv"],
             "test",
         )
@@ -321,9 +321,9 @@ def test_mysql_txt_to_table():
         db.csv_to_table(
             "../data/test/read_txt.txt",
             "Inventory",
-            ["Product", "Inventory"],
+            {"Product": str, "Inventory": int},
             ["Prd", "Inv"],
-            delemeter=r"\s+",
+            delimiter=r"\s+",
         )
         query = "SELECT Prd, Inv FROM Inventory;"
         inventory = db.query_db(query)
@@ -374,26 +374,27 @@ def test_mysql_pdf_to_table():
 # ------------------------------------------------------------------------------------------
 
 
-def test_implementation():
-    obj = MySQLDB("root", "nopwd", database="ZillowHousing")
-    qry = """CREATE TABLE IF NOT EXISTS College (
-        college_id INTEGER AUTO_INCREMENT,
-        Term VARCHAR(20),
-        Graduate INT,
-        PRIMARY KEY (college_id)
-    )
-    """
-    file = "../data/test/pdf_tables.pdf"
-    pdf_headers = {"Term": str, "Undergraduate": int}
-    obj.query_db(qry)
-    tables = obj.get_db_tables()
-    print(tables)
-    obj.pdf_to_table(
-        file, "College", pdf_headers, table_columns=["Term", "Graduate"], table_idx=2
-    )
-    dat = obj.query_db("SELECT * FROM College;")
-    print(dat)
-    obj.close_conn()
+# def test_implementation():
+#     obj = MySQLDB("root", "nopwd", database="ZillowHousing")
+#     qry = """CREATE TABLE IF NOT EXISTS Inventory (
+#         college_id INTEGER AUTO_INCREMENT,
+#         Prd VARCHAR(20),
+#         Inv INT,
+#         PRIMARY KEY (college_id)
+#     )
+#     """
+#     file = "../data/test/read_xls.xlsx"
+#     csv_headers = {"Product": str, "Inventory": int}
+#     obj.query_db(qry)
+#     tables = obj.get_db_tables()
+#     print(tables)
+#     obj.excel_to_table(
+#             file, "Inventory", csv_headers, table_headers=["Prd", "Inv"],
+#             sheet_name="test"
+#     )
+#     dat = obj.query_db("SELECT * FROM Inventory;")
+#     print(dat)
+#     obj.close_conn()
 
 
 # ==========================================================================================

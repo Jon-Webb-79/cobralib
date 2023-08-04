@@ -17,7 +17,11 @@ except ImportError:
     # Handle the case when mysql-connector is not available
     print(msg)
 
-from cobralib.io import read_pdf_columns_by_headers
+from cobralib.io import (
+    read_excel_columns_by_headers,
+    read_pdf_columns_by_headers,
+    read_text_columns_by_headers,
+)
 
 # ==========================================================================================
 # ==========================================================================================
@@ -354,23 +358,24 @@ class MySQLDB:
 
     def csv_to_table(
         self,
-        txt_file: str,
+        csv_file: str,
         table_name: str,
-        txt_columns: list,
-        table_columns: list = None,
-        delemeter: str = ",",
+        csv_headers: dict[str, type],
+        table_headers: list = None,
+        delimiter: str = ",",
         skip: int = 0,
     ) -> None:
         """
         Read data from a CSV or TXT file and insert it into the specified table.
 
-        :param txt_file: The path to the CSV file or TXT file.
+        :param csv_file: The path to the CSV file or TXT file.
         :param table_name: The name of the table.
-        :param txt_columns: The names of the columns in the TXT file.
-        :param table_columns: The names of the columns in the table (default is None,
+        :param csv_headers: The names of the columns in the TXT file and datatypes
+                            as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
                               assumes CSV column names and table column names
                               are the same).
-        :param delemeter: The seperating delimeter in the text file.  Defaulted to
+        :param delimiter: The seperating delimeter in the text file.  Defaulted to
                           ',' for a CSV file, but can work with other delimeters
         :param skip: The number of rows to be skipped if metadata exists before
                      the header definition.  Defaulted to 0
@@ -389,7 +394,8 @@ class MySQLDB:
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
            db.change_db('Names')
-           db.csv_to_table('csv_file.csv', 'FirstLastName', ['FirstName', 'LastName'],
+           db.csv_to_table('csv_file.csv', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
                            ['First', 'Last'])
            query = "SELDCT * FROM Names;"
            result = db.query_db(query)
@@ -409,7 +415,8 @@ class MySQLDB:
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
            db.change_db('Names')
-           db.csv_to_table('txt_file.txt', 'FirstLastName', ['FirstName', 'LastName'],
+           db.csv_to_table('txt_file.txt', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
                            ['First', 'Last'], delemeter=r"\\s+", skip=2)
            query = "SELDCT * FROM Names;"
            result = db.query_db(query)
@@ -419,27 +426,31 @@ class MySQLDB:
               1      2       Fred    Smith
               2      3       Jillian Webb
         """
-        if len(txt_columns) == 0:
+        if len(csv_headers) == 0:
             raise ValueError("CSV column names are required.")
 
         try:
-            csv_data = pd.read_csv(txt_file, sep=delemeter, skiprows=skip)
+            csv_data = read_text_columns_by_headers(
+                csv_file, csv_headers, skip=skip, delimiter=delimiter
+            )
 
-            if table_columns is None:
-                table_columns = txt_columns
+            if table_headers is None:
+                table_headers = list(csv_headers.keys())
 
             sanitized_columns = [
-                self._sanitize_column_name(name) for name in table_columns
+                self._sanitize_column_name(name) for name in table_headers
             ]
+
+            csv_header_keys = list(csv_headers.keys())
 
             for _, row in csv_data.iterrows():
                 insert_data = {}
-                for i, column in enumerate(table_columns):
-                    value = row[txt_columns[i]]
+                for i, column in enumerate(table_headers):
+                    value = row[csv_header_keys[i]]
                     insert_data[column] = value
 
                 placeholders = ", ".join(["%s"] * len(insert_data))
-                if table_columns is not None:
+                if table_headers is not None:
                     columns = ", ".join(sanitized_columns)
                 else:
                     columns = ", ".join(insert_data.keys())
@@ -460,8 +471,8 @@ class MySQLDB:
         self,
         excel_file: str,
         table_name: str,
-        excel_columns: list,
-        table_columns: list = None,
+        excel_headers: dict[str, type],
+        table_headers: list = None,
         sheet_name: str = "Sheet1",
         skip: int = 0,
     ) -> None:
@@ -470,8 +481,9 @@ class MySQLDB:
 
         :param excel_file: The path to the Excel file.
         :param table_name: The name of the table.
-        :param excel_columns: The names of the columns in the Excel file.
-        :param table_columns: The names of the columns in the table (default is None,
+        :param excel_headers: The names of the columns in the Excel file and their
+                              data types as a dictionary
+        :param table_headers: The names of the columns in the table (default is None,
                               assumes Excel column names and table column names are
                               the same).
         :param sheet_name: The name of the sheet in the Excel file
@@ -494,7 +506,8 @@ class MySQLDB:
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
            db.change_db('Names')
-           db.csv_to_table('excel_file.xlsx', 'FirstLastName', ['FirstName', 'LastName'],
+           db.csv_to_table('excel_file.xlsx', 'FirstLastName',
+                           {'FirstName': str, 'LastName': str},
                            ['First', 'Last'])
            query = "SELDCT * FROM Names;"
            result = db.query_db(query)
@@ -504,27 +517,30 @@ class MySQLDB:
               1      2       Fred    Smith
               2      3       Jillian Webb
         """
-        if len(excel_columns) == 0:
+        if len(excel_headers) == 0:
             raise ValueError("Excel column names are required.")
 
         try:
-            excel_data = pd.read_excel(
-                excel_file, sheet_name=sheet_name, usecols=excel_columns, skiprows=skip
+            excel_data = read_excel_columns_by_headers(
+                excel_file, sheet_name, excel_headers, skip
             )
-            if table_columns is None:
-                table_columns = excel_columns
+            if table_headers is None:
+                table_headers = list(excel_headers.keys())
 
             sanitized_columns = [
-                self._sanitize_column_name(name) for name in table_columns
+                self._sanitize_column_name(name) for name in table_headers
             ]
+
+            excel_header_keys = list(excel_headers.keys())
+
             for _, row in excel_data.iterrows():
                 insert_data = {}
-                for i, column in enumerate(table_columns):
-                    value = row[excel_columns[i]]
+                for i, column in enumerate(table_headers):
+                    value = row[excel_header_keys[i]]
                     insert_data[column] = value
 
                 placeholders = ", ".join(["%s"] * len(insert_data))
-                if table_columns is not None:
+                if table_headers is not None:
                     columns = ", ".join(sanitized_columns)
                 else:
                     columns = ", ".join(insert_data.keys())
