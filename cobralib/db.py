@@ -1,5 +1,6 @@
 # Import necessary packages here
 import re
+import sqlite3
 
 import pandas as pd
 
@@ -77,7 +78,7 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, db_name) -> None:
+    def change_database(self, db_name: str) -> None:
         """
         Change to the specified database within the server.
 
@@ -665,6 +666,95 @@ class MySQLDB:
         Sanitize column names to include only alphanumeric characters and underscores.
         """
         return re.sub(r"\W|^(?=\d)", "_", name)
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+class SQLiteDB:
+    """
+    A class for connection to a SQLite database file using the sqlite3 python package.
+    The usser can access the conn and cur variables, where conn is the connection
+    variable and cur is the connection.cursor() method to expand the capability
+    of this class beyond its methods.  **NOTE:** If the user passes an incorrect
+    database name to the constructor, the class will assume that the user wants
+    to create a database of that name, and will create a new database file.
+
+    :param database: The name of the database file to include its path length.
+    :raises ConnectionError: If a connection can not be established.
+    :ivar conn: The connection attribute of the mysql-connector-python module.
+    :ivar cur: The cursor method for the mysql-connector-python module.
+    :ivar database: The name of the database currently being used.
+    """
+
+    def __init__(self, database: str = None):
+        self.database = database
+        self.conn = None
+        self.curr = None
+
+        self._create_connection()
+
+    # ------------------------------------------------------------------------------------------
+
+    def close_connection(self) -> None:
+        """
+        Close the connection to tjhe SQLite database
+        """
+        self.conn.close()
+
+    # ------------------------------------------------------------------------------------------
+
+    def change_database(self, db_name: str) -> None:
+        """
+        Method to change the connection from one database file to another
+
+        :paramn db_name: The new database file to be used to include the path length
+        """
+        self.database = db_name
+        self.close_connection()
+        self._create_connection()
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+        if db_name is None:
+            query = "SELECT name FROM sqlite_master WHERE type='table';"
+            try:
+                df = pd.read_sql_query(query, self.conn)
+            except sqlite3.Error as e:
+                raise Error(f"Failed to retrieve tables: {e}")
+
+            return df
+        else:
+            db = self.database
+            self.close_connection()
+            self.database = db_name
+            self._create_connection()
+            query = "SELECT name FROM sqlite_master WHERE type='table';"
+            try:
+                df = pd.read_sql_query(query, self.conn)
+            except sqlite3.Error as e:
+                raise Error(f"Failed to retrieve tables: {e}")
+            self.close_connection()
+            self.database = db
+            self._create_connection()
+            return df
+
+    # ==========================================================================================
+    # PRIVATE-LIKE METHODS
+
+    def _create_connection(self) -> None:
+        """
+        Create a connection to the SQLite database.
+        """
+        try:
+            self.conn = sqlite3.connect(self.database)
+            self.cur = self.conn.cursor()
+        except sqlite3.DatabaseError as e:
+            raise ConnectionError(
+                f"Failed to create a connection due to DatabaseError: {e}"
+            )
 
 
 # ==========================================================================================

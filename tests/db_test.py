@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB
+from cobralib.db import MySQLDB, SQLiteDB
 
 # ==========================================================================================
 # ==========================================================================================
@@ -369,6 +369,51 @@ def test_mysql_pdf_to_table():
         inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ==========================================================================================
+# ==========================================================================================
+# Test SQLiteDB
+
+
+@pytest.mark.sqlite
+def test_sqlite_connection():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    assert db.database == db_file
+    # Test close_conn method
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_change_sqlite_db():
+    db_file = "../data/test/db_two.db"
+    db = SQLiteDB(db_file)
+    db.change_database("../data/test/db_one.db")
+    assert db.database == "../data/test/db_one.db"
+    df = db.get_database_tables()
+    mock_return = [("Inventory"), ("Produce")]
+
+    expected_df = pd.DataFrame(mock_return, columns=["name"])
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_get_sqlite_tables():
+    db_file = "../data/test/db_two.db"
+    db = SQLiteDB(db_file)
+    df = db.get_database_tables("../data/test/db_one.db")
+    mock_return = [("Inventory"), ("Produce")]
+
+    expected_df = pd.DataFrame(mock_return, columns=["name"])
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    assert db.database == db_file
 
 
 # ------------------------------------------------------------------------------------------
