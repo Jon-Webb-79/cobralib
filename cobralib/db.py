@@ -134,7 +134,7 @@ class MySQLDB:
            from cobralib.io import MySQLDB
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
-           dbs = db.get_dbs()
+           dbs = db.get_databases()
            db.close_conn()
            print(dbs)
            >> index  Databases
@@ -173,7 +173,7 @@ class MySQLDB:
            from cobralib.io import MySQLDB
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
-           dbs = db.get_db_tables("Inventory")
+           dbs = db.get_database_tables("Inventory")
            db.close_conn()
            print(dbs)
            >> index  Tables
@@ -223,7 +223,7 @@ class MySQLDB:
             from cobralib.io import MySQLDB
 
             db = MySQLDB('username', 'password', port=3306, hostname='localhost')
-            db.change_db('Address')
+            db.change_database('Address')
             query = '''CREATE TABLE IF NOT EXIST Names (
                 name_id INTEGER AUTO_INCREMENT,
                 FirstName VARCHAR(20) NOT NULL,
@@ -232,8 +232,8 @@ class MySQLDB:
                 PRIMARY KEY (name_id)
             );
             '''
-            db.query_db(query)
-            cols = db.get_columns('Names')
+            db.execute_query(query)
+            cols = db.get_table_columns('Names')
             db.close_conn()
             print(cols)
             >> index Field      Type        Null   Key     Default  Extra
@@ -249,7 +249,7 @@ class MySQLDB:
             from cobralib.io import MySQLDB
 
             db = MySQLDB('username', 'password', port=3306, hostname='localhost')
-            cols = db.get_columns('Names', 'Address')
+            cols = db.get_table_columns('Names', 'Address')
             db.close_conn()
             print(cols)
             >> index Field      Type        Null   Key     Default  Extra
@@ -307,7 +307,7 @@ class MySQLDB:
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
            query = "SELECT * FROM names WHERE name_id = %s"
            params = (2,)
-           result = db.query_db(query, params)
+           result = db.execute_query(query, params)
            print(result)
            >> index  name_id  FirstName  LastName
               0      2        Fred       Smith
@@ -320,7 +320,7 @@ class MySQLDB:
 
            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
            query = "SELECT * FROM names"
-           result = db.query_db(query)
+           result = db.execute_query(query)
            print(result)
            >> index  name_id  FirstName  LastName
             0        1        Jon        Webb
@@ -718,10 +718,35 @@ class SQLiteDB:
     # ------------------------------------------------------------------------------------------
 
     def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+        """
+        Method the retrieve a dataframe containing a list of all tables within
+        a SQLite database file.  If the user does not pass a database name, the
+        method will return the list of tables in the current database.  However,
+        the user can also pass this method the name of another database file,
+        and this will return a list of tables in that database file/
+
+        Assuming the user has a database titled ``Inventory`` which had the
+        tables ``Names``, ``Product``, ``Sales``.
+
+        .. code-block:: python
+
+           from cobralib.io import SQLiteDB
+
+           db = SQLiteDB('test.db')
+           dbs = db.get_database_tables("Inventory")
+           db.close_connection()
+           print(dbs)
+           >> index  Tables
+              0      Names
+              1      Product
+              2      Sales
+        """
+        rename = {"name": "Tables"}
         if db_name is None:
             query = "SELECT name FROM sqlite_master WHERE type='table';"
             try:
                 df = pd.read_sql_query(query, self.conn)
+                df.rename(columns=rename, inplace=True)
             except sqlite3.Error as e:
                 raise Error(f"Failed to retrieve tables: {e}")
 
@@ -734,12 +759,148 @@ class SQLiteDB:
             query = "SELECT name FROM sqlite_master WHERE type='table';"
             try:
                 df = pd.read_sql_query(query, self.conn)
+                df.rename(columns=rename, inplace=True)
             except sqlite3.Error as e:
                 raise Error(f"Failed to retrieve tables: {e}")
             self.close_connection()
             self.database = db
             self._create_connection()
             return df
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+        """
+         Retrieve the names and data types of the columns within the specified table.
+
+         :param table_name: The name of the table.
+         :param db: The database name, defaulted to currently selected database
+                    or None
+         :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,
+                  and Extra
+         :raises ValueError: If the database is not selected at the class level
+         :raises ConnectionError: If the columns cannot be retrieved.
+
+         This example shows a scenario where the database analyst has navigated
+         into a database
+
+         .. highlight:: python
+         .. code-block:: python
+
+            from cobralib.io import SQLiteDB
+
+            db = SQLiteDB('test_db.db')
+            query = '''CREATE TABLE IF NOT EXIST Names (
+                name_id INTEGER AUTO_INCREMENT,
+                FirstName VARCHAR(20) NOT NULL,
+                MiddleName VARCHAR(20),
+                LastName VARCHAR(20) NOT NULL,
+                PRIMARY KEY (name_id)
+            );
+            '''
+            db.execute_query(query)
+            cols = db.get_table_columns('Names')
+            db.close_conn()
+            print(cols)
+            >> index Field      Type        Null   Key     Default  Extra
+               0     name_id    Integer     True   Primary  False   autoincrement
+               1     FirstName  Varchar(20) False  NA       False   None
+               2     MiddleName Varchar(20) True   NA       False   None
+               3     LastName   Varchar(20) False  NA       False   None
+
+        However, this code can also be executed when not in the database
+
+         .. code-block:: python
+
+            from cobralib.io import MySQLDB
+
+            db = MySQLDB('username', 'password', port=3306, hostname='localhost')
+            cols = db.get_table_columns('Names', 'Address')
+            db.close_conn()
+            print(cols)
+            >> index Field      Type        Null   Key     Default  Extra
+               0     name_id    Integer     True   Primary  False   autoincrement
+               1     FirstName  Varchar(20) False  NA       False   None
+               2     MiddleName Varchar(20) True   NA       False   None
+               3     LastName   Varchar(20) False  NA       False   None
+
+        """
+        if db is None:
+            try:
+                # Execute the PRAGMA command to get the table information
+                self.cur.execute(f"PRAGMA table_info({table_name})")
+
+                # Fetch all rows from the cursor
+                rows = self.cur.fetchall()
+
+                if len(rows) == 0:
+                    raise Error(f"The table '{table_name}' does not exist.")
+
+                # The names of the columns in the result set
+                columns = ["id", "name", "type", "notnull", "default_value", "pk"]
+
+                # Convert the result set to a DataFrame
+                df = pd.DataFrame(rows, columns=columns)
+
+                # Modify the DataFrame to match the output from the MySQLDB method
+                df["Field"] = df["name"]
+                df["Type"] = df["type"]
+                df["Null"] = df["notnull"].map({0: "YES", 1: "NO"})
+                df["Key"] = df["pk"].map({0: "", 1: "PRI"})
+                df["Default"] = df["default_value"]
+                df["Extra"] = ""
+
+                # Only include the relevant columns in the DataFrame
+                df = df[["Field", "Type", "Null", "Key", "Default", "Extra"]]
+
+                return df
+
+            except sqlite3.Error as e:
+                # Handle any SQLite errors that occur
+                raise Error(f"An error occurred: {e}")
+        else:
+            db_name = self.database
+            self.close_connection()
+            self.database = db
+            self._create_connection()
+            try:
+                # Execute the PRAGMA command to get the table information
+                self.cur.execute(f"PRAGMA table_info({table_name})")
+
+                # Fetch all rows from the cursor
+                rows = self.cur.fetchall()
+
+                if len(rows) == 0:
+                    raise Error(f"The table '{table_name}' does not exist.")
+
+                # The names of the columns in the result set
+                columns = ["id", "name", "type", "notnull", "default_value", "pk"]
+
+                # Convert the result set to a DataFrame
+                df = pd.DataFrame(rows, columns=columns)
+
+                # Modify the DataFrame to match the output from the MySQLDB method
+                df["Field"] = df["name"]
+                df["Type"] = df["type"]
+                df["Null"] = df["notnull"].map({0: "YES", 1: "NO"})
+                df["Key"] = df["pk"].map({0: "", 1: "PRI"})
+                df["Default"] = df["default_value"]
+                df["Extra"] = ""
+
+                # Only include the relevant columns in the DataFrame
+                df = df[["Field", "Type", "Null", "Key", "Default", "Extra"]]
+                self.database = db_name
+                self.close_connection()
+                self._create_connection()
+
+                return df
+
+            except sqlite3.Error as e:
+                self.database = db_name
+                self.close_connection()
+                self._create_connection()
+                # Handle any SQLite errors that occur
+                raise Error(f"An error occurred: {e}")
 
     # ==========================================================================================
     # PRIVATE-LIKE METHODS

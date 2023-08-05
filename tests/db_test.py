@@ -397,7 +397,7 @@ def test_change_sqlite_db():
     df = db.get_database_tables()
     mock_return = [("Inventory"), ("Produce")]
 
-    expected_df = pd.DataFrame(mock_return, columns=["name"])
+    expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
 
 
@@ -411,9 +411,28 @@ def test_get_sqlite_tables():
     df = db.get_database_tables("../data/test/db_one.db")
     mock_return = [("Inventory"), ("Produce")]
 
-    expected_df = pd.DataFrame(mock_return, columns=["name"])
+    expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
     assert db.database == db_file
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_get_sqlite_table_columns():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    df = db.get_table_columns("Students", "../data/test/db_two.db")
+    mock_return = [
+        ("student_id", "INTEGER", "NO", "PRI", None, ""),
+        ("FirstName", "VARCHAR(20)", "NO", "", None, ""),
+        ("LastName", "VARCHAR(20)", "NO", "", None, ""),
+    ]
+    expected_df = pd.DataFrame(
+        mock_return, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
+    )
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
 
 
 # ------------------------------------------------------------------------------------------
