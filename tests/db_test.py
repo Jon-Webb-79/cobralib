@@ -355,7 +355,8 @@ def test_mysql_pdf_to_table():
             term_id INTEGER AUTO_INCREMENT
             Term VARCHAR(20) NOT NULL,
             Graduate INT NOT NULL,
-            PRIMARY KEY (product_id);
+            PRIMARY KEY (term_id)
+        );
         """
         db.execute_query(query)
 
@@ -365,7 +366,7 @@ def test_mysql_pdf_to_table():
             {"Term": str, "Graduate": int},
             table_idx=2,
         )
-        query = "SELECT Prd, Inv FROM Admissions;"
+        query = "SELECT Term, Graduate FROM Admissions;"
         inventory = db.execute_query(query)
 
         pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
@@ -486,6 +487,98 @@ def test_sqlite_csv_to_table():
 
 # ------------------------------------------------------------------------------------------
 
+
+@pytest.mark.sqlite
+def test_sqlite_text_to_table():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    create = """CREATE TABLE IF NOT EXISTS Test (
+        prd_id INTEGER NOT NULL,
+        Prd VARCHAR(20) NOT NULL,
+        Inv INTEGER,
+        PRIMARY KEY (prd_id)
+    );"""
+    db.execute_query(create)
+    db.csv_to_table(
+        "../data/test/read_txt.txt",
+        "Test",
+        {"Product": str, "Inventory": int},
+        ["Prd", "Inv"],
+        delimiter=r"\s+",
+    )
+    df = db.execute_query("SELECT * FROM Test;")
+    df = df.drop(["prd_id"], axis=1)
+    mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+    expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+    db.execute_query("DROP TABLE Test;")
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_sqlite_excel_to_table():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    create = """CREATE TABLE IF NOT EXISTS Test (
+        prd_id INTEGER NOT NULL,
+        Prd VARCHAR(20) NOT NULL,
+        Inv INTEGER,
+        PRIMARY KEY (prd_id)
+    );"""
+    db.execute_query(create)
+    db.excel_to_table(
+        "../data/test/read_xls.xlsx",
+        "Test",
+        {"Product": str, "Inventory": int},
+        ["Prd", "Inv"],
+        sheet_name="test",
+    )
+    df = db.execute_query("SELECT * FROM Test;")
+    df = df.drop(["prd_id"], axis=1)
+    mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+    expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+    db.execute_query("DROP TABLE Test;")
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_sqlite_pdf_to_table():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    # Create table
+    query = """CREATE TABLE IF NOT EXISTS Admissions (
+        term_id INTEGER NOT NULL,
+        Term VARCHAR(20) NOT NULL,
+        Graduate INTEGER NOT NULL,
+        PRIMARY KEY (term_id)
+    );
+    """
+    db.execute_query(query)
+    # Mock the fetchall method to return known columns and their metadata
+    mock_return = [("Fall 2019", 3441), ("Winter 2020", 3499), ("Spring 2020", 3520)]
+
+    expected_df = pd.DataFrame(mock_return, columns=["Term", "Graduate"])
+
+    db.pdf_to_table(
+        "../data/test/pdf_tables.pdf",
+        "Admissions",
+        {"Term": str, "Graduate": int},
+        table_idx=2,
+    )
+    query = "SELECT Term, Graduate FROM Admissions;"
+    inventory = db.execute_query(query)
+    db.execute_query("DROP TABLE Admissions;")
+    pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
 
 # def test_implementation():
 #     obj = MySQLDB("root", "nopwd", database="ZillowHousing")

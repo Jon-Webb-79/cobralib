@@ -1042,6 +1042,145 @@ class SQLiteDB:
             # Generic error handler for any other exceptions.
             raise Error(f"Failed to insert data into the table: {e}")
 
+    # ------------------------------------------------------------------------------------------
+
+    def excel_to_table(
+        self,
+        excel_file: str,
+        table_name: str,
+        excel_headers: dict[str, type],
+        table_headers: list = None,
+        sheet_name: str = "Sheet1",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from an Excel file and insert it into the specified table.
+
+        :param excel_file: The path to the Excel file.
+        :param table_name: The name of the table.
+        :param excel_headers: The names of the columns in the Excel file and their
+                              data types as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes Excel column names and table column names are
+                              the same).
+        :param sheet_name: The name of the sheet in the Excel file (default is 'Sheet1').
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition. Defaulted to 0.
+        :raises ValueError: If the Excel file, table name, or sheet name is not
+                            provided, or if the number of Excel columns and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+        if len(excel_headers) == 0:
+            raise ValueError("Excel column names are required.")
+
+        try:
+            excel_data = read_excel_columns_by_headers(
+                excel_file, sheet_name, excel_headers, skip
+            )
+
+            if table_headers is None:
+                table_headers = list(excel_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+
+            excel_header_keys = list(excel_headers.keys())
+
+            for _, row in excel_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_headers):
+                    value = row[excel_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                if table_headers is not None:
+                    columns = ", ".join(sanitized_columns)
+                else:
+                    columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+
+            self.conn.commit()
+        except sqlite3.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
+        except sqlite3.Error as e:
+            # Generic error handler for any other exceptions.
+            raise Error(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def pdf_to_table(
+        self,
+        pdf_file: str,
+        table_name: str,
+        pdf_headers: dict[str, type],
+        table_columns: list = None,
+        table_idx: int = 0,
+        page_num: int = 0,
+        skip: int = 0,
+    ) -> None:
+        """
+        Read a table from a PDF file and insert it into the specified SQLite table.
+
+        :param pdf_file: The path to the PDF file.
+        :param table_name: The name of the SQLite table.
+        :param pdf_headers: A dictionary of column names in the PDF and their data
+                            types.
+        :param table_columns: The names of the columns in the SQLite table
+                              (default is None, assumes PDF column names and SQLite
+                              column names are the same).
+        :param table_idx: Index of the table in the PDF (default: 0).
+        :param page_num: Page number from which to extract the table (default: 0).
+        :param skip: The number of rows to skip in the PDF table.
+        :raises ValueError: If the PDF file, table name, or sheet name is not
+                            provided, or if the number of PDF headers and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+
+        if len(pdf_headers) == 0:
+            raise ValueError("PDF headers are required.")
+
+        try:
+            # Read the table from the PDF file
+            pdf_data = read_pdf_columns_by_headers(
+                pdf_file, pdf_headers, table_idx, page_num, skip
+            )
+
+            if table_columns is None:
+                table_columns = list(pdf_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
+            pdf_header_keys = list(pdf_headers.keys())
+
+            for _, row in pdf_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_columns):
+                    value = row[pdf_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                columns = ", ".join(sanitized_columns)
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+
+            self.conn.commit()
+        except sqlite3.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
+        except sqlite3.Error as e:
+            # Generic error handler for any other exceptions.
+            raise Error(f"Failed to insert data into the table: {e}")
+
     # ==========================================================================================
     # PRIVATE-LIKE METHODS
 
