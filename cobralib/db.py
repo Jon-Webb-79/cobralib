@@ -902,6 +902,77 @@ class SQLiteDB:
                 # Handle any SQLite errors that occur
                 raise Error(f"An error occurred: {e}")
 
+    # ------------------------------------------------------------------------------------------
+
+    def execute_query(self, query: str, params: tuple = ()) -> pd.DataFrame:
+        """
+        Execute a query with placeholders and return the result as a Pandas DataFrame.
+        The user of this class should ensure that when applicable they parameteratize
+        the inputs to this method to minimize the potential for an injection
+        attack
+
+        :param query: The query with placeholders.
+        :param params: The values to be substituted into the placeholders
+                       (default is an empty tuple).
+        :return: A Pandas DataFrame with the query result.
+        :raises ValueError: If the database name is not provided.
+        :raises Error: If the query execution fails.
+
+        Example usage when parameters are provided:
+
+        .. code-block:: python
+
+          from mylib.io import SQLiteDB
+
+          db = SQLiteDB('example.db')
+          query = "SELECT * FROM names WHERE name_id = ?"
+          params = (2,)
+          result = db.execute_query(query, params)
+          print(result)
+          >> index  name_id  FirstName  LastName
+             0      2        Fred       Smith
+
+        Example usage when no parameters are provided:
+
+        .. code-block:: python
+
+          from mylib.io import SQLiteDB
+
+          db = SQLiteDB('example.db')
+          query = "SELECT * FROM names"
+          result = db.execute_query(query)
+          print(result)
+          >> index  name_id  FirstName  LastName
+           0        1        Jon        Webb
+           1        2        Fred       Smith
+           2        3        Jillian    Webb
+
+        """
+
+        msg = "The number of placeholders in the query does not "
+        msg += "match the number of parameters."
+        num_placeholders = query.count("?")
+        if num_placeholders != len(params):
+            raise ValueError(msg)
+
+        try:
+            if len(params) == 0:
+                self.cur.execute(query)
+            else:
+                self.cur.execute(query, params)
+            rows = self.cur.fetchall()
+            if rows:
+                column_names = [desc[0] for desc in self.cur.description]
+                df = pd.DataFrame(rows, columns=column_names)
+                return df
+            else:
+                return pd.DataFrame()
+        except sqlite3.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to execute query: {e}")
+        except sqlite3.Error as e:
+            raise Error(f"Failed to execute query: {e}")
+
     # ==========================================================================================
     # PRIVATE-LIKE METHODS
 

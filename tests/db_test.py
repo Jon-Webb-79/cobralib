@@ -438,6 +438,22 @@ def test_get_sqlite_table_columns():
 # ------------------------------------------------------------------------------------------
 
 
+@pytest.mark.sqlite
+def test_query_sqlite():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    query = "SELECT * FROM Inventory WHERE Item = ?;"
+    df = db.execute_query(query, ("Apple",))
+    mock_return = [
+        (1, "Apple", 4.0),
+    ]
+    expected_df = pd.DataFrame(mock_return, columns=["inv_id", "Item", "Number"])
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
 # def test_implementation():
 #     obj = MySQLDB("root", "nopwd", database="ZillowHousing")
 #     qry = """CREATE TABLE IF NOT EXISTS Inventory (
