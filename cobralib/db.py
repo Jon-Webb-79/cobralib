@@ -973,6 +973,75 @@ class SQLiteDB:
         except sqlite3.Error as e:
             raise Error(f"Failed to execute query: {e}")
 
+    # ------------------------------------------------------------------------------------------
+
+    def csv_to_table(
+        self,
+        csv_file: str,
+        table_name: str,
+        csv_headers: dict[str, type],
+        table_headers: list = None,
+        delimiter: str = ",",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from a CSV or TXT file and insert it into the specified table.
+
+        :param csv_file: The path to the CSV file or TXT file.
+        :param table_name: The name of the table.
+        :param csv_headers: The names of the columns in the TXT file and datatypes
+                            as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes CSV column names and table column names
+                              are the same).
+        :param delimiter: The seperating delimeter in the text file.  Defaulted to
+                          ',' for a CSV file, but can work with other delimeters
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the CSV file or table name is not provided, or if
+                            the number of CSV columns and table columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+        if len(csv_headers) == 0:
+            raise ValueError("CSV column names are required.")
+
+        try:
+            csv_data = read_text_columns_by_headers(
+                csv_file, csv_headers, skip=skip, delimiter=delimiter
+            )
+
+            if table_headers is None:
+                table_headers = list(csv_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+
+            csv_header_keys = list(csv_headers.keys())
+
+            for _, row in csv_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_headers):
+                    value = row[csv_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                if table_headers is not None:
+                    columns = ", ".join(sanitized_columns)
+                else:
+                    columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+            self.conn.commit()  # Commit changes
+        except sqlite3.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Error(f"Failed to insert data into the table: {e}")
+        except sqlite3.Error as e:
+            # Generic error handler for any other exceptions.
+            raise Error(f"Failed to insert data into the table: {e}")
+
     # ==========================================================================================
     # PRIVATE-LIKE METHODS
 
@@ -987,6 +1056,14 @@ class SQLiteDB:
             raise ConnectionError(
                 f"Failed to create a connection due to DatabaseError: {e}"
             )
+
+    # ------------------------------------------------------------------------------------------
+
+    def _sanitize_column_name(self, name: str) -> str:
+        """
+        Sanitize column names to include only alphanumeric characters and underscores.
+        """
+        return re.sub(r"\W|^(?=\d)", "_", name)
 
 
 # ==========================================================================================

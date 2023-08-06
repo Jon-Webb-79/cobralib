@@ -399,6 +399,7 @@ def test_change_sqlite_db():
 
     expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
 
 
 # ------------------------------------------------------------------------------------------
@@ -414,6 +415,7 @@ def test_get_sqlite_tables():
     expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
     assert db.database == db_file
+    db.close_connection()
 
 
 # ------------------------------------------------------------------------------------------
@@ -433,6 +435,7 @@ def test_get_sqlite_table_columns():
         mock_return, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
     )
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
 
 
 # ------------------------------------------------------------------------------------------
@@ -449,6 +452,36 @@ def test_query_sqlite():
     ]
     expected_df = pd.DataFrame(mock_return, columns=["inv_id", "Item", "Number"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.sqlite
+def test_sqlite_csv_to_table():
+    db_file = "../data/test/db_one.db"
+    db = SQLiteDB(db_file)
+    create = """CREATE TABLE IF NOT EXISTS Test (
+        prd_id INTEGER NOT NULL,
+        Prd VARCHAR(20) NOT NULL,
+        Inv INTEGER,
+        PRIMARY KEY (prd_id)
+    );"""
+    db.execute_query(create)
+    db.csv_to_table(
+        "../data/test/read_csv.csv",
+        "Test",
+        {"Product": str, "Inventory": int},
+        ["Prd", "Inv"],
+    )
+    df = db.execute_query("SELECT * FROM Test;")
+    df = df.drop(["prd_id"], axis=1)
+    mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+    expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+    db.execute_query("DROP TABLE Test;")
+    pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
+    db.close_connection()
 
 
 # ------------------------------------------------------------------------------------------
