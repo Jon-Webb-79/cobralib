@@ -1495,8 +1495,8 @@ expand the capability of this class beyond its methods.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.db.MySQLDB.change_db">
-<span class="sig-name descname"><span class="pre">change_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.change_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.change_db" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.db.MySQLDB.change_database">
+<span class="sig-name descname"><span class="pre">change_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.change_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.change_database" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change to the specified database within the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1509,8 +1509,8 @@ expand the capability of this class beyond its methods.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.db.MySQLDB.close_conn">
-<span class="sig-name descname"><span class="pre">close_conn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.close_conn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.close_conn" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.db.MySQLDB.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.close_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the connection to the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -1640,8 +1640,60 @@ a table with no entries that has columns for <code class="docutils literal notra
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.db.MySQLDB.get_db_tables">
-<span class="sig-name descname"><span class="pre">get_db_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.get_db_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.get_db_tables" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.db.MySQLDB.execute_query">
+<span class="sig-name descname"><span class="pre">execute_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.execute_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.execute_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a query with placeholders and return the result as a Pandas DataFrame.
+The user of this class should ensure that when applicable they parameteratize
+the inputs to this method to minimize the potential for an injection
+attack</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> – The query with placeholders.</p></li>
+<li><p><strong>params</strong> – The values to be substituted into the placeholders
+(default is an empty tuple).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Pandas DataFrame with the query result.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the database name is not provided.</p></li>
+<li><p><strong>ConnectionError</strong> – If the query execution fails.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage when parameters are provided:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM names WHERE name_id = </span><span class="si">%s</span><span class="s2">&quot;</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">name_id</span>  <span class="n">FirstName</span>  <span class="n">LastName</span>
+   <span class="mi">0</span>      <span class="mi">2</span>        <span class="n">Fred</span>       <span class="n">Smith</span>
+</pre></div>
+</div>
+<p>Example usage when no parameters are provided:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM names&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">name_id</span>  <span class="n">FirstName</span>  <span class="n">LastName</span>
+ <span class="mi">0</span>        <span class="mi">1</span>        <span class="n">Jon</span>        <span class="n">Webb</span>
+ <span class="mi">1</span>        <span class="mi">2</span>        <span class="n">Fred</span>       <span class="n">Smith</span>
+ <span class="mi">2</span>        <span class="mi">3</span>        <span class="n">Jillian</span>    <span class="n">Webb</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.MySQLDB.get_database_tables">
+<span class="sig-name descname"><span class="pre">get_database_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.get_database_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.get_database_tables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the names of all tables within the current database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1662,7 +1714,7 @@ tables <code class="docutils literal notranslate"><span class="pre">Names</span>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
 
 <span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_db_tables</span><span class="p">(</span><span class="s2">&quot;Inventory&quot;</span><span class="p">)</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_database_tables</span><span class="p">(</span><span class="s2">&quot;Inventory&quot;</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Tables</span>
@@ -1674,8 +1726,8 @@ tables <code class="docutils literal notranslate"><span class="pre">Names</span>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.db.MySQLDB.get_dbs">
-<span class="sig-name descname"><span class="pre">get_dbs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.get_dbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.get_dbs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.db.MySQLDB.get_databases">
+<span class="sig-name descname"><span class="pre">get_databases</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.get_databases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.get_databases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the names of all databases available to the user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1691,7 +1743,7 @@ could use this class with the following commands.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
 
 <span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_dbs</span><span class="p">()</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_databases</span><span class="p">()</span>
 <span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Databases</span>
@@ -1731,7 +1783,7 @@ into a database</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
 
 <span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">db</span><span class="o">.</span><span class="n">change_db</span><span class="p">(</span><span class="s1">&#39;Address&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="s1">&#39;Address&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
 <span class="s1">    name_id INTEGER AUTO_INCREMENT,</span>
 <span class="s1">    FirstName VARCHAR(20) NOT NULL,</span>
@@ -1740,8 +1792,8 @@ into a database</p>
 <span class="s1">    PRIMARY KEY (name_id)</span>
 <span class="s1">);</span>
 <span class="s1">&#39;&#39;&#39;</span>
-<span class="n">db</span><span class="o">.</span><span class="n">query_db</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="n">Field</span>      <span class="n">Type</span>        <span class="n">Null</span>   <span class="n">Key</span>     <span class="n">Default</span>  <span class="n">Extra</span>
@@ -1757,7 +1809,7 @@ into a database</p>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
 
 <span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">,</span> <span class="s1">&#39;Address&#39;</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">,</span> <span class="s1">&#39;Address&#39;</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="n">Field</span>      <span class="n">Type</span>        <span class="n">Null</span>   <span class="n">Key</span>     <span class="n">Default</span>  <span class="n">Extra</span>
@@ -1801,9 +1853,114 @@ incompatible.</p></li>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.db.</span></span><span class="sig-name descname"><span class="pre">SQLiteDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for connection to a SQLite database file using the sqlite3 python package.
+The usser can access the conn and cur variables, where conn is the connection
+variable and cur is the connection.cursor() method to expand the capability
+of this class beyond its methods.  <strong>NOTE:</strong> If the user passes an incorrect
+database name to the constructor, the class will assume that the user wants
+to create a database of that name, and will create a new database file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>database</strong> – The name of the database file to include its path length.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If a connection can not be established.</p>
+</dd>
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conn</strong> – The connection attribute of the mysql-connector-python module.</p></li>
+<li><p><strong>cur</strong> – The cursor method for the mysql-connector-python module.</p></li>
+<li><p><strong>database</strong> – The name of the database currently being used.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="cobralib.db.MySQLDB.query_db">
-<span class="sig-name descname"><span class="pre">query_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#MySQLDB.query_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.MySQLDB.query_db" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.change_database">
+<span class="sig-name descname"><span class="pre">change_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.change_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.change_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to change the connection from one database file to another</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramn db_name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The new database file to be used to include the path length</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the connection to tjhe SQLite database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.csv_to_table">
+<span class="sig-name descname"><span class="pre">csv_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.csv_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.csv_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data from a CSV or TXT file and insert it into the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file</strong> – The path to the CSV file or TXT file.</p></li>
+<li><p><strong>table_name</strong> – The name of the table.</p></li>
+<li><p><strong>csv_headers</strong> – The names of the columns in the TXT file and datatypes
+as a dictionary.</p></li>
+<li><p><strong>table_headers</strong> – The names of the columns in the table (default is None,
+assumes CSV column names and table column names
+are the same).</p></li>
+<li><p><strong>delimiter</strong> – The seperating delimeter in the text file.  Defaulted to
+‘,’ for a CSV file, but can work with other delimeters</p></li>
+<li><p><strong>skip</strong> – The number of rows to be skipped if metadata exists before
+the header definition.  Defaulted to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the CSV file or table name is not provided, or if
+the number of CSV columns and table columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.excel_to_table">
+<span class="sig-name descname"><span class="pre">excel_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">excel_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excel_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Sheet1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.excel_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.excel_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data from an Excel file and insert it into the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>excel_file</strong> – The path to the Excel file.</p></li>
+<li><p><strong>table_name</strong> – The name of the table.</p></li>
+<li><p><strong>excel_headers</strong> – The names of the columns in the Excel file and their
+data types as a dictionary.</p></li>
+<li><p><strong>table_headers</strong> – The names of the columns in the table (default is None,
+assumes Excel column names and table column names are
+the same).</p></li>
+<li><p><strong>sheet_name</strong> – The name of the sheet in the Excel file (default is ‘Sheet1’).</p></li>
+<li><p><strong>skip</strong> – The number of rows to be skipped if metadata exists before
+the header definition. Defaulted to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the Excel file, table name, or sheet name is not
+provided, or if the number of Excel columns and table
+columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.execute_query">
+<span class="sig-name descname"><span class="pre">execute_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.execute_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.execute_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a query with placeholders and return the result as a Pandas DataFrame.
 The user of this class should ensure that when applicable they parameteratize
 the inputs to this method to minimize the potential for an injection
@@ -1822,28 +1979,28 @@ attack</p>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ValueError</strong> – If the database name is not provided.</p></li>
-<li><p><strong>ConnectionError</strong> – If the query execution fails.</p></li>
+<li><p><strong>Error</strong> – If the query execution fails.</p></li>
 </ul>
 </dd>
 </dl>
 <p>Example usage when parameters are provided:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mylib.io</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
 
-<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
-<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM names WHERE name_id = </span><span class="si">%s</span><span class="s2">&quot;</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="s1">&#39;example.db&#39;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM names WHERE name_id = ?&quot;</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query_db</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">name_id</span>  <span class="n">FirstName</span>  <span class="n">LastName</span>
    <span class="mi">0</span>      <span class="mi">2</span>        <span class="n">Fred</span>       <span class="n">Smith</span>
 </pre></div>
 </div>
 <p>Example usage when no parameters are provided:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mylib.io</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
 
-<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="s1">&#39;example.db&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM names&quot;</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query_db</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">name_id</span>  <span class="n">FirstName</span>  <span class="n">LastName</span>
  <span class="mi">0</span>        <span class="mi">1</span>        <span class="n">Jon</span>        <span class="n">Webb</span>
@@ -1851,6 +2008,128 @@ attack</p>
  <span class="mi">2</span>        <span class="mi">3</span>        <span class="n">Jillian</span>    <span class="n">Webb</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.get_database_tables">
+<span class="sig-name descname"><span class="pre">get_database_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.get_database_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.get_database_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method the retrieve a dataframe containing a list of all tables within
+a SQLite database file.  If the user does not pass a database name, the
+method will return the list of tables in the current database.  However,
+the user can also pass this method the name of another database file,
+and this will return a list of tables in that database file/</p>
+<p>Assuming the user has a database titled <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> which had the
+tables <code class="docutils literal notranslate"><span class="pre">Names</span></code>, <code class="docutils literal notranslate"><span class="pre">Product</span></code>, <code class="docutils literal notranslate"><span class="pre">Sales</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="s1">&#39;test.db&#39;</span><span class="p">)</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_database_tables</span><span class="p">(</span><span class="s2">&quot;Inventory&quot;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dbs</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span>  <span class="n">Tables</span>
+   <span class="mi">0</span>      <span class="n">Names</span>
+   <span class="mi">1</span>      <span class="n">Product</span>
+   <span class="mi">2</span>      <span class="n">Sales</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.get_table_columns">
+<span class="sig-name descname"><span class="pre">get_table_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.get_table_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.get_table_columns" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Retrieve the names and data types of the columns within the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param table_name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the table.</p>
+</dd>
+<dt class="field-even">param db<span class="colon">:</span></dt>
+<dd class="field-even"><p>The database name, defaulted to currently selected database
+or None</p>
+</dd>
+<dt class="field-odd">return<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas dataframe with headers ot Field, Type, Null, Key, Default,
+and Extra</p>
+</dd>
+<dt class="field-even">raises ValueError<span class="colon">:</span></dt>
+<dd class="field-even"><p>If the database is not selected at the class level</p>
+</dd>
+<dt class="field-odd">raises ConnectionError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If the columns cannot be retrieved.</p>
+</dd>
+</dl>
+<p>This example shows a scenario where the database analyst has navigated
+into a database</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="s1">&#39;test_db.db&#39;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
+<span class="s1">    name_id INTEGER AUTO_INCREMENT,</span>
+<span class="s1">    FirstName VARCHAR(20) NOT NULL,</span>
+<span class="s1">    MiddleName VARCHAR(20),</span>
+<span class="s1">    LastName VARCHAR(20) NOT NULL,</span>
+<span class="s1">    PRIMARY KEY (name_id)</span>
+<span class="s1">);</span>
+<span class="s1">&#39;&#39;&#39;</span>
+<span class="n">db</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="n">Field</span>      <span class="n">Type</span>        <span class="n">Null</span>   <span class="n">Key</span>     <span class="n">Default</span>  <span class="n">Extra</span>
+   <span class="mi">0</span>     <span class="n">name_id</span>    <span class="n">Integer</span>     <span class="kc">True</span>   <span class="n">Primary</span>  <span class="kc">False</span>   <span class="n">autoincrement</span>
+   <span class="mi">1</span>     <span class="n">FirstName</span>  <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">False</span>  <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+   <span class="mi">2</span>     <span class="n">MiddleName</span> <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">True</span>   <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+   <span class="mi">3</span>     <span class="n">LastName</span>   <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">False</span>  <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>However, this code can also be executed when not in the database</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">MySQLDB</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_table_columns</span><span class="p">(</span><span class="s1">&#39;Names&#39;</span><span class="p">,</span> <span class="s1">&#39;Address&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close_conn</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="n">Field</span>      <span class="n">Type</span>        <span class="n">Null</span>   <span class="n">Key</span>     <span class="n">Default</span>  <span class="n">Extra</span>
+   <span class="mi">0</span>     <span class="n">name_id</span>    <span class="n">Integer</span>     <span class="kc">True</span>   <span class="n">Primary</span>  <span class="kc">False</span>   <span class="n">autoincrement</span>
+   <span class="mi">1</span>     <span class="n">FirstName</span>  <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">False</span>  <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+   <span class="mi">2</span>     <span class="n">MiddleName</span> <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">True</span>   <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+   <span class="mi">3</span>     <span class="n">LastName</span>   <span class="n">Varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="kc">False</span>  <span class="n">NA</span>       <span class="kc">False</span>   <span class="kc">None</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.SQLiteDB.pdf_to_table">
+<span class="sig-name descname"><span class="pre">pdf_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#SQLiteDB.pdf_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.SQLiteDB.pdf_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a table from a PDF file and insert it into the specified SQLite table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_file</strong> – The path to the PDF file.</p></li>
+<li><p><strong>table_name</strong> – The name of the SQLite table.</p></li>
+<li><p><strong>pdf_headers</strong> – A dictionary of column names in the PDF and their data
+types.</p></li>
+<li><p><strong>table_columns</strong> – The names of the columns in the SQLite table
+(default is None, assumes PDF column names and SQLite
+column names are the same).</p></li>
+<li><p><strong>table_idx</strong> – Index of the table in the PDF (default: 0).</p></li>
+<li><p><strong>page_num</strong> – Page number from which to extract the table (default: 0).</p></li>
+<li><p><strong>skip</strong> – The number of rows to skip in the PDF table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the PDF file, table name, or sheet name is not
+provided, or if the number of PDF headers and table
+columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1907,15 +2186,26 @@ attack</p>
 </li>
 <li><a class="reference internal" href="#databases">Databases</a><ul>
 <li><a class="reference internal" href="#cobralib.db.MySQLDB"><code class="docutils literal notranslate"><span class="pre">MySQLDB</span></code></a><ul>
-<li><a class="reference internal" href="#cobralib.db.MySQLDB.change_db"><code class="docutils literal notranslate"><span class="pre">MySQLDB.change_db()</span></code></a></li>
-<li><a class="reference internal" href="#cobralib.db.MySQLDB.close_conn"><code class="docutils literal notranslate"><span class="pre">MySQLDB.close_conn()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.MySQLDB.change_database"><code class="docutils literal notranslate"><span class="pre">MySQLDB.change_database()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.MySQLDB.close_connection"><code class="docutils literal notranslate"><span class="pre">MySQLDB.close_connection()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.db.MySQLDB.csv_to_table"><code class="docutils literal notranslate"><span class="pre">MySQLDB.csv_to_table()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.db.MySQLDB.excel_to_table"><code class="docutils literal notranslate"><span class="pre">MySQLDB.excel_to_table()</span></code></a></li>
-<li><a class="reference internal" href="#cobralib.db.MySQLDB.get_db_tables"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_db_tables()</span></code></a></li>
-<li><a class="reference internal" href="#cobralib.db.MySQLDB.get_dbs"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_dbs()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.MySQLDB.execute_query"><code class="docutils literal notranslate"><span class="pre">MySQLDB.execute_query()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.MySQLDB.get_database_tables"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_database_tables()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.MySQLDB.get_databases"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_databases()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.db.MySQLDB.get_table_columns"><code class="docutils literal notranslate"><span class="pre">MySQLDB.get_table_columns()</span></code></a></li>
 <li><a class="reference internal" href="#cobralib.db.MySQLDB.pdf_to_table"><code class="docutils literal notranslate"><span class="pre">MySQLDB.pdf_to_table()</span></code></a></li>
-<li><a class="reference internal" href="#cobralib.db.MySQLDB.query_db"><code class="docutils literal notranslate"><span class="pre">MySQLDB.query_db()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB"><code class="docutils literal notranslate"><span class="pre">SQLiteDB</span></code></a><ul>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.change_database"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.change_database()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.close_connection"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.close_connection()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.csv_to_table"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.csv_to_table()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.excel_to_table"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.excel_to_table()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.execute_query"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.execute_query()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.get_database_tables"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_database_tables()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.get_table_columns"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_table_columns()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.SQLiteDB.pdf_to_table"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.pdf_to_table()</span></code></a></li>
 </ul>
 </li>
 </ul>

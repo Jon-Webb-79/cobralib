@@ -35,6 +35,7 @@
   <h1>Source code for cobralib.db</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Import necessary packages here</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
@@ -108,11 +109,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">change_db</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.change_db"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.change_db">[docs]</a>    <span class="k">def</span> <span class="nf">change_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.change_database"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.change_database">[docs]</a>    <span class="k">def</span> <span class="nf">change_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Change to the specified database within the server.</span>
 
@@ -137,7 +138,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.close_conn"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.close_conn">[docs]</a>    <span class="k">def</span> <span class="nf">close_conn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.close_connection"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Close the connection to the server.</span>
 
@@ -152,7 +153,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.get_dbs"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.get_dbs">[docs]</a>    <span class="k">def</span> <span class="nf">get_dbs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.get_databases"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.get_databases">[docs]</a>    <span class="k">def</span> <span class="nf">get_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the names of all databases available to the user.</span>
 
@@ -168,7 +169,7 @@
 <span class="sd">           from cobralib.io import MySQLDB</span>
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">           dbs = db.get_dbs()</span>
+<span class="sd">           dbs = db.get_databases()</span>
 <span class="sd">           db.close_conn()</span>
 <span class="sd">           print(dbs)</span>
 <span class="sd">           &gt;&gt; index  Databases</span>
@@ -190,7 +191,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.get_db_tables"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.get_db_tables">[docs]</a>    <span class="k">def</span> <span class="nf">get_db_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.get_database_tables"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.get_database_tables">[docs]</a>    <span class="k">def</span> <span class="nf">get_database_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the names of all tables within the current database.</span>
 
@@ -207,7 +208,7 @@
 <span class="sd">           from cobralib.io import MySQLDB</span>
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">           dbs = db.get_db_tables(&quot;Inventory&quot;)</span>
+<span class="sd">           dbs = db.get_database_tables(&quot;Inventory&quot;)</span>
 <span class="sd">           db.close_conn()</span>
 <span class="sd">           print(dbs)</span>
 <span class="sd">           &gt;&gt; index  Tables</span>
@@ -257,7 +258,7 @@
 <span class="sd">            from cobralib.io import MySQLDB</span>
 
 <span class="sd">            db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">            db.change_db(&#39;Address&#39;)</span>
+<span class="sd">            db.change_database(&#39;Address&#39;)</span>
 <span class="sd">            query = &#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
 <span class="sd">                name_id INTEGER AUTO_INCREMENT,</span>
 <span class="sd">                FirstName VARCHAR(20) NOT NULL,</span>
@@ -266,8 +267,8 @@
 <span class="sd">                PRIMARY KEY (name_id)</span>
 <span class="sd">            );</span>
 <span class="sd">            &#39;&#39;&#39;</span>
-<span class="sd">            db.query_db(query)</span>
-<span class="sd">            cols = db.get_columns(&#39;Names&#39;)</span>
+<span class="sd">            db.execute_query(query)</span>
+<span class="sd">            cols = db.get_table_columns(&#39;Names&#39;)</span>
 <span class="sd">            db.close_conn()</span>
 <span class="sd">            print(cols)</span>
 <span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
@@ -283,7 +284,7 @@
 <span class="sd">            from cobralib.io import MySQLDB</span>
 
 <span class="sd">            db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
-<span class="sd">            cols = db.get_columns(&#39;Names&#39;, &#39;Address&#39;)</span>
+<span class="sd">            cols = db.get_table_columns(&#39;Names&#39;, &#39;Address&#39;)</span>
 <span class="sd">            db.close_conn()</span>
 <span class="sd">            print(cols)</span>
 <span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
@@ -318,7 +319,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="MySQLDB.query_db"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.query_db">[docs]</a>    <span class="k">def</span> <span class="nf">query_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="MySQLDB.execute_query"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.MySQLDB.execute_query">[docs]</a>    <span class="k">def</span> <span class="nf">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute a query with placeholders and return the result as a Pandas DataFrame.</span>
 <span class="sd">        The user of this class should ensure that when applicable they parameteratize</span>
@@ -341,7 +342,7 @@
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
 <span class="sd">           query = &quot;SELECT * FROM names WHERE name_id = %s&quot;</span>
 <span class="sd">           params = (2,)</span>
-<span class="sd">           result = db.query_db(query, params)</span>
+<span class="sd">           result = db.execute_query(query, params)</span>
 <span class="sd">           print(result)</span>
 <span class="sd">           &gt;&gt; index  name_id  FirstName  LastName</span>
 <span class="sd">              0      2        Fred       Smith</span>
@@ -354,7 +355,7 @@
 
 <span class="sd">           db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
 <span class="sd">           query = &quot;SELECT * FROM names&quot;</span>
-<span class="sd">           result = db.query_db(query)</span>
+<span class="sd">           result = db.execute_query(query)</span>
 <span class="sd">           print(result)</span>
 <span class="sd">           &gt;&gt; index  name_id  FirstName  LastName</span>
 <span class="sd">            0        1        Jon        Webb</span>
@@ -692,6 +693,543 @@
         <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Generic error handler for any other exceptions.</span>
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create a connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_sanitize_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitize column names to include only alphanumeric characters and underscores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+
+
+<div class="viewcode-block" id="SQLiteDB"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB">[docs]</a><span class="k">class</span> <span class="nc">SQLiteDB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for connection to a SQLite database file using the sqlite3 python package.</span>
+<span class="sd">    The usser can access the conn and cur variables, where conn is the connection</span>
+<span class="sd">    variable and cur is the connection.cursor() method to expand the capability</span>
+<span class="sd">    of this class beyond its methods.  **NOTE:** If the user passes an incorrect</span>
+<span class="sd">    database name to the constructor, the class will assume that the user wants</span>
+<span class="sd">    to create a database of that name, and will create a new database file.</span>
+
+<span class="sd">    :param database: The name of the database file to include its path length.</span>
+<span class="sd">    :raises ConnectionError: If a connection can not be established.</span>
+<span class="sd">    :ivar conn: The connection attribute of the mysql-connector-python module.</span>
+<span class="sd">    :ivar cur: The cursor method for the mysql-connector-python module.</span>
+<span class="sd">    :ivar database: The name of the database currently being used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curr</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.close_connection"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the connection to tjhe SQLite database</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.change_database"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.change_database">[docs]</a>    <span class="k">def</span> <span class="nf">change_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to change the connection from one database file to another</span>
+
+<span class="sd">        :paramn db_name: The new database file to be used to include the path length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.get_database_tables"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.get_database_tables">[docs]</a>    <span class="k">def</span> <span class="nf">get_database_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method the retrieve a dataframe containing a list of all tables within</span>
+<span class="sd">        a SQLite database file.  If the user does not pass a database name, the</span>
+<span class="sd">        method will return the list of tables in the current database.  However,</span>
+<span class="sd">        the user can also pass this method the name of another database file,</span>
+<span class="sd">        and this will return a list of tables in that database file/</span>
+
+<span class="sd">        Assuming the user has a database titled ``Inventory`` which had the</span>
+<span class="sd">        tables ``Names``, ``Product``, ``Sales``.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import SQLiteDB</span>
+
+<span class="sd">           db = SQLiteDB(&#39;test.db&#39;)</span>
+<span class="sd">           dbs = db.get_database_tables(&quot;Inventory&quot;)</span>
+<span class="sd">           db.close_connection()</span>
+<span class="sd">           print(dbs)</span>
+<span class="sd">           &gt;&gt; index  Tables</span>
+<span class="sd">              0      Names</span>
+<span class="sd">              1      Product</span>
+<span class="sd">              2      Sales</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rename</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Tables&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">db_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve tables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve tables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">df</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.get_table_columns"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.get_table_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Retrieve the names and data types of the columns within the specified table.</span>
+
+<span class="sd">         :param table_name: The name of the table.</span>
+<span class="sd">         :param db: The database name, defaulted to currently selected database</span>
+<span class="sd">                    or None</span>
+<span class="sd">         :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,</span>
+<span class="sd">                  and Extra</span>
+<span class="sd">         :raises ValueError: If the database is not selected at the class level</span>
+<span class="sd">         :raises ConnectionError: If the columns cannot be retrieved.</span>
+
+<span class="sd">         This example shows a scenario where the database analyst has navigated</span>
+<span class="sd">         into a database</span>
+
+<span class="sd">         .. highlight:: python</span>
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">            from cobralib.io import SQLiteDB</span>
+
+<span class="sd">            db = SQLiteDB(&#39;test_db.db&#39;)</span>
+<span class="sd">            query = &#39;&#39;&#39;CREATE TABLE IF NOT EXIST Names (</span>
+<span class="sd">                name_id INTEGER AUTO_INCREMENT,</span>
+<span class="sd">                FirstName VARCHAR(20) NOT NULL,</span>
+<span class="sd">                MiddleName VARCHAR(20),</span>
+<span class="sd">                LastName VARCHAR(20) NOT NULL,</span>
+<span class="sd">                PRIMARY KEY (name_id)</span>
+<span class="sd">            );</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+<span class="sd">            db.execute_query(query)</span>
+<span class="sd">            cols = db.get_table_columns(&#39;Names&#39;)</span>
+<span class="sd">            db.close_conn()</span>
+<span class="sd">            print(cols)</span>
+<span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
+<span class="sd">               0     name_id    Integer     True   Primary  False   autoincrement</span>
+<span class="sd">               1     FirstName  Varchar(20) False  NA       False   None</span>
+<span class="sd">               2     MiddleName Varchar(20) True   NA       False   None</span>
+<span class="sd">               3     LastName   Varchar(20) False  NA       False   None</span>
+
+<span class="sd">        However, this code can also be executed when not in the database</span>
+
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">            from cobralib.io import MySQLDB</span>
+
+<span class="sd">            db = MySQLDB(&#39;username&#39;, &#39;password&#39;, port=3306, hostname=&#39;localhost&#39;)</span>
+<span class="sd">            cols = db.get_table_columns(&#39;Names&#39;, &#39;Address&#39;)</span>
+<span class="sd">            db.close_conn()</span>
+<span class="sd">            print(cols)</span>
+<span class="sd">            &gt;&gt; index Field      Type        Null   Key     Default  Extra</span>
+<span class="sd">               0     name_id    Integer     True   Primary  False   autoincrement</span>
+<span class="sd">               1     FirstName  Varchar(20) False  NA       False   None</span>
+<span class="sd">               2     MiddleName Varchar(20) True   NA       False   None</span>
+<span class="sd">               3     LastName   Varchar(20) False  NA       False   None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Execute the PRAGMA command to get the table information</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRAGMA table_info(</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Fetch all rows from the cursor</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The table &#39;</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&#39; does not exist.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># The names of the columns in the result set</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;notnull&quot;</span><span class="p">,</span> <span class="s2">&quot;default_value&quot;</span><span class="p">,</span> <span class="s2">&quot;pk&quot;</span><span class="p">]</span>
+
+                <span class="c1"># Convert the result set to a DataFrame</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+
+                <span class="c1"># Modify the DataFrame to match the output from the MySQLDB method</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;notnull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">})</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;PRI&quot;</span><span class="p">})</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;default_value&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Extra&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+                <span class="c1"># Only include the relevant columns in the DataFrame</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;Key&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Extra&quot;</span><span class="p">]]</span>
+
+                <span class="k">return</span> <span class="n">df</span>
+
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Handle any SQLite errors that occur</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">db_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Execute the PRAGMA command to get the table information</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRAGMA table_info(</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Fetch all rows from the cursor</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The table &#39;</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&#39; does not exist.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># The names of the columns in the result set</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;notnull&quot;</span><span class="p">,</span> <span class="s2">&quot;default_value&quot;</span><span class="p">,</span> <span class="s2">&quot;pk&quot;</span><span class="p">]</span>
+
+                <span class="c1"># Convert the result set to a DataFrame</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+
+                <span class="c1"># Modify the DataFrame to match the output from the MySQLDB method</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;notnull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">})</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;PRI&quot;</span><span class="p">})</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;default_value&quot;</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Extra&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+                <span class="c1"># Only include the relevant columns in the DataFrame</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;Key&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Extra&quot;</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+
+                <span class="k">return</span> <span class="n">df</span>
+
+            <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">()</span>
+                <span class="c1"># Handle any SQLite errors that occur</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.execute_query"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.execute_query">[docs]</a>    <span class="k">def</span> <span class="nf">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a query with placeholders and return the result as a Pandas DataFrame.</span>
+<span class="sd">        The user of this class should ensure that when applicable they parameteratize</span>
+<span class="sd">        the inputs to this method to minimize the potential for an injection</span>
+<span class="sd">        attack</span>
+
+<span class="sd">        :param query: The query with placeholders.</span>
+<span class="sd">        :param params: The values to be substituted into the placeholders</span>
+<span class="sd">                       (default is an empty tuple).</span>
+<span class="sd">        :return: A Pandas DataFrame with the query result.</span>
+<span class="sd">        :raises ValueError: If the database name is not provided.</span>
+<span class="sd">        :raises Error: If the query execution fails.</span>
+
+<span class="sd">        Example usage when parameters are provided:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">          from mylib.io import SQLiteDB</span>
+
+<span class="sd">          db = SQLiteDB(&#39;example.db&#39;)</span>
+<span class="sd">          query = &quot;SELECT * FROM names WHERE name_id = ?&quot;</span>
+<span class="sd">          params = (2,)</span>
+<span class="sd">          result = db.execute_query(query, params)</span>
+<span class="sd">          print(result)</span>
+<span class="sd">          &gt;&gt; index  name_id  FirstName  LastName</span>
+<span class="sd">             0      2        Fred       Smith</span>
+
+<span class="sd">        Example usage when no parameters are provided:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">          from mylib.io import SQLiteDB</span>
+
+<span class="sd">          db = SQLiteDB(&#39;example.db&#39;)</span>
+<span class="sd">          query = &quot;SELECT * FROM names&quot;</span>
+<span class="sd">          result = db.execute_query(query)</span>
+<span class="sd">          print(result)</span>
+<span class="sd">          &gt;&gt; index  name_id  FirstName  LastName</span>
+<span class="sd">           0        1        Jon        Webb</span>
+<span class="sd">           1        2        Fred       Smith</span>
+<span class="sd">           2        3        Jillian    Webb</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The number of placeholders in the query does not &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;match the number of parameters.&quot;</span>
+        <span class="n">num_placeholders</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_placeholders</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute query: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute query: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.csv_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.csv_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">csv_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">csv_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read data from a CSV or TXT file and insert it into the specified table.</span>
+
+<span class="sd">        :param csv_file: The path to the CSV file or TXT file.</span>
+<span class="sd">        :param table_name: The name of the table.</span>
+<span class="sd">        :param csv_headers: The names of the columns in the TXT file and datatypes</span>
+<span class="sd">                            as a dictionary.</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
+<span class="sd">                              assumes CSV column names and table column names</span>
+<span class="sd">                              are the same).</span>
+<span class="sd">        :param delimiter: The seperating delimeter in the text file.  Defaulted to</span>
+<span class="sd">                          &#39;,&#39; for a CSV file, but can work with other delimeters</span>
+<span class="sd">        :param skip: The number of rows to be skipped if metadata exists before</span>
+<span class="sd">                     the header definition.  Defaulted to 0</span>
+<span class="sd">        :raises ValueError: If the CSV file or table name is not provided, or if</span>
+<span class="sd">                            the number of CSV columns and table columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CSV column names are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">csv_data</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span>
+                <span class="n">csv_file</span><span class="p">,</span> <span class="n">csv_headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
+            <span class="p">]</span>
+
+            <span class="n">csv_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_headers</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">csv_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;?&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>  <span class="c1"># Commit changes</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.excel_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.excel_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">excel_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">excel_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">excel_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sheet_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sheet1&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read data from an Excel file and insert it into the specified table.</span>
+
+<span class="sd">        :param excel_file: The path to the Excel file.</span>
+<span class="sd">        :param table_name: The name of the table.</span>
+<span class="sd">        :param excel_headers: The names of the columns in the Excel file and their</span>
+<span class="sd">                              data types as a dictionary.</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
+<span class="sd">                              assumes Excel column names and table column names are</span>
+<span class="sd">                              the same).</span>
+<span class="sd">        :param sheet_name: The name of the sheet in the Excel file (default is &#39;Sheet1&#39;).</span>
+<span class="sd">        :param skip: The number of rows to be skipped if metadata exists before</span>
+<span class="sd">                     the header definition. Defaulted to 0.</span>
+<span class="sd">        :raises ValueError: If the Excel file, table name, or sheet name is not</span>
+<span class="sd">                            provided, or if the number of Excel columns and table</span>
+<span class="sd">                            columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">excel_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Excel column names are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">read_excel_columns_by_headers</span><span class="p">(</span>
+                <span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">excel_headers</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
+            <span class="p">]</span>
+
+            <span class="n">excel_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">excel_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_headers</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">excel_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;?&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SQLiteDB.pdf_to_table"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.db.SQLiteDB.pdf_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">pdf_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pdf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pdf_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">table_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">page_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read a table from a PDF file and insert it into the specified SQLite table.</span>
+
+<span class="sd">        :param pdf_file: The path to the PDF file.</span>
+<span class="sd">        :param table_name: The name of the SQLite table.</span>
+<span class="sd">        :param pdf_headers: A dictionary of column names in the PDF and their data</span>
+<span class="sd">                            types.</span>
+<span class="sd">        :param table_columns: The names of the columns in the SQLite table</span>
+<span class="sd">                              (default is None, assumes PDF column names and SQLite</span>
+<span class="sd">                              column names are the same).</span>
+<span class="sd">        :param table_idx: Index of the table in the PDF (default: 0).</span>
+<span class="sd">        :param page_num: Page number from which to extract the table (default: 0).</span>
+<span class="sd">        :param skip: The number of rows to skip in the PDF table.</span>
+<span class="sd">        :raises ValueError: If the PDF file, table name, or sheet name is not</span>
+<span class="sd">                            provided, or if the number of PDF headers and table</span>
+<span class="sd">                            columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;PDF headers are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Read the table from the PDF file</span>
+            <span class="n">pdf_data</span> <span class="o">=</span> <span class="n">read_pdf_columns_by_headers</span><span class="p">(</span>
+                <span class="n">pdf_file</span><span class="p">,</span> <span class="n">pdf_headers</span><span class="p">,</span> <span class="n">table_idx</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
+            <span class="p">]</span>
+            <span class="n">pdf_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">pdf_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">pdf_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;?&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a connection to the SQLite database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to DatabaseError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 

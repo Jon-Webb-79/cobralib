@@ -58,3 +58,6 @@ query relational databases.
 
 .. autoclass:: cobralib.db.MySQLDB
    :members:
+
+.. autoclass:: cobralib.db.SQLiteDB
+   :members:
