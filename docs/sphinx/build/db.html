@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>db &#8212; cobralib 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=89b800e6" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">db</a></li>
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+
+  <section id="db">
+<h1>db<a class="headerlink" href="#db" title="Permalink to this heading">¶</a></h1>
+<p>The db module can be used to connect to and interact with several relational database
+management systems.  Fundamentally this module relies on the <strong>RelationalDB</strong> class
+which is a protocol to set the structural sub-typing of all classes that exist
+with the protocol.  The base methods and data types are shown below.  However,
+certain implimentations for server based relational database management systems
+have some methods in excess of what is required by the Protocol.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.db.</span></span><span class="sig-name descname"><span class="pre">RelationalDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>A protocol class to handle structural sub-typing of classes used to read and
+interact with relational databases</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> – The name of the database currently being used</p></li>
+<li><p><strong>conn</strong> – The connection attribute of the database management system</p></li>
+<li><p><strong>cur</strong> – The cursor attribute of the database management system.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If a connection can not be established</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.change_database">
+<span class="sig-name descname"><span class="pre">change_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.change_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.change_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to change the connection from one database to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db_name</strong> – The new database or database file to be used.  If a database
+file, this must include the path length.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – if query fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the connection to the database managment system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ConnectionError</strong> – If the connection does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.csv_to_table">
+<span class="sig-name descname"><span class="pre">csv_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.csv_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.csv_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data from a CSV or TXT file and insert it into the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file</strong> – The path to the CSV file or TXT file.</p></li>
+<li><p><strong>table_name</strong> – The name of the table.</p></li>
+<li><p><strong>csv_headers</strong> – The names of the columns in the TXT file and datatypes
+as a dictionary.</p></li>
+<li><p><strong>table_headers</strong> – The names of the columns in the table (default is None,
+assumes CSV column names and table column names
+are the same).</p></li>
+<li><p><strong>delimiter</strong> – The seperating delimeter in the text file.  Defaulted to
+‘,’ for a CSV file, but can work with other delimeters</p></li>
+<li><p><strong>skip</strong> – The number of rows to be skipped if metadata exists before
+the header definition.  Defaulted to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the CSV file or table name is not provided, or if
+the number of CSV columns and table columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.excel_to_table">
+<span class="sig-name descname"><span class="pre">excel_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">excel_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excel_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Sheet1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.excel_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.excel_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data from an Excel file and insert it into the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>excel_file</strong> – The path to the Excel file.</p></li>
+<li><p><strong>table_name</strong> – The name of the table.</p></li>
+<li><p><strong>excel_headers</strong> – The names of the columns in the Excel file and their
+data types as a dictionary.</p></li>
+<li><p><strong>table_headers</strong> – The names of the columns in the table (default is None,
+assumes Excel column names and table column names are
+the same).</p></li>
+<li><p><strong>sheet_name</strong> – The name of the sheet in the Excel file (default is ‘Sheet1’).</p></li>
+<li><p><strong>skip</strong> – The number of rows to be skipped if metadata exists before
+the header definition. Defaulted to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the Excel file, table name, or sheet name is not
+provided, or if the number of Excel columns and table
+columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.execute_query">
+<span class="sig-name descname"><span class="pre">execute_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.execute_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.execute_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a query with placeholders and return the result as a Pandas DataFrame.
+The user of this class should ensure that when applicable they parameteratize
+the inputs to this method to minimize the potential for an injection
+attack</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> – The query with placeholders.</p></li>
+<li><p><strong>params</strong> – The values to be substituted into the placeholders
+(default is an empty tuple).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Pandas DataFrame with the query result.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the database name is not provided.</p></li>
+<li><p><strong>ConnectionError</strong> – If the query execution fails.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.get_database_tables">
+<span class="sig-name descname"><span class="pre">get_database_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.get_database_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.get_database_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to retrieve a dataframe containing a list of all tables wtihin
+the SQL database or database file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db_name</strong> – The name of the database or database file that the tables
+will be retrieved from.</p>
+</dd>
+<dt class="field-even">Return df<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dataframe containing all information relating to the tables
+within the database or database file.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ConnectionError</strong> – If program is not able to get tables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.get_table_columns">
+<span class="sig-name descname"><span class="pre">get_table_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.get_table_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.get_table_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the names and data types of the columns within the specified table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> – The name of the table.</p></li>
+<li><p><strong>db</strong> – The database name, defaulted to currently selected database
+or None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Pandas Dataframe with the table information</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the database is not selected at the class level
+:raises ConnectionError: If the columns cannot be retrieved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.db.RelationalDB.pdf_to_table">
+<span class="sig-name descname"><span class="pre">pdf_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/cobralib/db.html#RelationalDB.pdf_to_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.db.RelationalDB.pdf_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a table from a PDF file and insert it into the specified SQLite table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_file</strong> – The path to the PDF file.</p></li>
+<li><p><strong>table_name</strong> – The name of the SQLite table.</p></li>
+<li><p><strong>pdf_headers</strong> – A dictionary of column names in the PDF and their data
+types.</p></li>
+<li><p><strong>table_columns</strong> – The names of the columns in the SQLite table
+(default is None, assumes PDF column names and SQLite
+column names are the same).</p></li>
+<li><p><strong>table_idx</strong> – Index of the table in the PDF (default: 0).</p></li>
+<li><p><strong>page_num</strong> – Page number from which to extract the table (default: 0).</p></li>
+<li><p><strong>skip</strong> – The number of rows to skip in the PDF table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the PDF file, table name, or sheet name is not
+provided, or if the number of PDF headers and table
+columns mismatch.</p></li>
+<li><p><strong>Error</strong> – If the data insertion fails or the data types are
+incompatible.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">db</a><ul>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB"><code class="docutils literal notranslate"><span class="pre">RelationalDB</span></code></a><ul>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.change_database"><code class="docutils literal notranslate"><span class="pre">RelationalDB.change_database()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.close_connection"><code class="docutils literal notranslate"><span class="pre">RelationalDB.close_connection()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.csv_to_table"><code class="docutils literal notranslate"><span class="pre">RelationalDB.csv_to_table()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.excel_to_table"><code class="docutils literal notranslate"><span class="pre">RelationalDB.excel_to_table()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.execute_query"><code class="docutils literal notranslate"><span class="pre">RelationalDB.execute_query()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.get_database_tables"><code class="docutils literal notranslate"><span class="pre">RelationalDB.get_database_tables()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.get_table_columns"><code class="docutils literal notranslate"><span class="pre">RelationalDB.get_table_columns()</span></code></a></li>
+<li><a class="reference internal" href="#cobralib.db.RelationalDB.pdf_to_table"><code class="docutils literal notranslate"><span class="pre">RelationalDB.pdf_to_table()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/db.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">cobralib 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">db</a></li>
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Jonathan A. Webb.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    </div>
+  </body>
+</html>

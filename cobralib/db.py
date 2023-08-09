@@ -1,6 +1,7 @@
 # Import necessary packages here
 import re
 import sqlite3
+from typing import Any, Protocol
 
 import pandas as pd
 
@@ -14,6 +15,14 @@ try:
     )
 except ImportError:
     msg = "Warning: mysql-connector-python package is not installed. "
+    msg += "Some features may not work."
+    # Handle the case when mysql-connector is not available
+    print(msg)
+
+try:
+    import pgdb
+except ImportError:
+    msg = "Warning: postgresql package is not installed. "
     msg += "Some features may not work."
     # Handle the case when mysql-connector is not available
     print(msg)
@@ -35,6 +44,193 @@ from cobralib.io import (
 # ==========================================================================================
 # ==========================================================================================
 # Insert Code here
+
+
+class RelationalDB(Protocol):
+    """
+    A protocol class to handle structural sub-typing of classes used to read and
+    interact with relational databases
+
+    :ivar database: The name of the database currently being used
+    :ivar conn: The connection attribute of the database management system
+    :ivar cur: The cursor attribute of the database management system.
+    :raises ConnectionError: If a connection can not be established
+    """
+
+    database: str
+    conn: Any
+    cur: Any
+
+    # ------------------------------------------------------------------------------------------
+
+    def close_connection(self) -> None:
+        """
+        Close the connection to the database managment system
+
+        :raises ConnectionError: If the connection does not exist.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def change_database(self, db_name: str) -> None:
+        """
+        Method to change the connection from one database to another.
+
+        :param db_name: The new database or database file to be used.  If a database
+                        file, this must include the path length.
+        :raises ConnectionError: if query fails.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+        """
+        Method to retrieve a dataframe containing a list of all tables wtihin
+        the SQL database or database file.
+
+        :param db_name: The name of the database or database file that the tables
+                        will be retrieved from.
+        :return df: A dataframe containing all information relating to the tables
+                    within the database or database file.
+        :raises ConnectionError: If program is not able to get tables
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+        """
+        Retrieve the names and data types of the columns within the specified table.
+
+        :param table_name: The name of the table.
+        :param db: The database name, defaulted to currently selected database
+                   or None
+        :return: A Pandas Dataframe with the table information
+        :raises ValueError: If the database is not selected at the class level
+         :raises ConnectionError: If the columns cannot be retrieved.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def execute_query(self, query: str, params: tuple = ()) -> pd.DataFrame:
+        """
+        Execute a query with placeholders and return the result as a Pandas DataFrame.
+        The user of this class should ensure that when applicable they parameteratize
+        the inputs to this method to minimize the potential for an injection
+        attack
+
+        :param query: The query with placeholders.
+        :param params: The values to be substituted into the placeholders
+                       (default is an empty tuple).
+        :return: A Pandas DataFrame with the query result.
+        :raises ValueError: If the database name is not provided.
+        :raises ConnectionError: If the query execution fails.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def csv_to_table(
+        self,
+        csv_file: str,
+        table_name: str,
+        csv_headers: dict[str, type],
+        table_headers: list = None,
+        delimiter: str = ",",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from a CSV or TXT file and insert it into the specified table.
+
+        :param csv_file: The path to the CSV file or TXT file.
+        :param table_name: The name of the table.
+        :param csv_headers: The names of the columns in the TXT file and datatypes
+                            as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes CSV column names and table column names
+                              are the same).
+        :param delimiter: The seperating delimeter in the text file.  Defaulted to
+                          ',' for a CSV file, but can work with other delimeters
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the CSV file or table name is not provided, or if
+                            the number of CSV columns and table columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def excel_to_table(
+        self,
+        excel_file: str,
+        table_name: str,
+        excel_headers: dict[str, type],
+        table_headers: list = None,
+        sheet_name: str = "Sheet1",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from an Excel file and insert it into the specified table.
+
+        :param excel_file: The path to the Excel file.
+        :param table_name: The name of the table.
+        :param excel_headers: The names of the columns in the Excel file and their
+                              data types as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes Excel column names and table column names are
+                              the same).
+        :param sheet_name: The name of the sheet in the Excel file (default is 'Sheet1').
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition. Defaulted to 0.
+        :raises ValueError: If the Excel file, table name, or sheet name is not
+                            provided, or if the number of Excel columns and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    def pdf_to_table(
+        self,
+        pdf_file: str,
+        table_name: str,
+        pdf_headers: dict[str, type],
+        table_columns: list = None,
+        table_idx: int = 0,
+        page_num: int = 0,
+        skip: int = 0,
+    ) -> None:
+        """
+        Read a table from a PDF file and insert it into the specified SQLite table.
+
+        :param pdf_file: The path to the PDF file.
+        :param table_name: The name of the SQLite table.
+        :param pdf_headers: A dictionary of column names in the PDF and their data
+                            types.
+        :param table_columns: The names of the columns in the SQLite table
+                              (default is None, assumes PDF column names and SQLite
+                              column names are the same).
+        :param table_idx: Index of the table in the PDF (default: 0).
+        :param page_num: Page number from which to extract the table (default: 0).
+        :param skip: The number of rows to skip in the PDF table.
+        :raises ValueError: If the PDF file, table name, or sheet name is not
+                            provided, or if the number of PDF headers and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+        ...
+
+
+# ==========================================================================================
+# ==========================================================================================
 
 
 class MySQLDB:
@@ -60,21 +256,19 @@ class MySQLDB:
         self,
         username: str,
         password: str,
+        database: str,
         port: int = 3306,
         hostname: str = "localhost",
-        database: str = None,
     ):
         self.username = username
         self.password = password
         self.port = port
         self.hostname = hostname
         self.database = database
-        self.conn = None
-        self.cur = None
+        # self.conn = None
+        # self.cur = None
 
         self._create_connection(password)
-        if self.database is not None:
-            self.change_database(database)
 
     # ------------------------------------------------------------------------------------------
 
@@ -86,7 +280,6 @@ class MySQLDB:
         :raises ConnectionError: if query fails.
         """
         try:
-            self.conn.database = db_name
             self.cur.execute(f"USE {db_name}")
             self.database = db_name
         except ProgrammingError as e:
@@ -156,11 +349,11 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, db: str = None) -> pd.DataFrame:
+    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
         """
         Retrieve the names of all tables within the current database.
 
-        :param db: Database name, defaulted to currently selected database or None
+        :param db_name: Database name, defaulted to currently selected database or None
         :return: A pandas dataframe of table names with a header of Tables
         :raises ValueError: If no database is currently selected.
         :raises ConnectionError: If program is not able to get tables
@@ -182,14 +375,14 @@ class MySQLDB:
               2      Sales
 
         """
-        if db is None:
-            db = self.database
+        if db_name is None:
+            db_name = self.database
 
-        if not db:
+        if not db_name:
             raise ValueError("No database is currently selected.")
-        msg = f"Failed to fetch tables from {db}"
+        msg = f"Failed to fetch tables from {db_name}"
         try:
-            self.cur.execute(f"SHOW TABLES FROM {db}")
+            self.cur.execute(f"SHOW TABLES FROM {db_name}")
             tables = self.cur.fetchall()
             return pd.DataFrame(tables, columns=["Tables"])
         except InterfaceError as e:
@@ -198,7 +391,7 @@ class MySQLDB:
             raise ConnectionError(msg)
         except Error as e:
             # Generic error handler for any other exceptions.
-            raise ConnectionError(f"Failed to fetch tables from {db}: {e}")
+            raise ConnectionError(f"Failed to fetch tables from {db_name}: {e}")
 
     # ------------------------------------------------------------------------------------------
 
@@ -683,15 +876,15 @@ class SQLiteDB:
 
     :param database: The name of the database file to include its path length.
     :raises ConnectionError: If a connection can not be established.
-    :ivar conn: The connection attribute of the mysql-connector-python module.
-    :ivar cur: The cursor method for the mysql-connector-python module.
+    :ivar conn: The connection attribute of the sqlite3 module.
+    :ivar cur: The cursor method for the sqlite3 module.
     :ivar database: The name of the database currently being used.
     """
 
-    def __init__(self, database: str = None):
+    def __init__(self, database: str):
         self.database = database
         self.conn = None
-        self.curr = None
+        self.cur = None
 
         self._create_connection()
 
@@ -724,6 +917,11 @@ class SQLiteDB:
         method will return the list of tables in the current database.  However,
         the user can also pass this method the name of another database file,
         and this will return a list of tables in that database file/
+
+        :param db_name: The name of the database or database file that the tables
+                        will be retrieved from.
+        :return df: A dataframe containing all information relating to the tables
+                    within the database or database file.
 
         Assuming the user has a database titled ``Inventory`` which had the
         tables ``Names``, ``Product``, ``Sales``.
@@ -1203,6 +1401,590 @@ class SQLiteDB:
         Sanitize column names to include only alphanumeric characters and underscores.
         """
         return re.sub(r"\W|^(?=\d)", "_", name)
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+class PostGreSQLDB:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        database: str,
+        port: int = 5432,
+        hostname: str = "localhost",
+    ):
+        """
+        Initialize the database connection to a PostgreSQL server.
+
+        :param username: The PostgreSQL username.
+        :param password: The PostgreSQL password.
+        :param database: The name of the database to connect to.
+        :param port: The port number for the PostgreSQL server (default is 5432).
+        :param hostname: The server's hostname (default is 'localhost').
+        """
+
+        self.username = username
+        self.password = password
+        self.port = port
+        self.hostname = hostname
+        self.database = database
+
+        self._create_connection(password, database)
+
+    # ------------------------------------------------------------------------------------------
+
+    def close_connection(self):
+        """
+        Close the connection to the PostgreSQL server and database.
+
+        :raises ConnectionError: If there's an issue closing the connection or cursor.
+        """
+        try:
+            if self.cur:
+                self.cur.close()
+            if self.conn:
+                self.conn.close()
+        except pgdb.Error as e:
+            raise ConnectionError(f"Failed to close the connection: {e}")
+        except Exception as e:
+            # Generic handler for any other exceptions
+            raise ConnectionError(f"Failed to close the connection: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def change_database(self, db_name: str) -> None:
+        """
+        Change to a different PostgreSQL database.
+
+        :param db_name: The name of the database to switch to.
+        :raises ConnectionError: If there's an issue establishing a connection
+                                 to the new database.
+        """
+        try:
+            # Close the current connection if it exists
+            if self.conn:
+                self.conn.close()
+
+            # Establish a new connection to the desired database
+            self.conn = pgdb.connect(
+                database=db_name,
+                user=self.username,
+                password=self.password,
+                host=self.hostname,
+                port=self.port,
+            )
+            self.database = db_name
+            self.cur = self.conn.cursor()
+        except pgdb.DatabaseError as e:
+            raise ConnectionError(f"Failed to change to database '{db_name}': {e}")
+        except Exception as e:
+            # Generic handler for any other exceptions
+            raise ConnectionError(f"Failed to change to database '{db_name}': {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_databases(self) -> pd.DataFrame:
+        """
+        Fetch a list of databases from the PostgreSQL server.
+
+        :return: A pandas DataFrame containing the list of databases with the
+                 column header "Databases".
+        """
+        query = "SELECT datname FROM pg_database;"
+
+        try:
+            self.cur.execute(query)
+            data = self.cur.fetchall()
+            df = pd.DataFrame(data, columns=["Databases"])
+            return df
+        except pgdb.DatabaseError as e:
+            raise Exception(f"Failed to fetch databases: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+        """
+        Fetch a list of tables from the specified or current PostgreSQL database.
+
+        :param db_name: The name of the database to fetch tables from. If not
+                        provided, uses the current database.
+        :return: A pandas DataFrame containing the list of tables with the column
+                 header "Tables".
+        """
+
+        original_db = self.database
+
+        # If db_name is provided, switch to that database
+        if db_name:
+            self.change_database(db_name)
+
+        query = "SELECT tablename FROM pg_tables WHERE schemaname='public';"
+
+        try:
+            self.cur.execute(query)
+            data = self.cur.fetchall()
+            df = pd.DataFrame(data, columns=["Tables"])
+
+            # If db_name was provided, switch back to the original database
+            if db_name:
+                self.change_database(original_db)
+
+            return df
+        except pgdb.DatabaseError as e:
+            if db_name:
+                try:
+                    self.change_database(original_db)
+                except (pgdb.DatabaseError, pgdb.OperationalError):
+                    pass
+            raise Exception(f"Failed to fetch tables: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+        """
+        Fetch column details for the given table in the specified or current
+        PostgreSQL database.
+
+        :param table_name: The name of the table to fetch column details for.
+        :param db: The name of the database the table resides in. If not provided,
+                   uses the current database.
+        :return: A pandas DataFrame containing column details.
+        """
+
+        original_db = self.database
+
+        # If db is provided, switch to that database
+        if db:
+            self.change_database(db)
+
+        try:
+            # Fetch column details
+            column_query = f"""
+            SELECT column_name as "Field",
+                   data_type as "Type",
+                   is_nullable = 'YES' as "Null",
+                   column_default as "Default",
+                   '' as "Key",
+                   '' as "Extra"
+            FROM information_schema.columns
+            WHERE table_name = '{table_name}'
+            """
+
+            self.cur.execute(column_query)
+            columns = self.cur.fetchall()
+            df = pd.DataFrame(
+                columns, columns=["Field", "Type", "Null", "Default", "Key", "Extra"]
+            )
+
+            # Fetch primary key
+            pk_query = f"""
+            SELECT a.attname as "Field", 'Primary' as "Key"
+            FROM   pg_index i
+            JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+            WHERE  i.indrelid = '{table_name}'::regclass AND i.indisprimary;
+            """
+
+            self.cur.execute(pk_query)
+            pks = self.cur.fetchall()
+            for pk in pks:
+                df.loc[df["Field"] == pk[0], "Key"] = "Primary"
+
+            # - Updating Foreign Key would be a more involved process due to the
+            #   way PostgreSQL manages it,
+            # skipping that for the moment.
+
+            # If db was provided, switch back to the original database
+            if db:
+                self.change_database(original_db)
+
+            return df
+        except pgdb.DatabaseError as e:
+            # - If db was provided and there's an error, try to switch back to
+            #   the original database
+            if db:
+                try:
+                    self.change_database(original_db)
+                except (pgdb.DatabaseError, pgdb.OperationalError):
+                    pass
+            raise Exception(f"Failed to fetch table columns: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def execute_query(self, query: str, params: tuple = None) -> pd.DataFrame:
+        """
+        Executes the provided SQL query and returns the results as a pandas DataFrame.
+
+        :param query: The SQL query to execute.
+        :param params: A tuple of parameters to bind to the query.
+        :return: A pandas DataFrame containing the query results.
+        """
+
+        try:
+            if params:
+                self.cur.execute(query, params)
+            else:
+                self.cur.execute(query)
+
+            if self.cur.description:
+                columns = [desc[0] for desc in self.cur.description]
+                return pd.DataFrame(self.cur.fetchall(), columns=columns)
+            else:
+                self.conn.commit()
+                return pd.DataFrame()
+        except (pgdb.DatabaseError, pgdb.OperationalError) as e:
+            raise Exception(f"Failed to execute query: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def csv_to_table(
+        self,
+        csv_file: str,
+        table_name: str,
+        csv_headers: dict[str, type],
+        table_headers: list = None,
+        delimiter: str = ",",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from a CSV or TXT file and insert it into the specified table.
+
+        :param csv_file: The path to the CSV file or TXT file.
+        :param table_name: The name of the table.
+        :param csv_headers: The names of the columns in the TXT file and datatypes
+                            as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes CSV column names and table column names
+                              are the same).
+        :param delimiter: The seperating delimeter in the text file.  Defaulted to
+                          ',' for a CSV file, but can work with other delimeters
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the CSV file or table name is not provided, or if
+                            the number of CSV columns and table columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+
+        Assune we have a csv table with the following Columns, ``FirstName``,
+        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have
+        a table with no entries that has columns for ``First`` and ``Last``.
+
+        .. code-block:: python
+
+           from cobralib.io import PostGreSQLDB
+
+           db = PostGreSQL('username', 'password', 'Names', port=3306,
+                           hostname='localhost')
+           db.csv_to_table('csv_file.csv', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
+                           ['First', 'Last'])
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
+
+        If instead of a csv file, you have a text file that uses spaces as
+        a delimeter, and the first two rows are consumed by file metadata
+        before reaching the header, the following code will work
+
+        .. code-block:: python
+
+           from cobralib.io import PostGreSQLDB
+
+           db = PostGreSQLDB('username', 'password', 'Names',
+                              port=3306, hostname='localhost')
+           db.csv_to_table('txt_file.txt', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
+                           ['First', 'Last'], delemeter=r"\\s+", skip=2)
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
+
+        ... [rest of the docstring remains unchanged] ...
+        """
+
+        if len(csv_headers) == 0:
+            raise ValueError("CSV column names are required.")
+
+        try:
+            csv_data = read_text_columns_by_headers(
+                csv_file, csv_headers, skip=skip, delimiter=delimiter
+            )
+
+            if table_headers is None:
+                table_headers = list(csv_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+
+            csv_header_keys = list(csv_headers.keys())
+
+            for _, row in csv_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_headers):
+                    value = row[csv_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["%s"] * len(insert_data))
+                if table_headers is not None:
+                    columns = ", ".join(sanitized_columns)
+                else:
+                    columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+            self.conn.commit()  # Commit changes
+        except pgdb.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise Exception(f"Failed to insert data into the table: {e}")
+        except pgdb.DatabaseError as e:
+            # Generic error handler for any other exceptions.
+            raise Exception(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def excel_to_table(
+        self,
+        excel_file: str,
+        table_name: str,
+        excel_headers: dict[str, type],
+        table_headers: list = None,
+        sheet_name: str = "Sheet1",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from an Excel file and insert it into the specified table.
+
+        :param excel_file: The path to the Excel file.
+        :param table_name: The name of the table.
+        :param excel_headers: The names of the columns in the Excel file and their
+                              data types as a dictionary
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes Excel column names and table column names are
+                              the same).
+        :param sheet_name: The name of the sheet in the Excel file
+                           (default is 'Sheet1').
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the Excel file, table name, or sheet name is not
+                            provided, or if the number of Excel columns and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+
+        Assune we have an excel table with the following Columns, ``FirstName``,
+        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have
+        a table with no entries that has columns for ``First`` and ``Last``.
+
+        .. code-block:: python
+
+           from cobralib.io import PostGreSQLDB
+
+           db = PostGreSQL('username', 'password', 'Names',
+                           port=3306, hostname='localhost')
+           db.csv_to_table('excel_file.xlsx', 'FirstLastName',
+                           {'FirstName': str, 'LastName': str},
+                           ['First', 'Last'])
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
+        """
+        if not excel_headers:
+            raise ValueError("Excel column names are required.")
+
+        try:
+            # Using pandas to read the Excel file
+            excel_data = read_excel_columns_by_headers(
+                excel_file, sheet_name, excel_headers, skip
+            )
+
+            if table_headers is None:
+                table_headers = list(excel_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+            excel_header_keys = list(excel_headers.keys())
+
+            for _, row in excel_data.iterrows():
+                insert_data = {
+                    table_headers[i]: row[excel_header_keys[i]]
+                    for i in range(len(table_headers))
+                }
+
+                placeholders = ", ".join(["%s"] * len(insert_data))
+                columns = ", ".join(sanitized_columns)
+                values = tuple(insert_data.values())
+
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+
+            self.conn.commit()
+        except (pgdb.DatabaseError, pgdb.OperationalError) as e:
+            raise Exception(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def pdf_to_table(
+        self,
+        pdf_file: str,
+        table_name: str,
+        pdf_headers: dict[str, type],
+        table_columns: list = None,
+        table_idx: int = 0,
+        page_num: int = 0,
+        skip: int = 0,
+    ) -> None:
+        """
+        Read a table from a PDF file and insert it into the specified MySQL table.
+
+        :param pdf_file: The path to the PDF file.
+        :param table_name: The name of the MySQL table.
+        :param pdf_headers: A dictionary of column names in the PDF and their data
+                            types.
+        :param table_columns: The names of the columns in the MySQL table
+                              (default is None, assumes PDF column names and MySQL
+                              column names are the same).
+        :param table_idx: Index of the table in the PDF (default: 0).
+        :param page_num: Page number from which to extract the table (default: 0).
+        :param skip: The number of rows to skip in the PDF table.
+        :raises ValueError: If the PDF file, table name, or sheet name is not
+                            provided, or if the number of PDF headers and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+
+        if len(pdf_headers) == 0:
+            raise ValueError("PDF headers are required.")
+
+        try:
+            # Read the table from the PDF file
+            pdf_data = read_pdf_columns_by_headers(
+                pdf_file, pdf_headers, table_idx, page_num, skip
+            )
+
+            if table_columns is None:
+                table_columns = list(pdf_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
+            pdf_header_keys = list(pdf_headers.keys())
+
+            for _, row in pdf_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_columns):
+                    value = row[pdf_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["%s"] * len(insert_data))
+                columns = ", ".join(sanitized_columns)
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self.cur.execute(query, values)
+
+            self.conn.commit()
+        except (pgdb.DatabaseError, pgdb.OperationalError) as e:
+            # Handle errors related to
+            raise Exception(f"Failed to insert data into the table: {e}")
+
+    # ==========================================================================================
+    # PRIVATE-LIKE METHODS
+
+    def _create_connection(self, password: str, database: str) -> None:
+        """
+        Create a connection to the PostgreSQL database.
+
+        :param password: The PostgreSQL password.
+        :param database: The name of the database to connect to.
+        :return: The PostgreSQL connection object.
+        """
+        try:
+            self.conn = pgdb.connect(
+                database=database,
+                host=self.hostname,
+                user=self.username,
+                password=password,
+                port=self.port,
+            )
+            self.cur = self.conn.cursor()
+        except pgdb.OperationalError as e:
+            raise ConnectionError(
+                f"Failed to create a connection due to OperationalError: {e}"
+            )
+        except pgdb.ProgrammingError as e:
+            raise ConnectionError(
+                f"Failed to create a connection due to ProgrammingError: {e}"
+            )
+        except pgdb.InternalError as e:
+            raise ConnectionError(
+                f"Failed to create a connection due to InternalError: {e}"
+            )
+        except Exception as e:
+            raise ConnectionError(f"Failed to create a connection: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def _sanitize_column_name(self, name: str) -> str:
+        """
+        Sanitize column names to include only alphanumeric characters and underscores.
+        """
+        return re.sub(r"\W|^(?=\d)", "_", name)
+
+
+# ==========================================================================================
+# ==========================================================================================
+# Factory pattern for Relational Database Management Systems
+
+
+def relational_database(
+    db_type: str,
+    username: str = "",
+    password: str = "",
+    port: int = 3306,
+    hostname: str = "localhost",
+    database: str = "",
+) -> RelationalDB:
+    """
+    Method will return a relational database object of type RelationalDB
+
+    :param db_type: A string representing the database management system, can be
+                    MySQL or SQLite. This parameter is case insensitive
+    :param username: The username for the database connection.
+    :param password: The password for the database connection.
+    :param port: The port number for the database connection. Defaulted to 3306
+    :param hostname: The hostname for the database connection
+                     (default is 'localhost').
+    :param database: The database you wish to connect to, defaulted to None
+    """
+    db_types = ["MYSQL", "SQLITE"]
+    if db_type.upper() not in db_types:
+        raise ValueError(f"db_type must be one of {db_types}")
+    if db_type.upper() == "MYSQL":
+        return MySQLDB(
+            username=username,
+            password=password,
+            port=port,
+            hostname=hostname,
+            database=database,
+        )
+    else:
+        return SQLiteDB(database)
 
 
 # ==========================================================================================

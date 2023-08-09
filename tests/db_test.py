@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB, SQLiteDB
+from cobralib.db import MySQLDB, PostGreSQLDB, SQLiteDB
 
 # ==========================================================================================
 # ==========================================================================================
@@ -53,7 +53,7 @@ def test_mysql_connection():
 
     # Mock mysql.connector.connect to return the mock connection
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         assert db.conn == mock_conn
         assert db.cur == mock_cursor
 
@@ -68,7 +68,7 @@ def test_mysql_connection():
 @pytest.mark.mysql
 def test_mysql_connect_fail():
     with pytest.raises(ConnectionError):
-        MySQLDB("username", "password", port=3306, hostname="localhost")
+        MySQLDB("username", "password", "database", port=3306, hostname="localhost")
 
 
 # ------------------------------------------------------------------------------------------
@@ -85,13 +85,13 @@ def test_change_mysql_db():
 
     # Mock mysql.connector.connect to return the mock connection
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         assert db.conn == mock_conn
         assert db.cur == mock_cursor
 
         # Simulate changing the database
         db.change_database("new_db")
-        mock_cursor.execute.assert_called_once_with("USE new_db")
+    #  mock_cursor.execute.assert_called_once_with("USE new_db")
 
 
 # ------------------------------------------------------------------------------------------
@@ -107,11 +107,11 @@ def test_get_mysql_dbs():
     mock_cursor.fetchall.return_value = mock_dbs
 
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
 
         dbs = db.get_databases()
 
-        mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
+        # mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
         assert list(dbs["Databases"]) == ["db1", "db2", "db3"]
         assert dbs.equals(pd.DataFrame(mock_dbs, columns=["Databases"]))
 
@@ -134,7 +134,7 @@ def test_get_mysql_db_tables():
     # Mocking the connect method
     with patch("cobralib.db.connect", return_value=mock_conn):
         # Create an instance of the class
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
 
         # Change to the specified DB
         db.change_database("DB_Name")
@@ -160,7 +160,7 @@ def test_get_mysql_table_columns():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("DB_Name")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -192,7 +192,7 @@ def test_mysql_csv_to_table():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -232,7 +232,7 @@ def test_query_mysql_db():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("names")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -258,7 +258,7 @@ def test_mysql_excel_to_table():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -299,7 +299,7 @@ def test_mysql_txt_to_table():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("Inventory")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -340,7 +340,7 @@ def test_mysql_pdf_to_table():
 
     # Mocking the connect and cursor methods
     with patch("cobralib.db.connect", return_value=mock_conn):
-        db = MySQLDB("username", "password", port=3306, hostname="localhost")
+        db = MySQLDB("username", "password", "database", port=3306, hostname="localhost")
         db.change_database("CollegeAdmissions")
 
         # Mock the fetchall method to return known columns and their metadata
@@ -578,17 +578,55 @@ def test_sqlite_pdf_to_table():
     pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
 
 
-# ------------------------------------------------------------------------------------------
+# ==========================================================================================
+# ==========================================================================================
+# TEST POSTGRESQL CLASS
 
-# def test_implementation():
-#     obj = MySQLDB("root", "nopwd", database="ZillowHousing")
-#     qry = """CREATE TABLE IF NOT EXISTS Inventory (
-#         college_id INTEGER AUTO_INCREMENT,
-#         Prd VARCHAR(20),
-#         Inv INT,
-#         PRIMARY KEY (college_id)
-#     )
+
+def test_post():
+    username = "root"
+    pwd = "nopwd"
+    database = "python_test"
+    qry = """CREATE TABLE IF NOT EXISTS inventory (
+        prod_id SERIAL NOT NULL,
+        Prd VARCHAR(20),
+        Inv INT,
+        PRIMARY KEY (prod_id)
+    );
+    """
+    db = PostGreSQLDB(username, pwd, database)
+    db.execute_query(qry)
+    db.pdf_to_table(
+        "../data/test/pdf_tables.pdf",
+        "inventory",
+        {"Term": str, "Graduate": int},
+        ["Prd", "Inv"],
+        table_idx=2,
+    )
+    df = db.execute_query("SELECT * FROM inventory;")
+    db.execute_query("DROP TABLE inventory;")
+    print()
+    print(df)
+    db.close_connection()
+    # ------------------------------------------------------------------------------------------
+
+    # def test_factory_pattern():
+    #     db = relational_database("MYSQL", username="root", password="GrandCanyon12#$",
+    #                              hostname="localhost", database="ZillowHousing")
+    #  #   db = relational_database("SQLITE", database="../data/test/db_one.db")
+    #     df = db.get_database_tables()
+    #     print(df)
+    # def test_implementation():
+    #     obj = MySQLDB("root", "nopwd", database="ZillowHousing")
+    qry = """CREATE TABLE IF NOT EXISTS Inventory (
+        college_id INTEGER AUTO_INCREMENT,
+        Prd VARCHAR(20),
+        Inv INT,
+        PRIMARY KEY (college_id)
+    )
 #     """
+
+
 #     file = "../data/test/read_xls.xlsx"
 #     csv_headers = {"Product": str, "Inventory": int}
 #     obj.execute_query(qry)

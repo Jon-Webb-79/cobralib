@@ -10,8 +10,8 @@ Welcome to Cobalib documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   UsersManual <UsersManual>
-   DevelopersManual <DevelopersManual>
+   io <io>
+   db <db>
 
 Indices and tables
 ==================
@@ -38,12 +38,8 @@ To install todo_six application as a developer, follow these steps.
 
 Usage
 =====
-The user instructions for this application is shown in :doc:`UsersManual`.
+The user instructions for this application is shown in :doc:`io` and :doc `db`.
 
-
-Developers Documentation
-========================
-For detailed documentation on developing with Todo List, please refer to the :doc:`DevelopersManual`.
 
 Contributing
 ============

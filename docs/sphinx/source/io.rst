@@ -1,8 +1,8 @@
-*****************
-Developers Manual
-*****************
-The various classes, methods and functions contained within this document enable
-easy implementation of utilities that are relevant to the average Python user.
+**
+io
+**
+The io module contains several functions and classes that can be user to read
+various ASCII based files.
 
 ReadKeyWords
 ============
@@ -49,15 +49,4 @@ This class is a wrapper around the logging module that adds the ability
 to truncate a log file to a user specified number of log values.
 
 .. autoclass:: cobralib.io.Logger
-   :members:
-
-Databases
-=========
-The cobralib module comes with serveral classes that can be used to connect with and
-query relational databases.
-
-.. autoclass:: cobralib.db.MySQLDB
-   :members:
-
-.. autoclass:: cobralib.db.SQLiteDB
    :members:
