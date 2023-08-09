@@ -1956,34 +1956,47 @@ class PostGreSQLDB:
 
 def relational_database(
     db_type: str,
+    database: str,
     username: str = "",
     password: str = "",
-    port: int = 3306,
+    port: int = -1,
     hostname: str = "localhost",
-    database: str = "",
 ) -> RelationalDB:
     """
     Method will return a relational database object of type RelationalDB
 
     :param db_type: A string representing the database management system, can be
                     MySQL or SQLite. This parameter is case insensitive
+    :param database: The database you wish to connect to, defaulted to appropriate
+                     port number for each database manager
     :param username: The username for the database connection.
     :param password: The password for the database connection.
     :param port: The port number for the database connection. Defaulted to 3306
     :param hostname: The hostname for the database connection
                      (default is 'localhost').
-    :param database: The database you wish to connect to, defaulted to None
     """
-    db_types = ["MYSQL", "SQLITE"]
+    db_types = ["MYSQL", "SQLITE", "POSTGRES"]
     if db_type.upper() not in db_types:
         raise ValueError(f"db_type must be one of {db_types}")
     if db_type.upper() == "MYSQL":
+        if port == -1:
+            port = 3306
         return MySQLDB(
             username=username,
             password=password,
+            database=database,
             port=port,
             hostname=hostname,
+        )
+    if db_type.upper() == "POSTGRES":
+        if port == -1:
+            port = 5432
+        return PostGreSQLDB(
+            username=username,
+            password=password,
             database=database,
+            port=port,
+            hostname=hostname,
         )
     else:
         return SQLiteDB(database)
