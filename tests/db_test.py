@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB, SQLiteDB
+from cobralib.db import MySQLDB, SQLiteDB, relational_database
 
 # ==========================================================================================
 # ==========================================================================================
@@ -584,31 +584,33 @@ def test_sqlite_pdf_to_table():
 # TEST POSTGRESQL CLASS
 
 
-# def test_post():
-#     username = "root"
-#     pwd = "nopwd"
-#     database = "python_test"
-#     qry = """CREATE TABLE IF NOT EXISTS inventory (
-#         prod_id SERIAL NOT NULL,
-#         Prd VARCHAR(20),
-#         Inv INT,
-#         PRIMARY KEY (prod_id)
-#     );
-#     """
-#     db = relational_database("POSTGRES", database, username, pwd)
-#     db.execute_query(qry)
-#     db.pdf_to_table(
-#         "../data/test/pdf_tables.pdf",
-#         "inventory",
-#         {"Term": str, "Graduate": int},
-#         ["Prd", "Inv"],
-#         table_idx=2,
-#     )
-#     df = db.execute_query("SELECT * FROM inventory;")
-#     db.execute_query("DROP TABLE inventory;")
-#     print()
-#     print(df)
-#     db.close_connection()
+def test_post():
+    username = "root"
+    pwd = "nopwd"
+    database = "python_test"
+    qry = """CREATE TABLE IF NOT EXISTS inventory (
+        prod_id SERIAL NOT NULL,
+        Prd VARCHAR(20),
+        Inv INT,
+        PRIMARY KEY (prod_id)
+    );
+    """
+    db = relational_database("MYSQL", database, username, pwd)
+    db.execute_query(qry)
+    db.pdf_to_table(
+        "../data/test/pdf_tables.pdf",
+        "inventory",
+        {"Term": str, "Graduate": int},
+        ["Prd", "Inv"],
+        table_idx=2,
+    )
+    df = db.execute_query("SELECT * FROM inventory;")
+    db.execute_query("DROP TABLE inventory;")
+    print()
+    print(df)
+    db.close_connection()
+
+
 # ------------------------------------------------------------------------------------------
 
 # def test_factory_pattern():

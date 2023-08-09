@@ -271,6 +271,7 @@ class MySQLDB:
         # self.cur = None
 
         self._create_connection(password)
+        self.change_database(database)
 
     # ------------------------------------------------------------------------------------------
 
@@ -524,10 +525,11 @@ class MySQLDB:
 
         """
 
-        msg = "The number of placeholders in the query does not "
-        msg += "match the number of parameters."
+        msg = "The number of placeholders in the query does not match "
+        msg += "the number of parameters."
         if not self.database:
             raise ValueError("No database is currently selected.")
+
         num_placeholders = query.count("%s")
         if num_placeholders != len(params):
             raise ValueError(msg)
@@ -537,13 +539,16 @@ class MySQLDB:
                 self.cur.execute(query)
             else:
                 self.cur.execute(query, params)
-            rows = self.cur.fetchall()
-            if rows:
+
+            # Check if there's a result set available
+            if self.cur.description:
+                rows = self.cur.fetchall()
                 column_names = [desc[0] for desc in self.cur.description]
                 df = pd.DataFrame(rows, columns=column_names)
                 return df
             else:
-                return pd.DataFrame()
+                return pd.DataFrame()  # No rows to return
+
         except InterfaceError as e:
             # Handle errors related to the interface.
             raise ConnectionError(f"Failed to execute query: {e}")
@@ -1148,25 +1153,24 @@ class SQLiteDB:
            2        3        Jillian    Webb
 
         """
-
         msg = "The number of placeholders in the query does not "
         msg += "match the number of parameters."
         num_placeholders = query.count("?")
         if num_placeholders != len(params):
             raise ValueError(msg)
-
         try:
-            if len(params) == 0:
-                self.cur.execute(query)
-            else:
+            if params:
                 self.cur.execute(query, params)
-            rows = self.cur.fetchall()
-            if rows:
-                column_names = [desc[0] for desc in self.cur.description]
-                df = pd.DataFrame(rows, columns=column_names)
-                return df
             else:
+                self.cur.execute(query)
+
+            if self.cur.description:
+                columns = [desc[0] for desc in self.cur.description]
+                return pd.DataFrame(self.cur.fetchall(), columns=columns)
+            else:
+                self.conn.commit()
                 return pd.DataFrame()
+
         except sqlite3.InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to execute query: {e}")
