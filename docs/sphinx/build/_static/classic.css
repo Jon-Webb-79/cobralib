@@ -46,6 +46,9 @@ div.body {
     color: #000000;
     padding: 0 20px 30px 20px;
 }
+div.bodywrapper {
+    margin: 0 230px 0 0;
+}
 
 div.footer {
     color: #ffffff;
@@ -71,6 +74,7 @@ div.related a {
 }
 
 div.sphinxsidebar {
+    float: right;
 }
 
 div.sphinxsidebar h3 {

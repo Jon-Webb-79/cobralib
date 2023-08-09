@@ -424,8 +424,9 @@ def test_get_sqlite_tables():
 
 @pytest.mark.sqlite
 def test_get_sqlite_table_columns():
-    db_file = "../data/test/db_one.db"
+    db_file = "../data/test/db_two.db"
     db = SQLiteDB(db_file)
+    # df = db.get_table_columns("Students")
     df = db.get_table_columns("Students", "../data/test/db_two.db")
     mock_return = [
         ("student_id", "INTEGER", "NO", "PRI", None, ""),

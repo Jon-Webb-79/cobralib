@@ -39,7 +39,7 @@ const initialiseSidebar = () => {
   const flipArrow = element => element.innerText = (element.innerText === "»") ? "«" : "»"
 
   const collapse_sidebar = () => {
-    bodyWrapper.style.marginLeft = ".8em";
+    bodyWrapper.style.marginRight = ".8em";
     sidebar.style.width = ".8em"
     sidebarWrapper.style.display = "none"
     flipArrow(sidebarArrow)
@@ -48,7 +48,7 @@ const initialiseSidebar = () => {
   }
 
   const expand_sidebar = () => {
-    bodyWrapper.style.marginLeft = ""
+    bodyWrapper.style.marginRight = ""
     sidebar.style.removeProperty("width")
     sidebarWrapper.style.display = ""
     flipArrow(sidebarArrow)

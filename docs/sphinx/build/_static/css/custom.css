@@ -1,0 +1,15 @@
+/* Limit the width of the sidebar */
+.wy-side-scroll {
+    max-width: 600px; /* Adjust the width as needed */
+    overflow-x: hidden;
+}
+
+/* Allow text to wrap in the sidebar */
+.wy-side-nav-search {
+    white-space: normal;
+}
+
+/* If you want to control the width of the main content area as well */
+.wy-main {
+    max-width: 800px; /* Adjust the width as needed */
+}

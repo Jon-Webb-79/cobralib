@@ -55,6 +55,8 @@ class RelationalDB(Protocol):
     :ivar conn: The connection attribute of the database management system
     :ivar cur: The cursor attribute of the database management system.
     :raises ConnectionError: If a connection can not be established
+
+    More to be added later
     """
 
     database: str
@@ -73,11 +75,11 @@ class RelationalDB(Protocol):
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, db_name: str) -> None:
+    def change_database(self, database: str) -> None:
         """
         Method to change the connection from one database to another.
 
-        :param db_name: The new database or database file to be used.  If a database
+        :param database: The new database or database file to be used.  If a database
                         file, this must include the path length.
         :raises ConnectionError: if query fails.
         """
@@ -85,13 +87,13 @@ class RelationalDB(Protocol):
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+    def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Method to retrieve a dataframe containing a list of all tables wtihin
         the SQL database or database file.
 
-        :param db_name: The name of the database or database file that the tables
-                        will be retrieved from.
+        :param database: The name of the database or database file that the tables
+                         will be retrieved from.
         :return df: A dataframe containing all information relating to the tables
                     within the database or database file.
         :raises ConnectionError: If program is not able to get tables
@@ -100,13 +102,13 @@ class RelationalDB(Protocol):
 
     # ------------------------------------------------------------------------------------------
 
-    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+    def get_table_columns(self, table_name: str, database: str = None) -> pd.DataFrame:
         """
         Retrieve the names and data types of the columns within the specified table.
 
         :param table_name: The name of the table.
-        :param db: The database name, defaulted to currently selected database
-                   or None
+        :param database: The database name, defaulted to currently selected database
+                         or None
         :return: A Pandas Dataframe with the table information
         :raises ValueError: If the database is not selected at the class level
          :raises ConnectionError: If the columns cannot be retrieved.
@@ -272,16 +274,16 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, db_name: str) -> None:
+    def change_database(self, database: str) -> None:
         """
         Change to the specified database within the server.
 
-        :param db_name: The name of the database to change to.
+        :param database: The name of the database to change to.
         :raises ConnectionError: if query fails.
         """
         try:
-            self.cur.execute(f"USE {db_name}")
-            self.database = db_name
+            self.cur.execute(f"USE {database}")
+            self.database = database
         except ProgrammingError as e:
             # Handle errors related to non-existing databases or insufficient permissions.
             raise ConnectionError(
@@ -349,11 +351,11 @@ class MySQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+    def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Retrieve the names of all tables within the current database.
 
-        :param db_name: Database name, defaulted to currently selected database or None
+        :param database: Database name, defaulted to currently selected database or None
         :return: A pandas dataframe of table names with a header of Tables
         :raises ValueError: If no database is currently selected.
         :raises ConnectionError: If program is not able to get tables
@@ -375,14 +377,14 @@ class MySQLDB:
               2      Sales
 
         """
-        if db_name is None:
-            db_name = self.database
+        if database is None:
+            database = self.database
 
-        if not db_name:
+        if not database:
             raise ValueError("No database is currently selected.")
-        msg = f"Failed to fetch tables from {db_name}"
+        msg = f"Failed to fetch tables from {database}"
         try:
-            self.cur.execute(f"SHOW TABLES FROM {db_name}")
+            self.cur.execute(f"SHOW TABLES FROM {database}")
             tables = self.cur.fetchall()
             return pd.DataFrame(tables, columns=["Tables"])
         except InterfaceError as e:
@@ -391,17 +393,17 @@ class MySQLDB:
             raise ConnectionError(msg)
         except Error as e:
             # Generic error handler for any other exceptions.
-            raise ConnectionError(f"Failed to fetch tables from {db_name}: {e}")
+            raise ConnectionError(f"Failed to fetch tables from {database}: {e}")
 
     # ------------------------------------------------------------------------------------------
 
-    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+    def get_table_columns(self, table_name: str, database: str = None) -> pd.DataFrame:
         """
          Retrieve the names and data types of the columns within the specified table.
 
          :param table_name: The name of the table.
-         :param db: The database name, defaulted to currently selected database
-                    or None
+         :param database: The database name, defaulted to currently selected database
+                          or None
          :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,
                   and Extra
          :raises ValueError: If the database is not selected at the class level
@@ -453,15 +455,15 @@ class MySQLDB:
 
         """
 
-        if db is None:
-            db = self.database
+        if database is None:
+            database = self.database
 
         msg = f"Failed to fetch columns from {table_name}"
-        if not db:
+        if not database:
             raise ValueError("No database is currently selected.")
 
         try:
-            self.conn.execute(f"SHOW COLUMNS FROM {db}.{table_name}")
+            self.conn.execute(f"SHOW COLUMNS FROM {database}.{table_name}")
             columns_info = self.cur.fetchall()
             df = pd.DataFrame(
                 columns_info, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
@@ -898,19 +900,19 @@ class SQLiteDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, db_name: str) -> None:
+    def change_database(self, database: str) -> None:
         """
         Method to change the connection from one database file to another
 
-        :paramn db_name: The new database file to be used to include the path length
+        :paramn database: The new database file to be used to include the path length
         """
-        self.database = db_name
+        self.database = database
         self.close_connection()
         self._create_connection()
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+    def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Method the retrieve a dataframe containing a list of all tables within
         a SQLite database file.  If the user does not pass a database name, the
@@ -918,8 +920,8 @@ class SQLiteDB:
         the user can also pass this method the name of another database file,
         and this will return a list of tables in that database file/
 
-        :param db_name: The name of the database or database file that the tables
-                        will be retrieved from.
+        :param database: The name of the database or database file that the tables
+                         will be retrieved from.
         :return df: A dataframe containing all information relating to the tables
                     within the database or database file.
 
@@ -940,7 +942,7 @@ class SQLiteDB:
               2      Sales
         """
         rename = {"name": "Tables"}
-        if db_name is None:
+        if database is None:
             query = "SELECT name FROM sqlite_master WHERE type='table';"
             try:
                 df = pd.read_sql_query(query, self.conn)
@@ -950,9 +952,9 @@ class SQLiteDB:
 
             return df
         else:
-            db = self.database
+            original_db = self.database
             self.close_connection()
-            self.database = db_name
+            self.database = database
             self._create_connection()
             query = "SELECT name FROM sqlite_master WHERE type='table';"
             try:
@@ -961,19 +963,19 @@ class SQLiteDB:
             except sqlite3.Error as e:
                 raise Error(f"Failed to retrieve tables: {e}")
             self.close_connection()
-            self.database = db
+            self.database = original_db
             self._create_connection()
             return df
 
     # ------------------------------------------------------------------------------------------
 
-    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+    def get_table_columns(self, table_name: str, database: str = None) -> pd.DataFrame:
         """
          Retrieve the names and data types of the columns within the specified table.
 
          :param table_name: The name of the table.
-         :param db: The database name, defaulted to currently selected database
-                    or None
+         :param database: The database name, defaulted to currently selected database
+                          or None
          :return: A pandas dataframe with headers ot Field, Type, Null, Key, Default,
                   and Extra
          :raises ValueError: If the database is not selected at the class level
@@ -1023,7 +1025,8 @@ class SQLiteDB:
                3     LastName   Varchar(20) False  NA       False   None
 
         """
-        if db is None:
+        original_db = self.database
+        if database is None:
             try:
                 # Execute the PRAGMA command to get the table information
                 self.cur.execute(f"PRAGMA table_info({table_name})")
@@ -1057,9 +1060,8 @@ class SQLiteDB:
                 # Handle any SQLite errors that occur
                 raise Error(f"An error occurred: {e}")
         else:
-            db_name = self.database
             self.close_connection()
-            self.database = db
+            self.database = database
             self._create_connection()
             try:
                 # Execute the PRAGMA command to get the table information
@@ -1087,14 +1089,14 @@ class SQLiteDB:
 
                 # Only include the relevant columns in the DataFrame
                 df = df[["Field", "Type", "Null", "Key", "Default", "Extra"]]
-                self.database = db_name
+                self.database = original_db
                 self.close_connection()
                 self._create_connection()
 
                 return df
 
             except sqlite3.Error as e:
-                self.database = db_name
+                self.database = original_db
                 self.close_connection()
                 self._create_connection()
                 # Handle any SQLite errors that occur
@@ -1455,11 +1457,11 @@ class PostGreSQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, db_name: str) -> None:
+    def change_database(self, database: str) -> None:
         """
         Change to a different PostgreSQL database.
 
-        :param db_name: The name of the database to switch to.
+        :param database: The name of the database to switch to.
         :raises ConnectionError: If there's an issue establishing a connection
                                  to the new database.
         """
@@ -1470,19 +1472,19 @@ class PostGreSQLDB:
 
             # Establish a new connection to the desired database
             self.conn = pgdb.connect(
-                database=db_name,
+                database=database,
                 user=self.username,
                 password=self.password,
                 host=self.hostname,
                 port=self.port,
             )
-            self.database = db_name
+            self.database = database
             self.cur = self.conn.cursor()
         except pgdb.DatabaseError as e:
-            raise ConnectionError(f"Failed to change to database '{db_name}': {e}")
+            raise ConnectionError(f"Failed to change to database '{database}': {e}")
         except Exception as e:
             # Generic handler for any other exceptions
-            raise ConnectionError(f"Failed to change to database '{db_name}': {e}")
+            raise ConnectionError(f"Failed to change to database '{database}': {e}")
 
     # ------------------------------------------------------------------------------------------
 
@@ -1505,12 +1507,12 @@ class PostGreSQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, db_name: str = None) -> pd.DataFrame:
+    def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Fetch a list of tables from the specified or current PostgreSQL database.
 
-        :param db_name: The name of the database to fetch tables from. If not
-                        provided, uses the current database.
+        :param database: The name of the database to fetch tables from. If not
+                         provided, uses the current database.
         :return: A pandas DataFrame containing the list of tables with the column
                  header "Tables".
         """
@@ -1518,8 +1520,8 @@ class PostGreSQLDB:
         original_db = self.database
 
         # If db_name is provided, switch to that database
-        if db_name:
-            self.change_database(db_name)
+        if database:
+            self.change_database(database)
 
         query = "SELECT tablename FROM pg_tables WHERE schemaname='public';"
 
@@ -1529,12 +1531,12 @@ class PostGreSQLDB:
             df = pd.DataFrame(data, columns=["Tables"])
 
             # If db_name was provided, switch back to the original database
-            if db_name:
+            if database:
                 self.change_database(original_db)
 
             return df
         except pgdb.DatabaseError as e:
-            if db_name:
+            if database:
                 try:
                     self.change_database(original_db)
                 except (pgdb.DatabaseError, pgdb.OperationalError):
@@ -1543,22 +1545,22 @@ class PostGreSQLDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_table_columns(self, table_name: str, db: str = None) -> pd.DataFrame:
+    def get_table_columns(self, table_name: str, database: str = None) -> pd.DataFrame:
         """
         Fetch column details for the given table in the specified or current
         PostgreSQL database.
 
         :param table_name: The name of the table to fetch column details for.
-        :param db: The name of the database the table resides in. If not provided,
-                   uses the current database.
+        :param database: The name of the database the table resides in. If not provided,
+                         uses the current database.
         :return: A pandas DataFrame containing column details.
         """
 
         original_db = self.database
 
         # If db is provided, switch to that database
-        if db:
-            self.change_database(db)
+        if database:
+            self.change_database(database)
 
         try:
             # Fetch column details
@@ -1597,14 +1599,14 @@ class PostGreSQLDB:
             # skipping that for the moment.
 
             # If db was provided, switch back to the original database
-            if db:
+            if database:
                 self.change_database(original_db)
 
             return df
         except pgdb.DatabaseError as e:
             # - If db was provided and there's an error, try to switch back to
             #   the original database
-            if db:
+            if database:
                 try:
                     self.change_database(original_db)
                 except (pgdb.DatabaseError, pgdb.OperationalError):

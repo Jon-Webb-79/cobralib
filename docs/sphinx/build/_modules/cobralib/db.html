@@ -36,8 +36,8 @@
 <span></span><span class="c1"># Import necessary packages here</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -50,6 +50,14 @@
     <span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Warning: mysql-connector-python package is not installed. &quot;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Some features may not work.&quot;</span>
+    <span class="c1"># Handle the case when mysql-connector is not available</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pgdb</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Warning: postgresql package is not installed. &quot;</span>
     <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Some features may not work.&quot;</span>
     <span class="c1"># Handle the case when mysql-connector is not available</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -82,12 +90,15 @@
 <span class="sd">    :ivar conn: The connection attribute of the database management system</span>
 <span class="sd">    :ivar cur: The cursor attribute of the database management system.</span>
 <span class="sd">    :raises ConnectionError: If a connection can not be established</span>
+
+<span class="sd">    More to be added later</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">database</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">cur</span><span class="p">:</span> <span class="n">Any</span>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.close_connection"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -96,7 +107,8 @@
 <span class="sd">        :raises ConnectionError: If the connection does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.change_database"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.change_database">[docs]</a>    <span class="k">def</span> <span class="nf">change_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -107,7 +119,8 @@
 <span class="sd">        :raises ConnectionError: if query fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.get_database_tables"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.get_database_tables">[docs]</a>    <span class="k">def</span> <span class="nf">get_database_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -121,7 +134,8 @@
 <span class="sd">        :raises ConnectionError: If program is not able to get tables</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.get_table_columns"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.get_table_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -135,7 +149,8 @@
 <span class="sd">         :raises ConnectionError: If the columns cannot be retrieved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.execute_query"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.execute_query">[docs]</a>    <span class="k">def</span> <span class="nf">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -152,7 +167,8 @@
 <span class="sd">        :raises ConnectionError: If the query execution fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.csv_to_table"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.csv_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -183,7 +199,8 @@
 <span class="sd">                       incompatible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.excel_to_table"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.excel_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">excel_to_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -214,7 +231,8 @@
 <span class="sd">                       incompatible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="RelationalDB.pdf_to_table"><a class="viewcode-back" href="../../db.html#cobralib.db.RelationalDB.pdf_to_table">[docs]</a>    <span class="k">def</span> <span class="nf">pdf_to_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -246,6 +264,8 @@
 <span class="sd">                       incompatible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div></div>
+
+
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 
@@ -273,21 +293,19 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3306</span><span class="p">,</span>
         <span class="n">hostname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
-        <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
-       <span class="c1"># self.conn = None</span>
-       <span class="c1"># self.cur = None</span>
+        <span class="c1"># self.conn = None</span>
+        <span class="c1"># self.cur = None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
@@ -1424,13 +1442,561 @@
 
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
+
+
+<span class="k">class</span> <span class="nc">PostGreSQLDB</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5432</span><span class="p">,</span>
+        <span class="n">hostname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the database connection to a PostgreSQL server.</span>
+
+<span class="sd">        :param username: The PostgreSQL username.</span>
+<span class="sd">        :param password: The PostgreSQL password.</span>
+<span class="sd">        :param database: The name of the database to connect to.</span>
+<span class="sd">        :param port: The port number for the PostgreSQL server (default is 5432).</span>
+<span class="sd">        :param hostname: The server&#39;s hostname (default is &#39;localhost&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="n">password</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the connection to the PostgreSQL server and database.</span>
+
+<span class="sd">        :raises ConnectionError: If there&#39;s an issue closing the connection or cursor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to close the connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic handler for any other exceptions</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to close the connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">change_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change to a different PostgreSQL database.</span>
+
+<span class="sd">        :param db_name: The name of the database to switch to.</span>
+<span class="sd">        :raises ConnectionError: If there&#39;s an issue establishing a connection</span>
+<span class="sd">                                 to the new database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Close the current connection if it exists</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="c1"># Establish a new connection to the desired database</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">database</span><span class="o">=</span><span class="n">db_name</span><span class="p">,</span>
+                <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">db_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to change to database &#39;</span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic handler for any other exceptions</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to change to database &#39;</span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">get_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetch a list of databases from the PostgreSQL server.</span>
+
+<span class="sd">        :return: A pandas DataFrame containing the list of databases with the</span>
+<span class="sd">                 column header &quot;Databases&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT datname FROM pg_database;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Databases&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch databases: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">get_database_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetch a list of tables from the specified or current PostgreSQL database.</span>
+
+<span class="sd">        :param db_name: The name of the database to fetch tables from. If not</span>
+<span class="sd">                        provided, uses the current database.</span>
+<span class="sd">        :return: A pandas DataFrame containing the list of tables with the column</span>
+<span class="sd">                 header &quot;Tables&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">original_db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+
+        <span class="c1"># If db_name is provided, switch to that database</span>
+        <span class="k">if</span> <span class="n">db_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">db_name</span><span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT tablename FROM pg_tables WHERE schemaname=&#39;public&#39;;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Tables&quot;</span><span class="p">])</span>
+
+            <span class="c1"># If db_name was provided, switch back to the original database</span>
+            <span class="k">if</span> <span class="n">db_name</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">original_db</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">db_name</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">original_db</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">):</span>
+                    <span class="k">pass</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch tables: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">get_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetch column details for the given table in the specified or current</span>
+<span class="sd">        PostgreSQL database.</span>
+
+<span class="sd">        :param table_name: The name of the table to fetch column details for.</span>
+<span class="sd">        :param db: The name of the database the table resides in. If not provided,</span>
+<span class="sd">                   uses the current database.</span>
+<span class="sd">        :return: A pandas DataFrame containing column details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">original_db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+
+        <span class="c1"># If db is provided, switch to that database</span>
+        <span class="k">if</span> <span class="n">db</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Fetch column details</span>
+            <span class="n">column_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            SELECT column_name as &quot;Field&quot;,</span>
+<span class="s2">                   data_type as &quot;Type&quot;,</span>
+<span class="s2">                   is_nullable = &#39;YES&#39; as &quot;Null&quot;,</span>
+<span class="s2">                   column_default as &quot;Default&quot;,</span>
+<span class="s2">                   &#39;&#39; as &quot;Key&quot;,</span>
+<span class="s2">                   &#39;&#39; as &quot;Extra&quot;</span>
+<span class="s2">            FROM information_schema.columns</span>
+<span class="s2">            WHERE table_name = &#39;</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">column_query</span><span class="p">)</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Key&quot;</span><span class="p">,</span> <span class="s2">&quot;Extra&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Fetch primary key</span>
+            <span class="n">pk_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            SELECT a.attname as &quot;Field&quot;, &#39;Primary&#39; as &quot;Key&quot;</span>
+<span class="s2">            FROM   pg_index i</span>
+<span class="s2">            JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)</span>
+<span class="s2">            WHERE  i.indrelid = &#39;</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&#39;::regclass AND i.indisprimary;</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">pk_query</span><span class="p">)</span>
+            <span class="n">pks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">pks</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">pk</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;Key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Primary&quot;</span>
+
+            <span class="c1"># - Updating Foreign Key would be a more involved process due to the</span>
+            <span class="c1">#   way PostgreSQL manages it,</span>
+            <span class="c1"># skipping that for the moment.</span>
+
+            <span class="c1"># If db was provided, switch back to the original database</span>
+            <span class="k">if</span> <span class="n">db</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">original_db</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># - If db was provided and there&#39;s an error, try to switch back to</span>
+            <span class="c1">#   the original database</span>
+            <span class="k">if</span> <span class="n">db</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">change_database</span><span class="p">(</span><span class="n">original_db</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">):</span>
+                    <span class="k">pass</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch table columns: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the provided SQL query and returns the results as a pandas DataFrame.</span>
+
+<span class="sd">        :param query: The SQL query to execute.</span>
+<span class="sd">        :param params: A tuple of parameters to bind to the query.</span>
+<span class="sd">        :return: A pandas DataFrame containing the query results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute query: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">csv_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">csv_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">csv_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read data from a CSV or TXT file and insert it into the specified table.</span>
+
+<span class="sd">        :param csv_file: The path to the CSV file or TXT file.</span>
+<span class="sd">        :param table_name: The name of the table.</span>
+<span class="sd">        :param csv_headers: The names of the columns in the TXT file and datatypes</span>
+<span class="sd">                            as a dictionary.</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
+<span class="sd">                              assumes CSV column names and table column names</span>
+<span class="sd">                              are the same).</span>
+<span class="sd">        :param delimiter: The seperating delimeter in the text file.  Defaulted to</span>
+<span class="sd">                          &#39;,&#39; for a CSV file, but can work with other delimeters</span>
+<span class="sd">        :param skip: The number of rows to be skipped if metadata exists before</span>
+<span class="sd">                     the header definition.  Defaulted to 0</span>
+<span class="sd">        :raises ValueError: If the CSV file or table name is not provided, or if</span>
+<span class="sd">                            the number of CSV columns and table columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+
+<span class="sd">        Assune we have a csv table with the following Columns, ``FirstName``,</span>
+<span class="sd">        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have</span>
+<span class="sd">        a table with no entries that has columns for ``First`` and ``Last``.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import PostGreSQLDB</span>
+
+<span class="sd">           db = PostGreSQL(&#39;username&#39;, &#39;password&#39;, &#39;Names&#39;, port=3306,</span>
+<span class="sd">                           hostname=&#39;localhost&#39;)</span>
+<span class="sd">           db.csv_to_table(&#39;csv_file.csv&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           [&#39;FirstName&#39;: str, &#39;LastName&#39;: str],</span>
+<span class="sd">                           [&#39;First&#39;, &#39;Last&#39;])</span>
+<span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
+<span class="sd">           result = db.query_db(query)</span>
+<span class="sd">           print(result)</span>
+<span class="sd">           &gt;&gt; index  name_id First   Last</span>
+<span class="sd">              0      1       Jon     Webb</span>
+<span class="sd">              1      2       Fred    Smith</span>
+<span class="sd">              2      3       Jillian Webb</span>
+
+<span class="sd">        If instead of a csv file, you have a text file that uses spaces as</span>
+<span class="sd">        a delimeter, and the first two rows are consumed by file metadata</span>
+<span class="sd">        before reaching the header, the following code will work</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import PostGreSQLDB</span>
+
+<span class="sd">           db = PostGreSQLDB(&#39;username&#39;, &#39;password&#39;, &#39;Names&#39;,</span>
+<span class="sd">                              port=3306, hostname=&#39;localhost&#39;)</span>
+<span class="sd">           db.csv_to_table(&#39;txt_file.txt&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           [&#39;FirstName&#39;: str, &#39;LastName&#39;: str],</span>
+<span class="sd">                           [&#39;First&#39;, &#39;Last&#39;], delemeter=r&quot;\\s+&quot;, skip=2)</span>
+<span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
+<span class="sd">           result = db.query_db(query)</span>
+<span class="sd">           print(result)</span>
+<span class="sd">           &gt;&gt; index  name_id First   Last</span>
+<span class="sd">              0      1       Jon     Webb</span>
+<span class="sd">              1      2       Fred    Smith</span>
+<span class="sd">              2      3       Jillian Webb</span>
+
+<span class="sd">        ... [rest of the docstring remains unchanged] ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CSV column names are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">csv_data</span> <span class="o">=</span> <span class="n">read_text_columns_by_headers</span><span class="p">(</span>
+                <span class="n">csv_file</span><span class="p">,</span> <span class="n">csv_headers</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
+            <span class="p">]</span>
+
+            <span class="n">csv_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_headers</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">csv_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>  <span class="c1"># Commit changes</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">InterfaceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to the interface.</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Generic error handler for any other exceptions.</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">excel_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">excel_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">excel_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_headers</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sheet_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sheet1&quot;</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read data from an Excel file and insert it into the specified table.</span>
+
+<span class="sd">        :param excel_file: The path to the Excel file.</span>
+<span class="sd">        :param table_name: The name of the table.</span>
+<span class="sd">        :param excel_headers: The names of the columns in the Excel file and their</span>
+<span class="sd">                              data types as a dictionary</span>
+<span class="sd">        :param table_headers: The names of the columns in the table (default is None,</span>
+<span class="sd">                              assumes Excel column names and table column names are</span>
+<span class="sd">                              the same).</span>
+<span class="sd">        :param sheet_name: The name of the sheet in the Excel file</span>
+<span class="sd">                           (default is &#39;Sheet1&#39;).</span>
+<span class="sd">        :param skip: The number of rows to be skipped if metadata exists before</span>
+<span class="sd">                     the header definition.  Defaulted to 0</span>
+<span class="sd">        :raises ValueError: If the Excel file, table name, or sheet name is not</span>
+<span class="sd">                            provided, or if the number of Excel columns and table</span>
+<span class="sd">                            columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+
+<span class="sd">        Assune we have an excel table with the following Columns, ``FirstName``,</span>
+<span class="sd">        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have</span>
+<span class="sd">        a table with no entries that has columns for ``First`` and ``Last``.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import PostGreSQLDB</span>
+
+<span class="sd">           db = PostGreSQL(&#39;username&#39;, &#39;password&#39;, &#39;Names&#39;,</span>
+<span class="sd">                           port=3306, hostname=&#39;localhost&#39;)</span>
+<span class="sd">           db.csv_to_table(&#39;excel_file.xlsx&#39;, &#39;FirstLastName&#39;,</span>
+<span class="sd">                           {&#39;FirstName&#39;: str, &#39;LastName&#39;: str},</span>
+<span class="sd">                           [&#39;First&#39;, &#39;Last&#39;])</span>
+<span class="sd">           query = &quot;SELDCT * FROM Names;&quot;</span>
+<span class="sd">           result = db.query_db(query)</span>
+<span class="sd">           print(result)</span>
+<span class="sd">           &gt;&gt; index  name_id First   Last</span>
+<span class="sd">              0      1       Jon     Webb</span>
+<span class="sd">              1      2       Fred    Smith</span>
+<span class="sd">              2      3       Jillian Webb</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">excel_headers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Excel column names are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Using pandas to read the Excel file</span>
+            <span class="n">excel_data</span> <span class="o">=</span> <span class="n">read_excel_columns_by_headers</span><span class="p">(</span>
+                <span class="n">excel_file</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">excel_headers</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_headers</span>
+            <span class="p">]</span>
+            <span class="n">excel_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">excel_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">excel_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">table_headers</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">row</span><span class="p">[</span><span class="n">excel_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">table_headers</span><span class="p">))</span>
+                <span class="p">}</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">pdf_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pdf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pdf_headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
+        <span class="n">table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">table_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">page_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read a table from a PDF file and insert it into the specified MySQL table.</span>
+
+<span class="sd">        :param pdf_file: The path to the PDF file.</span>
+<span class="sd">        :param table_name: The name of the MySQL table.</span>
+<span class="sd">        :param pdf_headers: A dictionary of column names in the PDF and their data</span>
+<span class="sd">                            types.</span>
+<span class="sd">        :param table_columns: The names of the columns in the MySQL table</span>
+<span class="sd">                              (default is None, assumes PDF column names and MySQL</span>
+<span class="sd">                              column names are the same).</span>
+<span class="sd">        :param table_idx: Index of the table in the PDF (default: 0).</span>
+<span class="sd">        :param page_num: Page number from which to extract the table (default: 0).</span>
+<span class="sd">        :param skip: The number of rows to skip in the PDF table.</span>
+<span class="sd">        :raises ValueError: If the PDF file, table name, or sheet name is not</span>
+<span class="sd">                            provided, or if the number of PDF headers and table</span>
+<span class="sd">                            columns mismatch.</span>
+<span class="sd">        :raises Error: If the data insertion fails or the data types are</span>
+<span class="sd">                       incompatible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdf_headers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;PDF headers are required.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Read the table from the PDF file</span>
+            <span class="n">pdf_data</span> <span class="o">=</span> <span class="n">read_pdf_columns_by_headers</span><span class="p">(</span>
+                <span class="n">pdf_file</span><span class="p">,</span> <span class="n">pdf_headers</span><span class="p">,</span> <span class="n">table_idx</span><span class="p">,</span> <span class="n">page_num</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">table_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">table_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="n">sanitized_columns</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_column_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">table_columns</span>
+            <span class="p">]</span>
+            <span class="n">pdf_header_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pdf_headers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">pdf_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">insert_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table_columns</span><span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">pdf_header_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                    <span class="n">insert_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="n">placeholders</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">insert_data</span><span class="p">))</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sanitized_columns</span><span class="p">)</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">insert_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">) VALUES (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">pgdb</span><span class="o">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle errors related to</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to insert data into the table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a connection to the PostgreSQL database.</span>
+
+<span class="sd">        :param password: The PostgreSQL password.</span>
+<span class="sd">        :param database: The name of the database to connect to.</span>
+<span class="sd">        :return: The PostgreSQL connection object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                <span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+                <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to OperationalError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">ProgrammingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to ProgrammingError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">pgdb</span><span class="o">.</span><span class="n">InternalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create a connection due to InternalError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create a connection: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_sanitize_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitize column names to include only alphanumeric characters and underscores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
 <span class="c1"># Factory pattern for Relational Database Management Systems</span>
 
 
-<span class="k">def</span> <span class="nf">relational_database</span><span class="p">(</span><span class="n">db_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                        <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3306</span><span class="p">,</span> <span class="n">hostname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
-                        <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelationalDB</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">relational_database</span><span class="p">(</span>
+    <span class="n">db_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3306</span><span class="p">,</span>
+    <span class="n">hostname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelationalDB</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method will return a relational database object of type RelationalDB</span>
 
@@ -1445,15 +2011,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">db_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MYSQL&quot;</span><span class="p">,</span> <span class="s2">&quot;SQLITE&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db_types</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;db_type must be one of </span><span class="si">{</span><span class="n">db_types</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db_type must be one of </span><span class="si">{</span><span class="n">db_types</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;MYSQL&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">MySQLDB</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
-                       <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">MySQLDB</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+            <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
+            <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
-
 
 
 <span class="c1"># ==========================================================================================</span>
