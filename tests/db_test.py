@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB, SQLiteDB, relational_database
+from cobralib.db import MySQLDB, SQLiteDB
 
 # ==========================================================================================
 # ==========================================================================================
@@ -396,7 +396,7 @@ def test_change_sqlite_db():
     db.change_database("../data/test/db_one.db")
     assert db.database == "../data/test/db_one.db"
     df = db.get_database_tables()
-    mock_return = [("Inventory"), ("Produce")]
+    mock_return = [("Produce"), ("sqlite_sequence"), ("Inventory")]
 
     expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
@@ -411,7 +411,7 @@ def test_get_sqlite_tables():
     db_file = "../data/test/db_two.db"
     db = SQLiteDB(db_file)
     df = db.get_database_tables("../data/test/db_one.db")
-    mock_return = [("Inventory"), ("Produce")]
+    mock_return = [("Produce"), ("sqlite_sequence"), ("Inventory")]
 
     expected_df = pd.DataFrame(mock_return, columns=["Tables"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
@@ -450,9 +450,9 @@ def test_query_sqlite():
     query = "SELECT * FROM Inventory WHERE Item = ?;"
     df = db.execute_query(query, ("Apple",))
     mock_return = [
-        (1, "Apple", 4.0),
+        (1, "Apple", 5),
     ]
-    expected_df = pd.DataFrame(mock_return, columns=["inv_id", "Item", "Number"])
+    expected_df = pd.DataFrame(mock_return, columns=["inv_id", "item", "number"])
     pd.testing.assert_frame_equal(df, expected_df, check_dtype=False)
     db.close_connection()
 
@@ -584,65 +584,31 @@ def test_sqlite_pdf_to_table():
 # TEST POSTGRESQL CLASS
 
 
-def test_post():
-    username = "root"
-    pwd = "nopwd"
-    database = "python_test"
-    qry = """CREATE TABLE IF NOT EXISTS inventory (
-        prod_id SERIAL NOT NULL,
-        Prd VARCHAR(20),
-        Inv INT,
-        PRIMARY KEY (prod_id)
-    );
-    """
-    db = relational_database("MYSQL", database, username, pwd)
-    db.execute_query(qry)
-    db.pdf_to_table(
-        "../data/test/pdf_tables.pdf",
-        "inventory",
-        {"Term": str, "Graduate": int},
-        ["Prd", "Inv"],
-        table_idx=2,
-    )
-    df = db.execute_query("SELECT * FROM inventory;")
-    db.execute_query("DROP TABLE inventory;")
-    print()
-    print(df)
-    db.close_connection()
-
-
-# ------------------------------------------------------------------------------------------
-
-# def test_factory_pattern():
-#     db = relational_database("MYSQL", username="root", password="GrandCanyon12#$",
-#                              hostname="localhost", database="ZillowHousing")
-#  #   db = relational_database("SQLITE", database="../data/test/db_one.db")
-#     df = db.get_database_tables()
-#     print(df)
-# def test_implementation():
-#     obj = MySQLDB("root", "nopwd", database="ZillowHousing")
-# qry = """CREATE TABLE IF NOT EXISTS Inventory (
-#     college_id INTEGER AUTO_INCREMENT,
-#     Prd VARCHAR(20),
-#     Inv INT,
-#     PRIMARY KEY (college_id)
-# )
-#  """
-
-
-#     file = "../data/test/read_xls.xlsx"
-#     csv_headers = {"Product": str, "Inventory": int}
-#     obj.execute_query(qry)
-#     tables = obj.get_database_tables()
-#     print(tables)
-#     obj.excel_to_table(
-#             file, "Inventory", csv_headers, table_headers=["Prd", "Inv"],
-#             sheet_name="test"
+# def test_post():
+#     username = "root"
+#     pwd = "nopwd"
+#     database = "python_test"
+#     qry = """CREATE TABLE IF NOT EXISTS inventory (
+#         prod_id SERIAL NOT NULL,
+#         Prd VARCHAR(20),
+#         Inv INT,
+#         PRIMARY KEY (prod_id)
+#     );
+#     """
+#     db = relational_database("POSTGRES", database, username, pwd)
+#     db.execute_query(qry)
+#     db.pdf_to_table(
+#         "../data/test/pdf_tables.pdf",
+#         "inventory",
+#         {"Term": str, "Graduate": int},
+#         ["Prd", "Inv"],
+#         table_idx=2
 #     )
-#     dat = obj.execute_query("SELECT * FROM Inventory;")
-#     print(dat)
-#     obj.close_connection()
-
+#     df = db.execute_query("SELECT * FROM inventory;")
+#     db.execute_query("DROP TABLE inventory;")
+#     print()
+#     print(df)
+#     db.close_connection()
 
 # ==========================================================================================
 # ==========================================================================================

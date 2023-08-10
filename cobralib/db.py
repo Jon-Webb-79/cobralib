@@ -464,7 +464,7 @@ class MySQLDB:
             raise ValueError("No database is currently selected.")
 
         try:
-            self.conn.execute(f"SHOW COLUMNS FROM {database}.{table_name}")
+            self.cur.execute(f"SHOW COLUMNS FROM {database}.{table_name}")
             columns_info = self.cur.fetchall()
             df = pd.DataFrame(
                 columns_info, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
