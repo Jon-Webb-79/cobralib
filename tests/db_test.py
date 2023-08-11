@@ -447,7 +447,7 @@ def test_get_sqlite_table_columns():
 def test_query_sqlite():
     db_file = "../data/test/db_one.db"
     db = SQLiteDB(db_file)
-    query = "SELECT * FROM Inventory WHERE Item = ?;"
+    query = "SELECT * FROM Inventory WHERE Item = %s;"
     df = db.execute_query(query, ("Apple",))
     mock_return = [
         (1, "Apple", 5),

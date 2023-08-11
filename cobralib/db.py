@@ -1176,6 +1176,7 @@ class SQLiteDB:
         """
         msg = "The number of placeholders in the query does not "
         msg += "match the number of parameters."
+        query = query.replace("%s", "?")
         num_placeholders = query.count("?")
         if num_placeholders != len(params):
             raise ValueError(msg)
