@@ -87,6 +87,16 @@ class RelationalDB(Protocol):
 
     # ------------------------------------------------------------------------------------------
 
+    def get_databases(self) -> pd.DataFrame:
+        """
+        Retrieve the names of all databases available to the user.
+
+        :return: A pandas dataframe of database names with a header of Databases
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
     def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Method to retrieve a dataframe containing a list of all tables wtihin
@@ -914,6 +924,17 @@ class SQLiteDB:
         self.database = database
         self.close_connection()
         self._create_connection()
+
+    # ------------------------------------------------------------------------------------------
+    def get_databases(self) -> pd.DataFrame:
+        """
+        Method included for compatibility with RelationalDB Protocol class. This method
+        returns an empty dataframe since SQLite does not support true databases.
+
+        :return : An empty pandas dataframe
+        """
+        print("SQLite does not support databases, returning an empty dataframe")
+        return pd.DataFrame()
 
     # ------------------------------------------------------------------------------------------
 
