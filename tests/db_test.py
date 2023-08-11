@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB, SQLiteDB
+from cobralib.db import MySQLDB, PostGreSQLDB, SQLiteDB
 
 # ==========================================================================================
 # ==========================================================================================
@@ -582,6 +582,365 @@ def test_sqlite_pdf_to_table():
 # ==========================================================================================
 # ==========================================================================================
 # TEST POSTGRESQL CLASS
+
+
+@pytest.fixture(autouse=True)
+def no_requests_post(monkeypatch):
+    monkeypatch.delattr("pg.connect")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_connection():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Mock mysql.connector.connect to return the mock connection
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+    # Test close_conn method
+    db.close_connection()
+    mock_conn.close.assert_called_once()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_connect_fail():
+    with pytest.raises(ConnectionError):
+        PostGreSQLDB("username", "password", "database", port=5432, hostname="localhost")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_change_postgres_db():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Mock mysql.connector.connect to return the mock connection
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+        # Simulate changing the database
+        db.change_database("new_db")
+    #  mock_cursor.execute.assert_called_once_with("USE new_db")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_get_postgres_dbs():
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_conn.cursor.return_value = mock_cursor
+    mock_dbs = [["db1"], ["db2"], ["db3"]]  # use list of lists
+    mock_cursor.fetchall.return_value = mock_dbs
+
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+
+        dbs = db.get_databases()
+
+        # mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
+        assert list(dbs["Databases"]) == ["db1", "db2", "db3"]
+        assert dbs.equals(pd.DataFrame(mock_dbs, columns=["Databases"]))
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_get_postgres_db_tables():
+    # Create the mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Assign the mock cursor to the mock connection
+    mock_conn.cursor.return_value = mock_cursor
+    mock_tables = [["Table1"], ["Table2"]]
+    # Mock the fetchall method to return known tables
+    mock_cursor.fetchall.return_value = mock_tables
+
+    # Mocking the connect method
+    with patch("pgdb.connect", return_value=mock_conn):
+        # Create an instance of the class
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+
+        # Change to the specified DB
+        db.change_database("DB_Name")
+
+        # Invoke the method
+        tables = db.get_database_tables()
+        # Check the result
+        assert list(tables["Tables"]) == ["Table1", "Table2"]
+
+    # Verify fetchall method was called
+    mock_cursor.fetchall.assert_called_once()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_get_postgres_table_columns():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("DB_Name")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [
+            ("Column1", "Integer", "YES", "MUL", "Primary", ""),
+            ("Column2", "Varchar(50)", "NO", "", "Primary", ""),
+            ("Column3", "Datetime", "YES", "", "Primary", ""),
+        ]
+        db.cur.fetchall.return_value = mock_return
+
+        # Invoke the method
+        columns = db.get_table_columns("Table1")
+
+        # Create expected DataFrame for comparison
+        expected_df = pd.DataFrame(
+            mock_return, columns=["Field", "Type", "Null", "Default", "Key", "Extra"]
+        )
+
+        # Check the result
+        pd.testing.assert_frame_equal(columns, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_csv_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.csv_to_table(
+            "../data/test/read_csv.csv",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_query_postgres_db():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("names")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Jon", "Fred"), ("Webb", "Smith")]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("FirstName",), ("LastName",)]
+        expected_df = pd.DataFrame(mock_return, columns=["FirstName", "LastName"])
+
+        query = "SELECT * FROM names;"
+        result = db.execute_query(query)
+
+        # Check the result
+        pd.testing.assert_frame_equal(result, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_excel_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.excel_to_table(
+            "../data/test/read_xls.xlsx",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+            "test",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_txt_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.csv_to_table(
+            "../data/test/read_txt.txt",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+            delimiter=r"\s+",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.postgres
+def test_postgres_pdf_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pgdb.connect", return_value=mock_conn):
+        db = PostGreSQLDB(
+            "username", "password", "database", port=5432, hostname="localhost"
+        )
+        db.change_database("CollegeAdmissions")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Fall 2019", 3441), ("Winter 2020", 3499), ("Spring 2020", 3520)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Term",), ("Graduate",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Term", "Graduate"])
+
+        # Create table
+        query = """CREATE TABLE Admissions (
+            term_id INTEGER AUTO_INCREMENT
+            Term VARCHAR(20) NOT NULL,
+            Graduate INT NOT NULL,
+            PRIMARY KEY (term_id)
+        );
+        """
+        db.execute_query(query)
+
+        db.pdf_to_table(
+            "../data/test/pdf_tables.pdf",
+            "Admissions",
+            {"Term": str, "Graduate": int},
+            table_idx=2,
+        )
+        query = "SELECT Term, Graduate FROM Admissions;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ==========================================================================================
+# ==========================================================================================
 
 
 # def test_post():

@@ -122,7 +122,8 @@ markers = [
 	"read_yaml: Marks tests for read_yaml functions",
 	"logger: Marks tests for logger",
 	"mysql: tests for MySQLDB class",
-	"sqlite: tests for SQLiteDB class"
+	"sqlite: tests for SQLiteDB class",
+	"postgres: tests for PostGreSQLDB class"
 ]
 
 [project.urls]
