@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Cobalib documentation! &mdash; cobralib 0.1.0 documentation</title>
+  <title>Welcome to Cobralib documentation! &mdash; cobralib 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="io" href="io.html" />
+    <link rel="next" title="Input / Output (io)" href="io.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -61,7 +61,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to Cobalib documentation!</li>
+      <li class="breadcrumb-item active">Welcome to Cobralib documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -71,8 +71,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
 
-  <section id="welcome-to-cobalib-documentation">
-<h1>Welcome to Cobalib documentation!<a class="headerlink" href="#welcome-to-cobalib-documentation" title="Permalink to this heading"></a></h1>
+  <section id="welcome-to-cobralib-documentation">
+<h1>Welcome to Cobralib documentation!<a class="headerlink" href="#welcome-to-cobralib-documentation" title="Permalink to this heading"></a></h1>
+<p>The cobralib package contains classes and functions that simplify
+the process of reading ASCII formatted text files in standardized
+ways.  In addition, this library contains classes that provide a
+standardized interface to MySQL, PostGreSQL, SQLite, and
+Microsoft SQL-Server relational databases.  In some cases,
+the software in this package is merely a wrapper around existing
+libraries that changes the interface or extends the current
+capability of the package.</p>
+<p><strong>NOTE:</strong> This version of the cobralib package is focused on
+software to support the process of reading in data, and in some
+cases writing data to a log file.  However, future versions
+may include data structures that are not provided with the
+standard Python library or the Numpy library.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -84,7 +97,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="db.html">db</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="db.html#cobralib.db.RelationalDB"><code class="docutils literal notranslate"><span class="pre">RelationalDB</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="db.html#relational-database">relational_database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db.html#protocol-class">Protocol Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db.html#sql-classes">SQL Classes</a></li>
 </ul>
 </li>
 </ul>
@@ -100,6 +115,47 @@
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<p>This package is loaded on the PyPi repository and can be installed via the following method</p>
+<ol class="arabic simple">
+<li><p>Create a python virtual environment <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">venv</span> <span class="pre">/path/to/new/virtual/environment</span></code></p></li>
+<li><p>Activate the virtual environment with the following command;</p></li>
+</ol>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Activation Commands for Virtual Environments</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Shell</p></th>
+<th class="head"><p>Command to activate virtual environment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td rowspan="4"><p>POSIX</p></td>
+<td><p>bash/zsh</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">source</span> <span class="pre">&lt;venv&gt;/bin/activate</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>fish</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">source</span> <span class="pre">&lt;venv&gt;/bin/activate.fish</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>csh/tcsh</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">source</span> <span class="pre">&lt;venv&gt;/bin/activate.csh</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Powershell</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">&lt;venv&gt;/bin/Activate.ps1</span></code></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>Windows</p></td>
+<td><p>cmd.exe</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">C:\&gt;</span> <span class="pre">&lt;venv&gt;\\Scripts\\activate.bat</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>PowerShell</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PS</span> <span class="pre">C:\\&gt;</span> <span class="pre">&lt;venv&gt;\\Scripts\\Activate.ps1</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li><p>If you are using a Python instance installed via a package manager such as brew, yum, pacman,
+or directly installed from the wheel, install with the command <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">cobralib</span></code></p></li>
+<li><p>If you are using a Anaconda distribution of Python install with the commnand</p></li>
+</ol>
 <p>To install todo_six application as a developer, follow these steps.</p>
 <ol class="arabic simple numbered-list">
 <li><p>Install poetry globally on your computer. Follow the instructions from the
@@ -114,7 +170,7 @@
 </section>
 <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
-<p>The user instructions for this application is shown in <a class="reference internal" href="io.html"><span class="doc">io</span></a> and :doc <cite>db</cite>.</p>
+<p>The user instructions for this application is shown in <a class="reference internal" href="io.html"><span class="doc">Input / Output (io)</span></a> and <a class="reference internal" href="db.html"><span class="doc">Database Management System</span></a>.</p>
 </section>
 <section id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading"></a></h1>
@@ -131,7 +187,7 @@ as relevant cod-strings and sphinx updates.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="io.html" class="btn btn-neutral float-right" title="io" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="io.html" class="btn btn-neutral float-right" title="Input / Output (io)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

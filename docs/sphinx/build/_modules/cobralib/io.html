@@ -1,36 +1,73 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cobralib.io &mdash; cobralib 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cobralib.io &#8212; cobralib 0.1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
-
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=2389946f"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cobralib 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">cobralib.io</a></li>
-      </ul>
-    </div>
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            cobralib
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../io.html">io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../db.html">db</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cobralib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">cobralib.io</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
 
   <h1>Source code for cobralib.io</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Import necessary packages here</span>
@@ -60,7 +97,7 @@
 <span class="c1"># Insert Code here</span>
 
 
-<div class="viewcode-block" id="ReadKeyWords"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords">[docs]</a><span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords">[docs]</a><span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class can be used by a read to read a text based config file.  The methods</span>
 <span class="sd">    will look for a specific key word that must begin on the first character of each</span>
@@ -107,7 +144,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_variable"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the variable to the</span>
 <span class="sd">        right of the keyword as the specified data type</span>
@@ -156,7 +193,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_string_variable"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_string_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_string_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_string_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the string variable</span>
 <span class="sd">        to the right of the keyword.</span>
@@ -183,7 +220,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_list"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_list">[docs]</a>    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_list"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_list">[docs]</a>    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the values after the keyword</span>
 <span class="sd">        as a list of the user-defined data type.</span>
@@ -217,7 +254,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_json"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_json"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the JSON data</span>
 <span class="sd">        to the right of the keyword until the termination of brackets.</span>
@@ -254,7 +291,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_full_json"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_full_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_full_json"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_full_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the entire contents of the file as JSON data.</span>
 <span class="sd">        If a keyword is provided, search for that keyword and return the nested</span>
@@ -337,7 +374,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_xml"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_xml"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the XML data</span>
 <span class="sd">        to the right of the keyword until the termination of tags.</span>
@@ -365,7 +402,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_full_xml"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.ReadKeyWords.read_full_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadKeyWords.read_full_xml"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_full_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the XML data. If a keyword is provided, search for the specified</span>
 <span class="sd">        keyword in the XML data and return the nested elements beneath it.</span>
@@ -462,7 +499,7 @@
 <span class="c1"># READ COLUMNAR DATA</span>
 
 
-<div class="viewcode-block" id="read_csv_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_csv_columns_by_headers"><a class="viewcode-back" href="../../io.html#cobralib.io.read_csv_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -583,7 +620,7 @@
 <span class="c1"># ----------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_csv_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_csv_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_csv_columns_by_index"><a class="viewcode-back" href="../../io.html#cobralib.io.read_csv_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_csv_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -705,7 +742,7 @@
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_text_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_text_columns_by_headers"><a class="viewcode-back" href="../../io.html#cobralib.io.read_text_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -833,7 +870,7 @@
 <span class="c1"># --------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_text_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_text_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_text_columns_by_index"><a class="viewcode-back" href="../../io.html#cobralib.io.read_text_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_text_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -969,7 +1006,7 @@
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_excel_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_excel_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_excel_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_excel_columns_by_headers"><a class="viewcode-back" href="../../io.html#cobralib.io.read_excel_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_excel_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tab</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1098,7 +1135,7 @@
 <span class="c1"># ----------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_excel_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_excel_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_excel_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_excel_columns_by_index"><a class="viewcode-back" href="../../io.html#cobralib.io.read_excel_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_excel_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">tab</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">col_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
@@ -1234,7 +1271,7 @@
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_pdf_columns_by_headers"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_pdf_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_pdf_columns_by_headers</span><span class="p">(</span>
+<div class="viewcode-block" id="read_pdf_columns_by_headers"><a class="viewcode-back" href="../../io.html#cobralib.io.read_pdf_columns_by_headers">[docs]</a><span class="k">def</span> <span class="nf">read_pdf_columns_by_headers</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">table_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1243,7 +1280,9 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read a table from a PDF document and save user-specified columns into a pandas</span>
-<span class="sd">    DataFrame.</span>
+<span class="sd">    DataFrame. This function will read a pdf table that spans multiple</span>
+<span class="sd">    pages. **NOTE:** The pdf document must be a vectorized pdf document and not</span>
+<span class="sd">    a scan of another document for this function to work.</span>
 
 <span class="sd">    :param file_name: The file name to include the path-link to the PDF file.</span>
 <span class="sd">    :param headers: A dictionary of column names and their data types.</span>
@@ -1304,7 +1343,7 @@
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="read_pdf_columns_by_index"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_pdf_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_pdf_columns_by_index</span><span class="p">(</span>
+<div class="viewcode-block" id="read_pdf_columns_by_index"><a class="viewcode-back" href="../../io.html#cobralib.io.read_pdf_columns_by_index">[docs]</a><span class="k">def</span> <span class="nf">read_pdf_columns_by_index</span><span class="p">(</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span>
     <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -1314,7 +1353,9 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read a table from a PDF document and save user-specified columns into a pandas</span>
-<span class="sd">    DataFrame based on their column index.</span>
+<span class="sd">    DataFrame based on their column index. This function will read a pdf table that</span>
+<span class="sd">    spans multiple pages. **NOTE:** The pdf document must be a vectorized pdf</span>
+<span class="sd">    document and not a scan of another document for this function to work.</span>
 
 <span class="sd">    :param file_name: The file name to include the path-link to the PDF file.</span>
 <span class="sd">    :param headers: A dictionary of column index and their data types.</span>
@@ -1384,7 +1425,7 @@
 <span class="c1"># READ AND WRITE TO YAML</span>
 
 
-<div class="viewcode-block" id="read_yaml_file"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.read_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="read_yaml_file"><a class="viewcode-back" href="../../io.html#cobralib.io.read_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function can be used to read in the contents of a single yaml file, or</span>
 <span class="sd">    a yaml file with multiple documents.  In order to accomodate thea reading</span>
@@ -1429,7 +1470,7 @@
 <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="write_yaml_file"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.write_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">write_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="write_yaml_file"><a class="viewcode-back" href="../../io.html#cobralib.io.write_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">write_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write or append data to a YAML file.</span>
 
@@ -1474,7 +1515,7 @@
 <span class="c1"># ==========================================================================================</span>
 
 
-<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../io.html#cobralib.io.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom logging class that writes messages to both console and log file.</span>
 
@@ -1556,7 +1597,7 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="Logger.log"><a class="viewcode-back" href="../../DevelopersManual.html#cobralib.io.Logger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="Logger.log"><a class="viewcode-back" href="../../io.html#cobralib.io.Logger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a log entry.</span>
 
@@ -1589,40 +1630,31 @@
 <span class="c1"># eof</span>
 </pre></div>
 
-            <div class="clearer"></div>
+           </div>
           </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Jonathan A. Webb.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cobralib 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">cobralib.io</a></li>
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Jonathan A. Webb.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
 </html>

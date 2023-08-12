@@ -1,7 +1,7 @@
-**
-io
-**
-The io module contains several functions and classes that can be user to read
+*******************
+Input / Output (io)
+*******************
+The io module contains several functions and classes that can be used to read
 various ASCII based files.
 
 ReadKeyWords
@@ -16,7 +16,7 @@ essense this enables a user to use a ``.txt`` file as a basic configuration file
 Read Columnar Data
 ==================
 The following functions can be used to read columnar data from ``.txt``, ``.csv``,
-``.xls``, and ``.xlsx`` files.
+``.xls``, and ``.xlsx``, and ``.pdf`` files.
 
 .. autofunction:: cobralib.io.read_csv_columns_by_headers
 
@@ -36,8 +36,11 @@ The following functions can be used to read columnar data from ``.txt``, ``.csv`
 
 YAML Files
 ==========
-The following functions are wrappers arund pyyaml and can be used
-to read from and write to yaml files
+The following functions are wrappers are in essence created as a wrapper
+around the PyYaml package and can be used to read from and write to yaml
+files.  The total functionality enabled by these function can
+be explored in the `PyYaml <https://pyyaml.org/wiki/PyYAMLDocumentation>`_ documentation.
+
 
 .. autofunction:: cobralib.io.read_yaml_file
 

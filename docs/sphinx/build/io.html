@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>io &mdash; cobralib 0.1.0 documentation</title>
+  <title>Input / Output (io) &mdash; cobralib 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="db" href="db.html" />
-    <link rel="prev" title="Welcome to Cobalib documentation!" href="index.html" />
+    <link rel="next" title="Database Management System" href="db.html" />
+    <link rel="prev" title="Welcome to Cobralib documentation!" href="index.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -100,7 +100,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">io</li>
+      <li class="breadcrumb-item active">Input / Output (io)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/io.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -110,9 +110,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
 
-  <section id="io">
-<h1>io<a class="headerlink" href="#io" title="Permalink to this heading"></a></h1>
-<p>The io module contains several functions and classes that can be user to read
+  <section id="input-output-io">
+<h1>Input / Output (io)<a class="headerlink" href="#input-output-io" title="Permalink to this heading"></a></h1>
+<p>The io module contains several functions and classes that can be used to read
 various ASCII based files.</p>
 <section id="readkeywords">
 <h2>ReadKeyWords<a class="headerlink" href="#readkeywords" title="Permalink to this heading"></a></h2>
@@ -446,7 +446,7 @@ to the right of the keyword until the termination of tags.</p>
 <section id="read-columnar-data">
 <h2>Read Columnar Data<a class="headerlink" href="#read-columnar-data" title="Permalink to this heading"></a></h2>
 <p>The following functions can be used to read columnar data from <code class="docutils literal notranslate"><span class="pre">.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">.csv</span></code>,
-<code class="docutils literal notranslate"><span class="pre">.xls</span></code>, and <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> files.</p>
+<code class="docutils literal notranslate"><span class="pre">.xls</span></code>, and <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>, and <code class="docutils literal notranslate"><span class="pre">.pdf</span></code> files.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_csv_columns_by_headers">
 <span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_csv_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_csv_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_csv_columns_by_headers" title="Permalink to this definition"></a></dt>
@@ -1008,7 +1008,9 @@ headers are not on the first line.  For instance, assume the following csv file;
 <dt class="sig sig-object py" id="cobralib.io.read_pdf_columns_by_headers">
 <span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_pdf_columns_by_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_pdf_columns_by_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_pdf_columns_by_headers" title="Permalink to this definition"></a></dt>
 <dd><p>Read a table from a PDF document and save user-specified columns into a pandas
-DataFrame.</p>
+DataFrame. This function will read a pdf table that spans multiple
+pages. <strong>NOTE:</strong> The pdf document must be a vectorized pdf document and not
+a scan of another document for this function to work.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1047,7 +1049,9 @@ Data types are limited to <code class="docutils literal notranslate"><span class
 <dt class="sig sig-object py" id="cobralib.io.read_pdf_columns_by_index">
 <span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_pdf_columns_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_pdf_columns_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_pdf_columns_by_index" title="Permalink to this definition"></a></dt>
 <dd><p>Read a table from a PDF document and save user-specified columns into a pandas
-DataFrame based on their column index.</p>
+DataFrame based on their column index. This function will read a pdf table that
+spans multiple pages. <strong>NOTE:</strong> The pdf document must be a vectorized pdf
+document and not a scan of another document for this function to work.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1368,8 +1372,10 @@ headers are not on the first line.  For instance, assume the following csv file;
 </section>
 <section id="yaml-files">
 <h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading"></a></h2>
-<p>The following functions are wrappers arund pyyaml and can be used
-to read from and write to yaml files</p>
+<p>The following functions are wrappers are in essence created as a wrapper
+around the PyYaml package and can be used to read from and write to yaml
+files.  The total functionality enabled by these function can
+be explored in the <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYaml</a> documentation.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cobralib.io.read_yaml_file">
 <span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">read_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cobralib/io.html#read_yaml_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.read_yaml_file" title="Permalink to this definition"></a></dt>
@@ -1541,8 +1547,8 @@ levels.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Cobalib documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="db.html" class="btn btn-neutral float-right" title="db" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Cobralib documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="db.html" class="btn btn-neutral float-right" title="Database Management System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

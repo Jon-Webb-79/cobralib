@@ -277,8 +277,7 @@ class MySQLDB:
         self.port = port
         self.hostname = hostname
         self.database = database
-        # self.conn = None
-        # self.cur = None
+        # self.conn = None.. code-block:: bash
 
         self._create_connection(password)
         self.change_database(database)
@@ -1992,7 +1991,8 @@ def relational_database(
     Method will return a relational database object of type RelationalDB
 
     :param db_type: A string representing the database management system, can be
-                    MySQL or SQLite. This parameter is case insensitive
+                    MySQL, PostGres or SQLite. This parameter is case insensitive.
+                    Case Insensitive
     :param database: The database you wish to connect to, defaulted to appropriate
                      port number for each database manager
     :param username: The username for the database connection.

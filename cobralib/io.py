@@ -1208,7 +1208,9 @@ def read_pdf_columns_by_headers(
 ) -> pd.DataFrame:
     """
     Read a table from a PDF document and save user-specified columns into a pandas
-    DataFrame.
+    DataFrame. This function will read a pdf table that spans multiple
+    pages. **NOTE:** The pdf document must be a vectorized pdf document and not
+    a scan of another document for this function to work.
 
     :param file_name: The file name to include the path-link to the PDF file.
     :param headers: A dictionary of column names and their data types.
@@ -1279,7 +1281,9 @@ def read_pdf_columns_by_index(
 ) -> pd.DataFrame:
     """
     Read a table from a PDF document and save user-specified columns into a pandas
-    DataFrame based on their column index.
+    DataFrame based on their column index. This function will read a pdf table that
+    spans multiple pages. **NOTE:** The pdf document must be a vectorized pdf
+    document and not a scan of another document for this function to work.
 
     :param file_name: The file name to include the path-link to the PDF file.
     :param headers: A dictionary of column index and their data types.
