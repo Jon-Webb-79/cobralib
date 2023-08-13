@@ -433,6 +433,31 @@ of the document.
    2     3        Cucumber 20
    3     4        Peach    3
 
+cursor and connect
+******************
+The user also has access to the cursor (self.cur) and the connect (self.conn) attributes within
+the object returned from the relational_database function.  They are able to access
+this attribute and use it in whatever way they want; however, make sure to consult
+the correct docucmentation depending on which database type you use.  The
+MySQL type uses the mysql-connector-python package, the SQLite type uses the sqlite3
+package, and PostGreSQL uses the pygresql package.
+
+.. code-block:: python
+
+   from cobralib.db import relational_database
+
+   # open connection, user must pass a database name
+   db = relational_database(db_type="SQLITE", database='first_db.db')
+   query = """CREATE TABLE IF NOT EXISTS Inventory (
+       inv_id INTEGER PRIMARY KEY AUTOINCREMENT,
+       Prd VARCHAR(20) NOT NULL,
+       Inv INTEGER
+    );
+   """
+   db.cur.execute_query(query)
+   db.conn.commit()
+   db.conn.close()
+
 .. _Protocol Overview:
 
 Protocol Class

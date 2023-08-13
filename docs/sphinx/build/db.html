@@ -56,6 +56,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#csv-to-table">csv_to_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#excel-to-table">excel_to_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pdf-to-table">pdf_to_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cursor-and-connect">cursor and connect</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#protocol-class">Protocol Class</a><ul>
@@ -554,6 +555,30 @@ Peach<span class="w">     </span><span class="m">3</span>
 <span class="m">1</span><span class="w">     </span><span class="m">2</span><span class="w">        </span>Banana<span class="w">   </span><span class="m">12</span>
 <span class="m">2</span><span class="w">     </span><span class="m">3</span><span class="w">        </span>Cucumber<span class="w"> </span><span class="m">20</span>
 <span class="m">3</span><span class="w">     </span><span class="m">4</span><span class="w">        </span>Peach<span class="w">    </span><span class="m">3</span>
+</pre></div>
+</div>
+</section>
+<section id="cursor-and-connect">
+<h3>cursor and connect<a class="headerlink" href="#cursor-and-connect" title="Permalink to this heading"></a></h3>
+<p>The user also has access to the cursor (self.cur) and the connect (self.conn) attributes within
+the object returned from the relational_database function.  They are able to access
+this attribute and use it in whatever way they want; however, make sure to consult
+the correct docucmentation depending on which database type you use.  The
+MySQL type uses the mysql-connector-python package, the SQLite type uses the sqlite3
+package, and PostGreSQL uses the pygresql package.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.db</span> <span class="kn">import</span> <span class="n">relational_database</span>
+
+<span class="c1"># open connection, user must pass a database name</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">relational_database</span><span class="p">(</span><span class="n">db_type</span><span class="o">=</span><span class="s2">&quot;SQLITE&quot;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;first_db.db&#39;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;CREATE TABLE IF NOT EXISTS Inventory (</span>
+<span class="s2">    inv_id INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s2">    Prd VARCHAR(20) NOT NULL,</span>
+<span class="s2">    Inv INTEGER</span>
+<span class="s2"> );</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">db</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">db</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>

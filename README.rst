@@ -74,3 +74,12 @@ In order to download this repository from github, follow these instructions
    - If the user has both MySQL and PostGreSQL installed locally, type ``poetry install -E mysql -E postgresql``
    - If you plan to support development, install the read_the_doc sphinx package with pip, ``pip install sphinx_rtd_theme``
 #. In the future this repository may also be available on PyPi
+
+This package can also be installed via pip
+
+#. Install with all packages ``pip install cobralib``
+#. Install with optional dependencies ``pip install cobralib[mysql, postgresql]``
+
+Bug Report
+##########
+#. Despite the fact that the test suite passes on Mac and Linux, the Github tests appear to be failing due to a mismatch in libraries.
