@@ -27,6 +27,14 @@ except ImportError:
     # Handle the case when mysql-connector is not available
     print(msg)
 
+try:
+    import pyodbc
+except ImportError:
+    msg = "Warning: pyodbc package is not installed. "
+    msg += "Some features may not work."
+    # Handle the case when mysql-connector is not available
+    print(msg)
+
 from cobralib.io import (
     read_excel_columns_by_headers,
     read_pdf_columns_by_headers,
@@ -54,14 +62,50 @@ class RelationalDB(Protocol):
     :ivar database: The name of the database currently being used
     :ivar conn: The connection attribute of the database management system
     :ivar cur: The cursor attribute of the database management system.
+    :ivar db_engine: A string representing the type of database engine
     :raises ConnectionError: If a connection can not be established
 
     More to be added later
     """
 
-    database: str
-    conn: Any
-    cur: Any
+    _database: str
+    _db_engine: str
+    _conn: Any
+    _cur: Any
+
+    @property
+    def conn(self) -> Any:
+        """
+        Protection for the _conn attribute
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def cur(self) -> Any:
+        """
+        Protection for the _cur attribute
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    # proprty
+    def db_engine(self) -> str:
+        """
+        Protection for the _db_engine attribute
+        """
+        ...
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def database(self) -> Any:
+        """
+        Protection for the _database attribute
+        """
+        ...
 
     # ------------------------------------------------------------------------------------------
 
@@ -261,8 +305,11 @@ class MySQLDB:
     :raises ConnectionError: If a connection can not be established
     :ivar conn: The connection attribute of the mysql-connector-python module.
     :ivar cur: The cursor method for the mysql-connector-python module.
+    :ivar db_engine: A string describing the database engine
     :ivar database: The name of the database currently being used.
     """
+
+    _db_engine: str = "MYSQL"
 
     def __init__(
         self,
@@ -276,11 +323,46 @@ class MySQLDB:
         self.password = password
         self.port = port
         self.hostname = hostname
-        self.database = database
-        # self.conn = None.. code-block:: bash
+        self._database = database
 
         self._create_connection(password)
         self.change_database(database)
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def conn(self) -> Any:
+        """
+        Protection for the _conn attribute
+        """
+        return self._conn
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def cur(self) -> Any:
+        """
+        Protection for the _cur attribute
+        """
+        return self._cur
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def db_engine(self) -> str:
+        """
+        Protection for the _db_engine attribute
+        """
+        return self._db_engine
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def database(self) -> Any:
+        """
+        Protection for the _database attribute
+        """
+        return self._database
 
     # ------------------------------------------------------------------------------------------
 
@@ -292,8 +374,8 @@ class MySQLDB:
         :raises ConnectionError: if query fails.
         """
         try:
-            self.cur.execute(f"USE {database}")
-            self.database = database
+            self._cur.execute(f"USE {database}")
+            self._database = database
         except ProgrammingError as e:
             # Handle errors related to non-existing databases or insufficient permissions.
             raise ConnectionError(
@@ -315,8 +397,8 @@ class MySQLDB:
         :raises ConnectionError: If the connection does not exist.
         """
         try:
-            if self.conn and self.conn.is_connected():
-                self.conn.close()
+            if self._conn and self._conn.is_connected():
+                self._conn.close()
         except Error as e:
             # Generic error handler for any other exceptions.
             raise ConnectionError(f"Failed to close the connection: {e}")
@@ -349,8 +431,8 @@ class MySQLDB:
 
         """
         try:
-            self.cur.execute("SHOW DATABASES;")
-            databases = self.cur.fetchall()
+            self._cur.execute("SHOW DATABASES;")
+            databases = self._cur.fetchall()
             return pd.DataFrame(databases, columns=["Databases"])
         except InterfaceError as e:
             # Handle errors related to the interface.
@@ -394,8 +476,8 @@ class MySQLDB:
             raise ValueError("No database is currently selected.")
         msg = f"Failed to fetch tables from {database}"
         try:
-            self.cur.execute(f"SHOW TABLES FROM {database}")
-            tables = self.cur.fetchall()
+            self._cur.execute(f"SHOW TABLES FROM {database}")
+            tables = self._cur.fetchall()
             return pd.DataFrame(tables, columns=["Tables"])
         except InterfaceError as e:
             # Handle errors related to the interface.
@@ -473,8 +555,8 @@ class MySQLDB:
             raise ValueError("No database is currently selected.")
 
         try:
-            self.cur.execute(f"SHOW COLUMNS FROM {database}.{table_name}")
-            columns_info = self.cur.fetchall()
+            self._cur.execute(f"SHOW COLUMNS FROM {database}.{table_name}")
+            columns_info = self._cur.fetchall()
             df = pd.DataFrame(
                 columns_info, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
             )
@@ -545,14 +627,20 @@ class MySQLDB:
 
         try:
             if len(params) == 0:
-                self.cur.execute(query)
+                self._cur.execute(query)
             else:
-                self.cur.execute(query, params)
+                self._cur.execute(query, params)
+            if (
+                query.strip()
+                .upper()
+                .startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "DROP"))
+            ):
+                self._conn.commit()
 
             # Check if there's a result set available
-            if self.cur.description:
-                rows = self.cur.fetchall()
-                column_names = [desc[0] for desc in self.cur.description]
+            if self._cur.description:
+                rows = self._cur.fetchall()
+                column_names = [desc[0] for desc in self._cur.description]
                 df = pd.DataFrame(rows, columns=column_names)
                 return df
             else:
@@ -666,8 +754,8 @@ class MySQLDB:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
-            self.conn.commit()  # Commit changes
+                self._cur.execute(query, values)
+            self._conn.commit()  # Commit changes
         except InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -756,9 +844,9 @@ class MySQLDB:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -825,9 +913,9 @@ class MySQLDB:
                 columns = ", ".join(sanitized_columns)
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -845,10 +933,10 @@ class MySQLDB:
         :return: The MySQL connection object.
         """
         try:
-            self.conn = connect(
+            self._conn = connect(
                 host=self.hostname, user=self.username, password=passwd, port=self.port
             )
-            self.cur = self.conn.cursor()
+            self._cur = self._conn.cursor()
         except InterfaceError as e:
             # Handle errors related to the interface.
             raise ConnectionError(
@@ -895,14 +983,50 @@ class SQLiteDB:
     :ivar conn: The connection attribute of the sqlite3 module.
     :ivar cur: The cursor method for the sqlite3 module.
     :ivar database: The name of the database currently being used.
+    :ivar db_engine: A string describing the database engine
     """
 
-    def __init__(self, database: str):
-        self.database = database
-        self.conn = None
-        self.cur = None
+    _db_engine: str = "SQLITEDB"
 
+    def __init__(self, database: str):
+        self._database = database
         self._create_connection()
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def conn(self) -> Any:
+        """
+        Protection for the _conn attribute
+        """
+        return self._conn
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def cur(self) -> Any:
+        """
+        Protection for the _cur attribute
+        """
+        return self._cur
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def db_engine(self) -> str:
+        """
+        Protection for the _db_engine attribute
+        """
+        return self._db_engine
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def database(self) -> Any:
+        """
+        Protection for the _database attribute
+        """
+        return self._database
 
     # ------------------------------------------------------------------------------------------
 
@@ -910,7 +1034,7 @@ class SQLiteDB:
         """
         Close the connection to tjhe SQLite database
         """
-        self.conn.close()
+        self._conn.close()
 
     # ------------------------------------------------------------------------------------------
 
@@ -920,7 +1044,7 @@ class SQLiteDB:
 
         :paramn database: The new database file to be used to include the path length
         """
-        self.database = database
+        self._database = database
         self.close_connection()
         self._create_connection()
 
@@ -979,7 +1103,7 @@ class SQLiteDB:
         else:
             original_db = self.database
             self.close_connection()
-            self.database = database
+            self._database = database
             self._create_connection()
             query = "SELECT name FROM sqlite_master WHERE type='table';"
             try:
@@ -988,7 +1112,7 @@ class SQLiteDB:
             except sqlite3.Error as e:
                 raise Error(f"Failed to retrieve tables: {e}")
             self.close_connection()
-            self.database = original_db
+            self._database = original_db
             self._create_connection()
             return df
 
@@ -1054,10 +1178,10 @@ class SQLiteDB:
         if database is None:
             try:
                 # Execute the PRAGMA command to get the table information
-                self.cur.execute(f"PRAGMA table_info({table_name})")
+                self._cur.execute(f"PRAGMA table_info({table_name})")
 
                 # Fetch all rows from the cursor
-                rows = self.cur.fetchall()
+                rows = self._cur.fetchall()
 
                 if len(rows) == 0:
                     raise Error(f"The table '{table_name}' does not exist.")
@@ -1086,14 +1210,14 @@ class SQLiteDB:
                 raise Error(f"An error occurred: {e}")
         else:
             self.close_connection()
-            self.database = database
+            self._database = database
             self._create_connection()
             try:
                 # Execute the PRAGMA command to get the table information
-                self.cur.execute(f"PRAGMA table_info({table_name})")
+                self._cur.execute(f"PRAGMA table_info({table_name})")
 
                 # Fetch all rows from the cursor
-                rows = self.cur.fetchall()
+                rows = self._cur.fetchall()
 
                 if len(rows) == 0:
                     raise Error(f"The table '{table_name}' does not exist.")
@@ -1114,14 +1238,14 @@ class SQLiteDB:
 
                 # Only include the relevant columns in the DataFrame
                 df = df[["Field", "Type", "Null", "Key", "Default", "Extra"]]
-                self.database = original_db
+                self._database = original_db
                 self.close_connection()
                 self._create_connection()
 
                 return df
 
             except sqlite3.Error as e:
-                self.database = original_db
+                self._database = original_db
                 self.close_connection()
                 self._create_connection()
                 # Handle any SQLite errors that occur
@@ -1181,15 +1305,21 @@ class SQLiteDB:
             raise ValueError(msg)
         try:
             if params:
-                self.cur.execute(query, params)
+                self._cur.execute(query, params)
             else:
-                self.cur.execute(query)
+                self._cur.execute(query)
+            if (
+                query.strip()
+                .upper()
+                .startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "DROP"))
+            ):
+                self._conn.commit()
 
-            if self.cur.description:
-                columns = [desc[0] for desc in self.cur.description]
-                return pd.DataFrame(self.cur.fetchall(), columns=columns)
+            if self._cur.description:
+                columns = [desc[0] for desc in self._cur.description]
+                return pd.DataFrame(self._cur.fetchall(), columns=columns)
             else:
-                self.conn.commit()
+                self._conn.commit()
                 return pd.DataFrame()
 
         except sqlite3.InterfaceError as e:
@@ -1258,8 +1388,8 @@ class SQLiteDB:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
-            self.conn.commit()  # Commit changes
+                self._cur.execute(query, values)
+            self._conn.commit()  # Commit changes
         except sqlite3.InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -1327,9 +1457,9 @@ class SQLiteDB:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except sqlite3.InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -1396,9 +1526,9 @@ class SQLiteDB:
                 columns = ", ".join(sanitized_columns)
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except sqlite3.InterfaceError as e:
             # Handle errors related to the interface.
             raise Error(f"Failed to insert data into the table: {e}")
@@ -1414,8 +1544,8 @@ class SQLiteDB:
         Create a connection to the SQLite database.
         """
         try:
-            self.conn = sqlite3.connect(self.database)
-            self.cur = self.conn.cursor()
+            self._conn = sqlite3.connect(self.database)
+            self._cur = self._conn.cursor()
         except sqlite3.DatabaseError as e:
             raise ConnectionError(
                 f"Failed to create a connection due to DatabaseError: {e}"
@@ -1435,6 +1565,23 @@ class SQLiteDB:
 
 
 class PostGreSQLDB:
+    """
+    Initialize the database connection to a PostgreSQL server.
+
+    :param username: The PostgreSQL username.
+    :param password: The PostgreSQL password.
+    :param database: The name of the database to connect to.
+    :param port: The port number for the PostgreSQL server (default is 5432).
+    :param hostname: The server's hostname (default is 'localhost').
+    :raises ConnectionError: If a connection can not be established.
+    :ivar conn: The connection attribute of the sqlite3 module.
+    :ivar cur: The cursor method for the sqlite3 module.
+    :ivar database: The name of the database currently being used.
+    :ivar db_engine: A string describing the database engine
+    """
+
+    _db_engine: str = "POSTGRES"
+
     def __init__(
         self,
         username: str,
@@ -1443,23 +1590,49 @@ class PostGreSQLDB:
         port: int = 5432,
         hostname: str = "localhost",
     ):
-        """
-        Initialize the database connection to a PostgreSQL server.
-
-        :param username: The PostgreSQL username.
-        :param password: The PostgreSQL password.
-        :param database: The name of the database to connect to.
-        :param port: The port number for the PostgreSQL server (default is 5432).
-        :param hostname: The server's hostname (default is 'localhost').
-        """
-
         self.username = username
         self.password = password
         self.port = port
         self.hostname = hostname
-        self.database = database
+        self._database = database
 
         self._create_connection(password, database)
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def conn(self) -> Any:
+        """
+        Protection for the _conn attribute
+        """
+        return self._conn
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def cur(self) -> Any:
+        """
+        Protection for the _cur attribute
+        """
+        return self._cur
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def db_engine(self) -> str:
+        """
+        Protection for the _db_engine attribute
+        """
+        return self._db_engine
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def database(self) -> Any:
+        """
+        Protection for the _database attribute
+        """
+        return self._database
 
     # ------------------------------------------------------------------------------------------
 
@@ -1470,10 +1643,10 @@ class PostGreSQLDB:
         :raises ConnectionError: If there's an issue closing the connection or cursor.
         """
         try:
-            if self.cur:
-                self.cur.close()
-            if self.conn:
-                self.conn.close()
+            if self._cur:
+                self._cur.close()
+            if self._conn:
+                self._conn.close()
         except pgdb.Error as e:
             raise ConnectionError(f"Failed to close the connection: {e}")
         except Exception as e:
@@ -1492,19 +1665,19 @@ class PostGreSQLDB:
         """
         try:
             # Close the current connection if it exists
-            if self.conn:
-                self.conn.close()
+            if self._conn:
+                self._conn.close()
 
             # Establish a new connection to the desired database
-            self.conn = pgdb.connect(
+            self._conn = pgdb.connect(
                 database=database,
                 user=self.username,
                 password=self.password,
                 host=self.hostname,
                 port=self.port,
             )
-            self.database = database
-            self.cur = self.conn.cursor()
+            self._database = database
+            self._cur = self._conn.cursor()
         except pgdb.DatabaseError as e:
             raise ConnectionError(f"Failed to change to database '{database}': {e}")
         except Exception as e:
@@ -1523,8 +1696,8 @@ class PostGreSQLDB:
         query = "SELECT datname FROM pg_database;"
 
         try:
-            self.cur.execute(query)
-            data = self.cur.fetchall()
+            self._cur.execute(query)
+            data = self._cur.fetchall()
             df = pd.DataFrame(data, columns=["Databases"])
             return df
         except pgdb.DatabaseError as e:
@@ -1542,7 +1715,7 @@ class PostGreSQLDB:
                  header "Tables".
         """
 
-        original_db = self.database
+        original_db = self._database
 
         # If db_name is provided, switch to that database
         if database:
@@ -1551,8 +1724,8 @@ class PostGreSQLDB:
         query = "SELECT tablename FROM pg_tables WHERE schemaname='public';"
 
         try:
-            self.cur.execute(query)
-            data = self.cur.fetchall()
+            self._cur.execute(query)
+            data = self._cur.fetchall()
             df = pd.DataFrame(data, columns=["Tables"])
 
             # If db_name was provided, switch back to the original database
@@ -1600,8 +1773,8 @@ class PostGreSQLDB:
             WHERE table_name = '{table_name}'
             """
 
-            self.cur.execute(column_query)
-            columns = self.cur.fetchall()
+            self._cur.execute(column_query)
+            columns = self._cur.fetchall()
             df = pd.DataFrame(
                 columns, columns=["Field", "Type", "Null", "Default", "Key", "Extra"]
             )
@@ -1614,8 +1787,8 @@ class PostGreSQLDB:
             WHERE  i.indrelid = '{table_name}'::regclass AND i.indisprimary;
             """
 
-            self.cur.execute(pk_query)
-            pks = self.cur.fetchall()
+            self._cur.execute(pk_query)
+            pks = self._cur.fetchall()
             for pk in pks:
                 df.loc[df["Field"] == pk[0], "Key"] = "Primary"
 
@@ -1651,15 +1824,21 @@ class PostGreSQLDB:
 
         try:
             if params:
-                self.cur.execute(query, params)
+                self._cur.execute(query, params)
             else:
-                self.cur.execute(query)
+                self._cur.execute(query)
+            if (
+                query.strip()
+                .upper()
+                .startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "DROP"))
+            ):
+                self._conn.commit()
 
-            if self.cur.description:
-                columns = [desc[0] for desc in self.cur.description]
-                return pd.DataFrame(self.cur.fetchall(), columns=columns)
+            if self._cur.description:
+                columns = [desc[0] for desc in self._cur.description]
+                return pd.DataFrame(self._cur.fetchall(), columns=columns)
             else:
-                self.conn.commit()
+                self._conn.commit()
                 return pd.DataFrame()
         except (pgdb.DatabaseError, pgdb.OperationalError) as e:
             raise Exception(f"Failed to execute query: {e}")
@@ -1769,8 +1948,8 @@ class PostGreSQLDB:
                     columns = ", ".join(insert_data.keys())
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
-            self.conn.commit()  # Commit changes
+                self._cur.execute(query, values)
+            self._conn.commit()  # Commit changes
         except pgdb.InterfaceError as e:
             # Handle errors related to the interface.
             raise Exception(f"Failed to insert data into the table: {e}")
@@ -1858,9 +2037,9 @@ class PostGreSQLDB:
                 values = tuple(insert_data.values())
 
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except (pgdb.DatabaseError, pgdb.OperationalError) as e:
             raise Exception(f"Failed to insert data into the table: {e}")
 
@@ -1923,9 +2102,9 @@ class PostGreSQLDB:
                 columns = ", ".join(sanitized_columns)
                 values = tuple(insert_data.values())
                 query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                self.cur.execute(query, values)
+                self._cur.execute(query, values)
 
-            self.conn.commit()
+            self._conn.commit()
         except (pgdb.DatabaseError, pgdb.OperationalError) as e:
             # Handle errors related to
             raise Exception(f"Failed to insert data into the table: {e}")
@@ -1942,14 +2121,14 @@ class PostGreSQLDB:
         :return: The PostgreSQL connection object.
         """
         try:
-            self.conn = pgdb.connect(
+            self._conn = pgdb.connect(
                 database=database,
                 host=self.hostname,
                 user=self.username,
                 password=password,
                 port=self.port,
             )
-            self.cur = self.conn.cursor()
+            self._cur = self._conn.cursor()
         except pgdb.OperationalError as e:
             raise ConnectionError(
                 f"Failed to create a connection due to OperationalError: {e}"
@@ -1976,6 +2155,567 @@ class PostGreSQLDB:
 
 # ==========================================================================================
 # ==========================================================================================
+
+
+class SQLServerDB:
+    """
+    Initialize the SQLServerDB object with connection parameters.
+
+    :param username: The username to connect to the database.
+    :param password: The password to connect to the database.
+    :param port: The port number to use for the connection. Default is 1433.
+    :param hostname: The database server name or IP address. Default is
+                    'localhost'.
+    :param database: The initial database to connect to (can be changed later).
+    :param cert: yes to trust certificat and no to not trust certificate
+                 without authentication. Defaulted to yes
+    :param driver: The ODBC driver to use for connection. Defaulted to
+                   "{ODBC Driver 18 for SQL Server}"
+    :raises ConnectionError: If a connection can not be established.
+    :ivar conn: The connection attribute of the sqlite3 module.
+    :ivar cur: The cursor method for the sqlite3 module.
+    :ivar database: The name of the database currently being used.
+    :ivar db_engine: A string describing the database engine
+    """
+
+    _db_engine: str = "MSSQL"
+
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        database: str,
+        port: int = 1433,
+        hostname: str = "localhost",
+        cert: str = "yes",
+        driver: str = "{ODBC Driver 18 for SQL Server}",
+    ):
+        self.username = username
+        self.password = password
+        self.port = port
+        self.hostname = hostname
+        self._database = database
+        self.driver = driver
+
+        self._create_connection(cert)
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def conn(self) -> Any:
+        """
+        Protection for the _conn attribute
+        """
+        return self._conn
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def cur(self) -> Any:
+        """
+        Protection for the _cur attribute
+        """
+        return self._cur
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def db_engine(self) -> str:
+        """
+        Protection for the _db_engine attribute
+        """
+        return self._db_engine
+
+    # ------------------------------------------------------------------------------------------
+
+    @property
+    def database(self) -> Any:
+        """
+        Protection for the _database attribute
+        """
+        return self._database
+
+    # ------------------------------------------------------------------------------------------
+
+    def change_database(self, database_name: str):
+        """
+        Change the active database for the current connection.
+
+        :param database_name: The name of the database to switch to.
+        """
+        if not database_name:
+            raise ValueError("Database name is required.")
+
+        # Prevent SQL injection by verifying database name
+        if not re.match("^[A-Za-z0-9_]+$", database_name):
+            raise ValueError("Invalid database name provided.")
+
+        try:
+            self._cur.execute(f"USE {database_name}")
+            self._conn.commit()
+        except pyodbc.ProgrammingError as e:
+            # Handle programming errors like syntax errors.
+            raise ConnectionError(
+                f"Failed to switch database due to ProgrammingError: {e}"
+            )
+        except pyodbc.DatabaseError as e:
+            # Handle other database-related errors like non-existing database.
+            raise ConnectionError(f"Failed to switch database due to DatabaseError: {e}")
+        except pyodbc.Error as e:
+            raise ConnectionError(f"Failed to switch database: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def close_connection(self):
+        """
+        Close the database connection.
+        """
+        if self._cur:
+            self._cur.close()
+        if self._conn:
+            self._conn.close()
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_databases(self) -> pd.DataFrame:
+        """
+        Retrieve a list of databases from the SQL Server.
+
+        :return: DataFrame containing the database names.
+        """
+
+        try:
+            self._cur.execute("SELECT name FROM sys.databases")
+            databases = [row[0] for row in self._cur.fetchall()]
+            return pd.DataFrame(databases, columns=["Databases"])
+        except pyodbc.ProgrammingError as e:
+            # Handle programming errors like syntax errors.
+            raise ConnectionError(
+                f"Failed to fetch databases due to ProgrammingError: {e}"
+            )
+        except pyodbc.DatabaseError as e:
+            # Handle other database-related errors.
+            raise ConnectionError(f"Failed to fetch databases due to DatabaseError: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch databases: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_database_tables(self, database_name: str = None) -> pd.DataFrame:
+        """
+        Retrieve a list of tables from the given or current SQL Server database.
+
+        :param database_name: Optional name of the database to fetch tables from.
+        :return: DataFrame containing the table names.
+        """
+
+        # If no specific database is given, use the current one.
+        if database_name is None:
+            database_name = self._database
+
+        # Remember the original database to switch back later if needed.
+        original_database = self._database
+
+        try:
+            # If the user provides a different database, switch to it.
+            if database_name != original_database:
+                self.change_database(database_name)
+
+            # Fetch the list of tables.
+            self._cur.execute("SELECT table_name FROM information_schema.tables")
+            tables = [row[0] for row in self._cur.fetchall()]
+
+            # If we did switch databases, switch back to the original one.
+            if database_name != original_database:
+                self.change_database(original_database)
+
+            return pd.DataFrame(tables, columns=["Tables"])
+
+        except pyodbc.ProgrammingError as e:
+            # Handle programming errors.
+            raise ConnectionError(f"Failed to fetch tables due to ProgrammingError: {e}")
+        except pyodbc.DatabaseError as e:
+            # Handle other database-related errors.
+            raise ConnectionError(f"Failed to fetch tables due to DatabaseError: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch tables: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def get_table_columns(self, table_name: str, database: str = None) -> pd.DataFrame:
+        """
+        Retrieve column details of the specified table from the given or current SQL
+        Server database.
+
+        :param table_name: Name of the table to fetch column details from.
+        :param database: Optional name of the database the table is in.
+        :return: DataFrame containing the column details.
+        """
+
+        # If no specific database is given, use the current one.
+        if database is None:
+            database = self._database
+
+        # Remember the original database to switch back later if needed.
+        original_database = self._database
+
+        try:
+            # If the user provides a different database, switch to it.
+            if database != original_database:
+                self.change_database(database)
+
+            # Fetch the column details.
+            query = f"""
+            SELECT
+                c.COLUMN_NAME AS [Field],
+                c.DATA_TYPE + ISNULL('(' + CAST(c.CHARACTER_MAXIMUM_LENGTH AS VARCHAR)
+                + ')', '') AS [Type],
+                CASE WHEN c.IS_NULLABLE = 'YES' THEN 'YES' ELSE 'NO' END AS [Null],
+                CASE WHEN pk.TABLE_NAME IS NOT NULL THEN 'PRI' ELSE '' END AS [Key],
+                c.COLUMN_DEFAULT AS [Default],
+                '' AS Extra
+            FROM INFORMATION_SCHEMA.COLUMNS c
+            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu
+            ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
+            LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS pk
+            ON pk.TABLE_NAME = kcu.TABLE_NAME AND pk.CONSTRAINT_TYPE = 'PRIMARY KEY'
+            WHERE c.TABLE_NAME = '{table_name}'
+            """
+
+            self._cur.execute(query)
+            columns = self._cur.fetchall()
+
+            # Convert the results to a list of lists
+            data = [list(row) for row in columns]
+
+            # Convert the results to a DataFrame
+            df = pd.DataFrame(
+                data, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
+            )
+            # Convert the results to a DataFrame
+
+            # If we did switch databases, switch back to the original one.
+            if database != original_database:
+                self.change_database(original_database)
+
+            return df
+
+        except pyodbc.ProgrammingError as e:
+            # Handle programming errors.
+            raise ConnectionError(f"Failed to fetch columns due to ProgrammingError: {e}")
+        except pyodbc.DatabaseError as e:
+            # Handle other database-related errors.
+            raise ConnectionError(f"Failed to fetch columns due to DatabaseError: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to fetch columns: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def execute_query(self, query: str, params: tuple = ()) -> pd.DataFrame:
+        """
+        Execute a given query on the SQL Server database.
+
+        :param query: The SQL query string to execute.
+        :param params: Optional tuple containing parameters for the query.
+        :return: DataFrame containing the query results if any, otherwise an empty
+                 DataFrame.
+        """
+        msg = "The number of placeholders in the query does not "
+        msg += "match the number of parameters."
+        query = query.replace("%s", "?")
+        num_placeholders = query.count("?")
+        if num_placeholders != len(params):
+            raise ValueError(msg)
+        try:
+            # If parameters are provided, execute the query with those parameters.
+            if len(params) > 0:
+                self._cur.execute(query, params)
+            else:
+                self._cur.execute(query)
+
+            if (
+                query.strip()
+                .upper()
+                .startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "DROP"))
+            ):
+                self._conn.commit()
+
+            # Try fetching results; if there's an exception, assume no results
+            try:
+                rows = self._cur.fetchall()
+                columns = [column[0] for column in self._cur.description]
+                df = pd.DataFrame.from_records(rows, columns=columns)
+                return df
+            except pyodbc.Error:
+                # If the query did not return any rows, return an empty DataFrame.
+                return pd.DataFrame()
+
+        except pyodbc.ProgrammingError as e:
+            raise ValueError(f"Failed to execute query due to ProgrammingError: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def csv_to_table(
+        self,
+        csv_file: str,
+        table_name: str,
+        csv_headers: dict[str, type],
+        table_headers: list = None,
+        delimiter: str = ",",
+        skip: int = 0,
+    ) -> None:
+        """
+        ... [rest of the docstring]
+        """
+
+        if len(csv_headers) == 0:
+            raise ValueError("CSV column names are required.")
+        if len(csv_headers) == 0:
+            raise ValueError("CSV column names are required.")
+
+        try:
+            csv_data = read_text_columns_by_headers(
+                csv_file, csv_headers, skip=skip, delimiter=delimiter
+            )
+
+            if table_headers is None:
+                table_headers = list(csv_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+
+            csv_header_keys = list(csv_headers.keys())
+            for _, row in csv_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_headers):
+                    value = row[csv_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                if table_headers is not None:
+                    columns = ", ".join(sanitized_columns)
+                else:
+                    columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self._cur.execute(query, values)
+            self._conn.commit()  # Commit changes
+        except pyodbc.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def excel_to_table(
+        self,
+        excel_file: str,
+        table_name: str,
+        excel_headers: dict[str, type],
+        table_headers: list = None,
+        sheet_name: str = "Sheet1",
+        skip: int = 0,
+    ) -> None:
+        """
+        Read data from an Excel file and insert it into the specified table.
+
+        :param excel_file: The path to the Excel file.
+        :param table_name: The name of the table.
+        :param excel_headers: The names of the columns in the Excel file and their
+                              data types as a dictionary
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes Excel column names and table column names are
+                              the same).
+        :param sheet_name: The name of the sheet in the Excel file
+                           (default is 'Sheet1').
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the Excel file, table name, or sheet name is not
+                            provided, or if the number of Excel columns and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+
+        Assune we have an excel table with the following Columns, ``FirstName``,
+        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have
+        a table with no entries that has columns for ``First`` and ``Last``.
+
+        .. code-block:: python
+
+           from cobralib.io import MySQLDB
+
+           db = MySQLDB('username', 'password', port=3306, hostname='localhost')
+           db.change_db('Names')
+           db.csv_to_table('excel_file.xlsx', 'FirstLastName',
+                           {'FirstName': str, 'LastName': str},
+                           ['First', 'Last'])
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
+        """
+        if len(excel_headers) == 0:
+            raise ValueError("Excel column names are required.")
+
+        try:
+            excel_data = read_excel_columns_by_headers(
+                excel_file, sheet_name, excel_headers, skip
+            )
+            if table_headers is None:
+                table_headers = list(excel_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_headers
+            ]
+
+            excel_header_keys = list(excel_headers.keys())
+
+            for _, row in excel_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_headers):
+                    value = row[excel_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                if table_headers is not None:
+                    columns = ", ".join(sanitized_columns)
+                else:
+                    columns = ", ".join(insert_data.keys())
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self._cur.execute(query, values)
+
+            self._conn.commit()
+        except pyodbc.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def pdf_to_table(
+        self,
+        pdf_file: str,
+        table_name: str,
+        pdf_headers: dict[str, type],
+        table_columns: list = None,
+        table_idx: int = 0,
+        page_num: int = 0,
+        skip: int = 0,
+    ) -> None:
+        """
+        Read a table from a PDF file and insert it into the specified MySQL table.
+
+        :param pdf_file: The path to the PDF file.
+        :param table_name: The name of the MySQL table.
+        :param pdf_headers: A dictionary of column names in the PDF and their data
+                            types.
+        :param table_columns: The names of the columns in the MySQL table
+                              (default is None, assumes PDF column names and MySQL
+                              column names are the same).
+        :param table_idx: Index of the table in the PDF (default: 0).
+        :param page_num: Page number from which to extract the table (default: 0).
+        :param skip: The number of rows to skip in the PDF table.
+        :raises ValueError: If the PDF file, table name, or sheet name is not
+                            provided, or if the number of PDF headers and table
+                            columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+        """
+
+        if len(pdf_headers) == 0:
+            raise ValueError("PDF headers are required.")
+
+        try:
+            # Read the table from the PDF file
+            pdf_data = read_pdf_columns_by_headers(
+                pdf_file, pdf_headers, table_idx, page_num, skip
+            )
+
+            if table_columns is None:
+                table_columns = list(pdf_headers.keys())
+
+            sanitized_columns = [
+                self._sanitize_column_name(name) for name in table_columns
+            ]
+            pdf_header_keys = list(pdf_headers.keys())
+
+            for _, row in pdf_data.iterrows():
+                insert_data = {}
+                for i, column in enumerate(table_columns):
+                    value = row[pdf_header_keys[i]]
+                    insert_data[column] = value
+
+                placeholders = ", ".join(["?"] * len(insert_data))
+                columns = ", ".join(sanitized_columns)
+                values = tuple(insert_data.values())
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                self._cur.execute(query, values)
+
+        except pyodbc.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ValueError(f"Failed to insert data into the table: {e}")
+
+    # ==========================================================================================
+    # PRIVATE-LIKE METHODS
+
+    def _create_connection(self, cert):
+        """
+        Create a connection to the SQL Server database.
+
+        :param cert: yes to trust certificat and no to not trust certificate without
+                     authentication
+        """
+        try:
+            connect = f"DRIVER={self.driver};SERVER={self.hostname},{self.port}"
+            connect += f";DATABASE={self._database};UID={self.username};"
+            connect += f"PWD={self.password};TrustServerCertificate={cert}"
+            self._conn = pyodbc.connect(connect)
+            self._cur = self._conn.cursor()
+        except pyodbc.InterfaceError as e:
+            # Handle errors related to the interface.
+            raise ConnectionError(
+                f"Failed to create a connection due to InterfaceError: {e}"
+            )
+        except pyodbc.ProgrammingError as e:
+            # Handle programming errors.
+            raise ConnectionError(
+                f"Failed to create a connection due to ProgrammingError: {e}"
+            )
+        except pyodbc.DatabaseError as e:
+            # Handle other database-related errors.
+            raise ConnectionError(
+                f"Failed to create a connection due to DatabaseError: {e}"
+            )
+        except pyodbc.Error as e:
+            # Generic error handler for any other exceptions.
+            raise ConnectionError(f"Failed to create a connection: {e}")
+
+    # ------------------------------------------------------------------------------------------
+
+    def _sanitize_column_name(self, name: str) -> str:
+        """
+        Sanitize column names to include only alphanumeric characters and underscores.
+        """
+        return re.sub(r"\W|^(?=\d)", "_", name)
+
+
+# ==========================================================================================
+# ==========================================================================================
 # Factory pattern for Relational Database Management Systems
 
 
@@ -1986,6 +2726,8 @@ def relational_database(
     password: str = "",
     port: int = -1,
     hostname: str = "localhost",
+    cert: str = "yes",
+    driver: str = "{ODBC Driver 18 for SQL Server}",
 ) -> RelationalDB:
     """
     Method will return a relational database object of type RelationalDB
@@ -2000,8 +2742,12 @@ def relational_database(
     :param port: The port number for the database connection. Defaulted to 3306
     :param hostname: The hostname for the database connection
                      (default is 'localhost').
+    :param cert: yes to trust certificat and no to not trust certificate
+                 without authentication. Defaulted to yes
+    :param driver: The ODBC driver to use for connection. Defaulted to
+                   "{ODBC Driver 18 for SQL Server}"
     """
-    db_types = ["MYSQL", "SQLITE", "POSTGRES"]
+    db_types = ["MYSQL", "SQLITE", "POSTGRES", "MSSQL"]
     if db_type.upper() not in db_types:
         raise ValueError(f"db_type must be one of {db_types}")
     if db_type.upper() == "MYSQL":
@@ -2014,7 +2760,7 @@ def relational_database(
             port=port,
             hostname=hostname,
         )
-    if db_type.upper() == "POSTGRES":
+    elif db_type.upper() == "POSTGRES":
         if port == -1:
             port = 5432
         return PostGreSQLDB(
@@ -2023,6 +2769,18 @@ def relational_database(
             database=database,
             port=port,
             hostname=hostname,
+        )
+    elif db_type.upper() == "MSSQL":
+        if port == -1:
+            port = 1433
+        return SQLServerDB(
+            username=username,
+            password=password,
+            database=database,
+            port=port,
+            hostname=hostname,
+            cert=cert,
+            driver=driver,
         )
     else:
         return SQLiteDB(database)
