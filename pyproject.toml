@@ -123,7 +123,8 @@ markers = [
 	"logger: Marks tests for logger",
 	"mysql: tests for MySQLDB class",
 	"sqlite: tests for SQLiteDB class",
-	"postgres: tests for PostGreSQLDB class"
+	"postgres: tests for PostGreSQLDB class",
+	"mssql: test for SQLServerDB class"
 ]
 
 [project.urls]

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from cobralib.db import MySQLDB, PostGreSQLDB, SQLiteDB, relational_database
+from cobralib.db import MySQLDB, PostGreSQLDB, SQLiteDB, SQLServerDB
 
 # ==========================================================================================
 # ==========================================================================================
@@ -941,36 +941,394 @@ def test_postgres_pdf_to_table():
 
 # ==========================================================================================
 # ==========================================================================================
+# TEST SQL-SERVER CLASS
 
 
-def test_post():
-    username = "sa"
-    pwd = "nopwd"
-    database = "python_test"
-    qry = """CREATE TABLE inventory (
-        prod_id INTEGER IDENTITY(1,1),
-        Prd VARCHAR(20),
-        Inv INT,
-        PRIMARY KEY (prod_id)
-    );
-    """
-    # db = SQLServerDB(username, pwd, database)
-    db = relational_database("MSSQL", database, username, pwd)
-    db.execute_query(qry)
-    # db.pdf_to_table(
-    #     "../data/test/pdf_tables.pdf",
-    #     "inventory",
-    #     {"Term": str, "Graduate": int},
-    #     ["Prd", "Inv"],
-    #     table_idx=2
-    # )
-    # df = db.execute_query("SELECT * FROM inventory;")
-    db.execute_query("DROP TABLE inventory;")
-    # print()
-    # print(db.database)
-    # print(db.db_engine)
-    # print(df)
+@pytest.mark.mssql
+def test_mssql_connection():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Mock pyodbc.connect
+    with patch("pyodbc.connect", return_value=mock_conn):
+        # Instantiate your SQLServerDB class
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+
+        # Assertions to ensure mocked connection and cursor are used
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+    # Test if close method of mock connection is called
     db.close_connection()
+    mock_conn.close.assert_called_once()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_mssql_connect_fail():
+    # Make mock_conn.cursor() return mock_cursor
+    with pytest.raises(ConnectionError):
+        SQLServerDB("username", "password", "database", port=1433, hostname="localhost")
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_change_mssql_db():
+    # Create mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Make mock_conn.cursor() return mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Mock mysql.connector.connect to return the mock connection
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        assert db.conn == mock_conn
+        assert db.cur == mock_cursor
+
+        # Simulate changing the database
+        db.change_database("new_db")
+    mock_cursor.execute.assert_called_once_with("USE new_db")
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_get_mssql_dbs():
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_conn.cursor.return_value = mock_cursor
+    mock_dbs = [["db1"], ["db2"], ["db3"]]  # use list of lists
+    mock_cursor.fetchall.return_value = mock_dbs
+
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+
+        dbs = db.get_databases()
+
+        # mock_cursor.execute.assert_called_once_with("SHOW DATABASES;")
+        assert list(dbs["Databases"]) == ["db1", "db2", "db3"]
+        assert dbs.equals(pd.DataFrame(mock_dbs, columns=["Databases"]))
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_get_mssql_db_tables():
+    # Create the mock connection and cursor
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    # Assign the mock cursor to the mock connection
+    mock_conn.cursor.return_value = mock_cursor
+    mock_tables = [["Table1"], ["Table2"]]
+    # Mock the fetchall method to return known tables
+    mock_cursor.fetchall.return_value = mock_tables
+
+    # Mocking the connect method
+    with patch("pyodbc.connect", return_value=mock_conn):
+        # Create an instance of the class
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+
+        # Change to the specified DB
+        db.change_database("DB_Name")
+
+        # Invoke the method
+        tables = db.get_database_tables()
+        # Check the result
+        assert list(tables["Tables"]) == ["Table1", "Table2"]
+
+    # Verify fetchall method was called
+    mock_cursor.fetchall.assert_called_once()
+    db.close_connection()
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_get_mssql_table_columns():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("DB_Name")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [
+            ("Column1", "Integer", "YES", "MUL", "Primary", ""),
+            ("Column2", "Varchar(50)", "NO", "", "Primary", ""),
+            ("Column3", "Datetime", "YES", "", "Primary", ""),
+        ]
+        db.cur.fetchall.return_value = mock_return
+
+        # Invoke the method
+        columns = db.get_table_columns("Table1")
+        # Create expected DataFrame for comparison
+        expected_df = pd.DataFrame(
+            mock_return, columns=["Field", "Type", "Null", "Key", "Default", "Extra"]
+        )
+
+        # Check the result
+        pd.testing.assert_frame_equal(columns, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_mssql_csv_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER IDENTITY(1,1)
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.csv_to_table(
+            "../data/test/read_csv.csv",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_query_mssql_db():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("names")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Jon", "Fred"), ("Webb", "Smith")]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("FirstName",), ("LastName",)]
+        expected_df = pd.DataFrame(mock_return, columns=["FirstName", "LastName"])
+
+        query = "SELECT * FROM names;"
+        result = db.execute_query(query)
+
+        # Check the result
+        pd.testing.assert_frame_equal(result, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_mssql_excel_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.excel_to_table(
+            "../data/test/read_xls.xlsx",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+            "test",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_mssql_txt_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("Inventory")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Apples", 5), ("Banana", 12), ("Cucumber", 20), ("Peach", 3)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Prd",), ("Inv",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Prd", "Inv"])
+
+        # Create table
+        query = """CREATE TABLE Inventory (
+            product_id INTEGER AUTO_INCREMENT
+            Prd VARCHAR(20) NOT NULL,
+            Inv INT NOT NULL,
+            PRIMARY KEY (product_id);
+        """
+        db.execute_query(query)
+
+        db.csv_to_table(
+            "../data/test/read_txt.txt",
+            "Inventory",
+            {"Product": str, "Inventory": int},
+            ["Prd", "Inv"],
+            delimiter=r"\s+",
+        )
+        query = "SELECT Prd, Inv FROM Inventory;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.mssql
+def test_mssql_pdf_to_table():
+    mock_conn = MagicMock()
+
+    # Mocking the connect and cursor methods
+    with patch("pyodbc.connect", return_value=mock_conn):
+        db = SQLServerDB(
+            "username", "password", "database", port=1433, hostname="localhost"
+        )
+        db.change_database("CollegeAdmissions")
+
+        # Mock the fetchall method to return known columns and their metadata
+        mock_return = [("Fall 2019", 3441), ("Winter 2020", 3499), ("Spring 2020", 3520)]
+        db.cur.fetchall.return_value = mock_return
+
+        db.cur.description = [("Term",), ("Graduate",)]
+        expected_df = pd.DataFrame(mock_return, columns=["Term", "Graduate"])
+
+        # Create table
+        query = """CREATE TABLE Admissions (
+            term_id INTEGER AUTO_INCREMENT
+            Term VARCHAR(20) NOT NULL,
+            Graduate INT NOT NULL,
+            PRIMARY KEY (term_id)
+        );
+        """
+        db.execute_query(query)
+
+        db.pdf_to_table(
+            "../data/test/pdf_tables.pdf",
+            "Admissions",
+            {"Term": str, "Graduate": int},
+            table_idx=2,
+        )
+        query = "SELECT Term, Graduate FROM Admissions;"
+        inventory = db.execute_query(query)
+
+        pd.testing.assert_frame_equal(inventory, expected_df, check_dtype=False)
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+# def test_post():
+#     username = "sa"
+#     pwd = "nopwd"
+#     database = "python_test"
+#     qry = """CREATE TABLE inventory (
+#         prod_id INTEGER IDENTITY(1,1),
+#         Prd VARCHAR(20),
+#         Inv INT,
+#         PRIMARY KEY (prod_id)
+#     );
+#     """
+# db = SQLServerDB(username, pwd, database)
+# db = relational_database("MSSQL", database, username, pwd)
+# db.execute_query(qry)
+# db.pdf_to_table(
+#     "../data/test/pdf_tables.pdf",
+#     "inventory",
+#     {"Term": str, "Graduate": int},
+#     ["Prd", "Inv"],
+#     table_idx=2
+# )
+# df = db.execute_query("SELECT * FROM inventory;")
+#    db.execute_query("DROP TABLE inventory;")
+# print()
+# print(db.database)
+# print(db.db_engine)
+# print(df)
+#    db.close_connection()
 
 
 # ==========================================================================================
