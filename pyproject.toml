@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cobralib"
-version = "0.1.2"
+version = "0.1.3"
 description = "A utilities module that contains classes and functions that simplify interfaces with files and databases."
 authors = ["Jon Webb <webbja123@gmail.com>"]
 readme = "README.rst"

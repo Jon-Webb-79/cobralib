@@ -73,8 +73,17 @@ In order to download this repository from github, follow these instructions
 This package can also be installed via pip
 
 #. Install with all packages ``pip install cobralib``
-#. Install with optional dependencies ``pip install cobralib[mysql, postgresql]``
+#. Install with optional dependencies ``pip install 'cobralib[mysql, postgresql]'``
 
 Bug Report
 ##########
 #. Despite the fact that the test suite passes on Mac and Linux, the Github tests appear to be failing due to a mismatch in libraries.
+
+Future Work
+###########
+#. Strengthen unit testing for existing functions and classes
+#. Strenghten typing requirements for functions in io.py (yaml, json, xml, etc)
+#. Add support for Oracle RDBMS
+#. Add functionality for database backup for all db classes
+#. Add functionality for database migration for all db classes
+#. Consider C++ implementation for linked list and binary search trees
