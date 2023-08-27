@@ -1,7 +1,12 @@
 [tool.poetry]
 name = "cobralib"
 version = "0.1.0"
-description = ""
+description = """
+	A Python utilities module that contains standardized methods
+	to simplify the process of reading and writing to files,
+	as well as some database management tools for use with
+	SQLite, MySQL, MS SQLServer, and PostGreSQL
+"""
 authors = ["Jon Webb <webbja123@gmail.com>"]
 readme = "README.rst"
 

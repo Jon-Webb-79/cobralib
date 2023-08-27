@@ -1303,7 +1303,7 @@ def test_mssql_pdf_to_table():
 
 # def test_post():
 #     username = "sa"
-#     pwd = "nopwd"
+#     pwd = "GrandCanyon12#$"
 #     database = "python_test"
 #     qry = """CREATE TABLE inventory (
 #         prod_id INTEGER IDENTITY(1,1),
@@ -1312,23 +1312,23 @@ def test_mssql_pdf_to_table():
 #         PRIMARY KEY (prod_id)
 #     );
 #     """
-# db = SQLServerDB(username, pwd, database)
-# db = relational_database("MSSQL", database, username, pwd)
-# db.execute_query(qry)
-# db.pdf_to_table(
-#     "../data/test/pdf_tables.pdf",
-#     "inventory",
-#     {"Term": str, "Graduate": int},
-#     ["Prd", "Inv"],
-#     table_idx=2
-# )
-# df = db.execute_query("SELECT * FROM inventory;")
-#    db.execute_query("DROP TABLE inventory;")
-# print()
-# print(db.database)
-# print(db.db_engine)
-# print(df)
-#    db.close_connection()
+#     db = SQLServerDB(username, pwd, database)
+#     db = relational_database("MSSQL", database, username, pwd)
+#     db.execute_query(qry)
+#     db.pdf_to_table(
+#         "../data/test/pdf_tables.pdf",
+#         "inventory",
+#         {"Term": str, "Graduate": int},
+#         ["Prd", "Inv"],
+#         table_idx=2
+#     )
+#     df = db.execute_query("SELECT * FROM inventory;")
+#     db.execute_query("DROP TABLE inventory;")
+#     print()
+#     print(db.database)
+#     print(db.db_engine)
+#     print(df)
+#     db.close_connection()
 
 
 # ==========================================================================================
