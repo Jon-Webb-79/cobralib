@@ -130,3 +130,4 @@ markers = [
 
 [project.urls]
 "Homepage" = "https://github.com/Jon-Webb-79/cobralib"
+"Documentation" = "https://cobralib.readthedocs.io/en/latest/index.html"
