@@ -17,10 +17,6 @@ Describe project here
 .. image:: http://www.mypy-lang.org/static/mypy_badge.svg
    :target: http://mypy-lang.org/
 
-
-.. image:: https://github.com/Jon-Webb-79/py_util_lib/workflows/Tests/badge.svg?cache=none
-    :target: https://github.com/Jon-Webb-79/py_util_lib/actions
-
 Overview
 ########
 This library contains basic utility classes and functions that enable faster Python programming.
@@ -47,7 +43,6 @@ This project is licensed under a basic MIT License
 Requirements
 ############
 Python 3.8 or greater, developed with Python 3.11
-List code package requirements here
 
 Installation
 ############
