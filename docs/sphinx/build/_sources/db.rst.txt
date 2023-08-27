@@ -13,7 +13,7 @@ relational_database
 ===================
 The ``relational_database`` function provides a common interface to the Microsfot SQL-Server,
 MySQL, PostGreSQL, and SQLite Relational Database Management Systems.  This function
-returns an object of ``MySQLDB``, ``PostGreSQLDB`` or ``SQLiteDB`` which is described
+returns an object of ``MySQLDB``, ``PostGreSQLDB``, ``MSSQL``, or ``SQLiteDB`` which is described
 in the :ref:`SQL Classes<SQL Overview>` Section of this documnet.  The form of these classes
 must conform to the interfaces of the Protocol class titled :ref:`RelationalDatabase<Protocol Overview>`.
 
@@ -483,4 +483,7 @@ However, a user can also import and access these classes if they wish to inherit
    :members:
 
 .. autoclass:: cobralib.db.SQLiteDB
+   :members:
+
+.. autoclass:: cobralib.db.SQLServerDB
    :members:

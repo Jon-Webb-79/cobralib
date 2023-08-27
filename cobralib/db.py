@@ -2237,21 +2237,22 @@ class SQLServerDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def change_database(self, database_name: str):
+    def change_database(self, database: str):
         """
         Change the active database for the current connection.
 
-        :param database_name: The name of the database to switch to.
+        :param database: The name of the database to switch to.
+        :raises ConnectionError: if query fails.
         """
-        if not database_name:
+        if not database:
             raise ValueError("Database name is required.")
 
         # Prevent SQL injection by verifying database name
-        if not re.match("^[A-Za-z0-9_]+$", database_name):
+        if not re.match("^[A-Za-z0-9_]+$", database):
             raise ValueError("Invalid database name provided.")
 
         try:
-            self._cur.execute(f"USE {database_name}")
+            self._cur.execute(f"USE {database}")
             self._conn.commit()
         except pyodbc.ProgrammingError as e:
             # Handle programming errors like syntax errors.
@@ -2270,10 +2271,13 @@ class SQLServerDB:
         """
         Close the database connection.
         """
-        if self._cur:
-            self._cur.close()
-        if self._conn:
-            self._conn.close()
+        try:
+            if self._cur:
+                self._cur.close()
+            if self._conn:
+                self._conn.close()
+        except Error as e:
+            raise ConnectionError(f"Failed to close the connection: {e}")
 
     # ------------------------------------------------------------------------------------------
 
@@ -2282,6 +2286,25 @@ class SQLServerDB:
         Retrieve a list of databases from the SQL Server.
 
         :return: DataFrame containing the database names.
+        :raises ConnectionError: If program fails to retrive database
+
+        If you assume the server has three databases available to the username, and
+        those databases were ``Inventory``, ``Address``, ``project_data``, you
+        could use this class with the following commands.
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQServerDB('username', 'password', port=3306, hostname='localhost')
+           dbs = db.get_databases()
+           db.close_conn()
+           print(dbs)
+           >> index  Databases
+              0      Address
+              1      Inventory
+              2      project_data
+
         """
 
         try:
@@ -2302,32 +2325,52 @@ class SQLServerDB:
 
     # ------------------------------------------------------------------------------------------
 
-    def get_database_tables(self, database_name: str = None) -> pd.DataFrame:
+    def get_database_tables(self, database: str = None) -> pd.DataFrame:
         """
         Retrieve a list of tables from the given or current SQL Server database.
 
-        :param database_name: Optional name of the database to fetch tables from.
+        :param database: Optional name of the database to fetch tables from.
         :return: DataFrame containing the table names.
+
+        :raises ValueError: If no database is currently selected.
+        :raises ConnectionError: If program is not able to get tables
+
+        Assuming the user has a database titled ``Inventory`` which had the
+        tables ``Names``, ``Product``, ``Sales``.
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           dbs = db.get_database_tables("Inventory")
+           db.close_conn()
+           print(dbs)
+           >> index  Tables
+              0      Names
+              1      Product
+              2      Sales
+
         """
 
         # If no specific database is given, use the current one.
-        if database_name is None:
-            database_name = self._database
+        if database is None:
+            database = self._database
 
         # Remember the original database to switch back later if needed.
         original_database = self._database
 
         try:
             # If the user provides a different database, switch to it.
-            if database_name != original_database:
-                self.change_database(database_name)
+            if database != original_database:
+                self.change_database(database)
 
             # Fetch the list of tables.
             self._cur.execute("SELECT table_name FROM information_schema.tables")
             tables = [row[0] for row in self._cur.fetchall()]
 
             # If we did switch databases, switch back to the original one.
-            if database_name != original_database:
+            if database != original_database:
                 self.change_database(original_database)
 
             return pd.DataFrame(tables, columns=["Tables"])
@@ -2352,6 +2395,55 @@ class SQLServerDB:
         :param table_name: Name of the table to fetch column details from.
         :param database: Optional name of the database the table is in.
         :return: DataFrame containing the column details.
+
+        :raises ValueError: If the database is not selected at the class level
+         :raises ConnectionError: If the columns cannot be retrieved.
+
+         This example shows a scenario where the database analyst has navigated
+         into a database
+
+         .. highlight:: python
+         .. code-block:: python
+
+            from cobralib.io import SQLServerDB
+
+            db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+            db.change_database('Address')
+            query = '''CREATE TABLE IF NOT EXIST Names (
+                name_id INTEGER AUTO_INCREMENT,
+                FirstName VARCHAR(20) NOT NULL,
+                MiddleName VARCHAR(20),
+                LastName VARCHAR(20) NOT NULL,
+                PRIMARY KEY (name_id)
+            );
+            '''
+            db.execute_query(query)
+            cols = db.get_table_columns('Names')
+            db.close_conn()
+            print(cols)
+            >> index Field      Type        Null   Key     Default  Extra
+               0     name_id    Integer     True   Primary  False   auto_increment
+               1     FirstName  Varchar(20) False  NA       False   None
+               2     MiddleName Varchar(20) True   NA       False   None
+               3     LastName   Varchar(20) False  NA       False   None
+
+        However, this code can also be executed when not in the database
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           cols = db.get_table_columns('Names', 'Address')
+           db.close_conn()
+           print(cols)
+           >> index Field      Type        Null   Key     Default  Extra
+               0     name_id    Integer     True   Primary  False   auto_increment
+               1     FirstName  Varchar(20) False  NA       False   None
+               2     MiddleName Varchar(20) True   NA       False   None
+               3     LastName   Varchar(20) False  NA       False   None
+
+
         """
 
         # If no specific database is given, use the current one.
@@ -2422,6 +2514,40 @@ class SQLServerDB:
         :param params: Optional tuple containing parameters for the query.
         :return: DataFrame containing the query results if any, otherwise an empty
                  DataFrame.
+
+        :raises ValueError: If the database name is not provided.
+        :raises ConnectionError: If the query execution fails.
+
+        Example usage when parameters are provided:
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           query = "SELECT * FROM names WHERE name_id = %s"
+           params = (2,)
+           result = db.execute_query(query, params)
+           print(result)
+           >> index  name_id  FirstName  LastName
+              0      2        Fred       Smith
+
+        Example usage when no parameters are provided:
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           query = "SELECT * FROM names"
+           result = db.execute_query(query)
+           print(result)
+           >> index  name_id  FirstName  LastName
+            0        1        Jon        Webb
+            1        2        Fred       Smith
+            2        3        Jillian    Webb
+
+
         """
         msg = "The number of placeholders in the query does not "
         msg += "match the number of parameters."
@@ -2468,7 +2594,65 @@ class SQLServerDB:
         skip: int = 0,
     ) -> None:
         """
-        ... [rest of the docstring]
+        Read data from a CSV or TXT file and insert it into the specified table.
+
+        :param csv_file: The path to the CSV file or TXT file.
+        :param table_name: The name of the table.
+        :param csv_headers: The names of the columns in the TXT file and datatypes
+                            as a dictionary.
+        :param table_headers: The names of the columns in the table (default is None,
+                              assumes CSV column names and table column names
+                              are the same).
+        :param delimiter: The seperating delimeter in the text file.  Defaulted to
+                          ',' for a CSV file, but can work with other delimeters
+        :param skip: The number of rows to be skipped if metadata exists before
+                     the header definition.  Defaulted to 0
+        :raises ValueError: If the CSV file or table name is not provided, or if
+                            the number of CSV columns and table columns mismatch.
+        :raises Error: If the data insertion fails or the data types are
+                       incompatible.
+
+        Assune we have a csv table with the following Columns, ``FirstName``,
+        ``MiddleName``, ``LastName``.  Within the ``Names`` database we have
+        a table with no entries that has columns for ``First`` and ``Last``.
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           db.change_db('Names')
+           db.csv_to_table('csv_file.csv', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
+                           ['First', 'Last'])
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
+
+        If instead of a csv file, you have a text file that uses spaces as
+        a delimeter, and the first two rows are consumed by file metadata
+        before reaching the header, the following code will work
+
+        .. code-block:: python
+
+           from cobralib.io import SQLServerDB
+
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
+           db.change_db('Names')
+           db.csv_to_table('txt_file.txt', 'FirstLastName',
+                           ['FirstName': str, 'LastName': str],
+                           ['First', 'Last'], delemeter=r"\\s+", skip=2)
+           query = "SELDCT * FROM Names;"
+           result = db.query_db(query)
+           print(result)
+           >> index  name_id First   Last
+              0      1       Jon     Webb
+              1      2       Fred    Smith
+              2      3       Jillian Webb
         """
 
         if len(csv_headers) == 0:
@@ -2548,9 +2732,9 @@ class SQLServerDB:
 
         .. code-block:: python
 
-           from cobralib.io import MySQLDB
+           from cobralib.io import SQLServerDB
 
-           db = MySQLDB('username', 'password', port=3306, hostname='localhost')
+           db = SQLServerDB('username', 'password', port=3306, hostname='localhost')
            db.change_db('Names')
            db.csv_to_table('excel_file.xlsx', 'FirstLastName',
                            {'FirstName': str, 'LastName': str},
@@ -2733,8 +2917,8 @@ def relational_database(
     Method will return a relational database object of type RelationalDB
 
     :param db_type: A string representing the database management system, can be
-                    MySQL, PostGres or SQLite. This parameter is case insensitive.
-                    Case Insensitive
+                    MySQL, MSSQL, PostGres or SQLite. This parameter is case
+                    insensitive. Case Insensitive
     :param database: The database you wish to connect to, defaulted to appropriate
                      port number for each database manager
     :param username: The username for the database connection.
