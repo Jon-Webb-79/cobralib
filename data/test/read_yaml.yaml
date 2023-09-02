@@ -1,0 +1,62 @@
+---
+key: 4.387
+list values:
+  - 1
+  - 2
+  - 3
+  - 4
+
+---
+name: John Doe
+age: 30
+First List:
+  - 1.1
+  - 2.2
+  - 3.3
+  - 4.4
+Numbers:
+  - |
+    Hello World
+    This is Jon
+  - ^
+    This
+  - ^
+    Is
+  - Correct
+Sentence: ^
+  Hello world
+Multi Sentence: |
+  This is a multiline sentence,
+  there is no reason to worry!
+Second Mult Sentence: >
+  This is a multiline sentence,
+    there is no reason to worry!
+String Value: Hello Again World!
+
+bool test1: TRUE
+
+bool test2: False
+
+bool test3: no
+
+bool test4: yes
+
+bool test5: on
+
+bool test6: Off
+
+Ages:
+  Jon: 44
+  Jill: 32
+  Bob: 12
+
+String Test:
+  0: String One
+  1: ^
+    Another String
+  2: >
+    This is multiline
+     one
+  3: |
+    This is multiline
+    two

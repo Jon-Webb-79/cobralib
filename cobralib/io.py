@@ -25,6 +25,493 @@ import yaml
 # Insert Code here
 
 
+class ReadYAML:
+    """
+
+    :param file_name: The name and path length for the file with the yaml-like
+                      format
+    :raises FileNotFoundError: If the file does not exist.
+
+    This class can be used to read a file woith a YAML-like format.  This class is
+    tailoered to read basic YAML files, but with looser requirements on how
+    key words are formatted, and stricter requirements on data typing. The methods
+    within this class can be used to read scalar variables from key-variable pairs,
+    lists, and flat dictionaries.  This class also enforces type casting for all
+    variables read into memory.
+
+    All code examples described in the documentation for this class reference
+    the read_yaml.yaml file shown below.
+
+    .. literalinclude:: ../../../data/test/read_yaml.yaml
+       :language: text
+    """
+
+    def __init__(self, file_name: str):
+        if not os.path.isfile(file_name):
+            raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
+        self._file_name = file_name
+        self.__lines = self._read_lines()
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_key_value(
+        self, keyword: str, data_type: type, document_index: int = 0
+    ) -> Any:
+        """
+        :param keyword: The keyword associated with the value to be read in. Unlike a
+                        pure YAML file this value does not have to end with a :
+                        symbol
+        :param data_type: The data type of the value to be read in
+        :param document_index: The number of the yaml document in the yaml file.
+        :return value: The value associated with a keyword
+        :raise ValueError: If the value can not be cast to the user defined type
+
+        This method can be used to read a key-value pair from a yaml or yaml-like
+        file.  This method will rcognize the >, ^, and | symbols that symbolize
+        strings that either start on the next line, or multiline strings.
+
+        Example 1
+        ---------
+        An example of a python code to read an float value from the
+        1st yaml document.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           value = reader.read_key_value('key:', float, 1)
+           print(value)
+           >> 4.387
+
+        Example 2
+        ---------
+        An example to read a multiline string value from the second yaml document
+        in the file
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           value = reader.read_key_value('Multi Sentence:', str, 2)
+           new_value = reader.read_key_value('Second Mult Sentence:', str, 2)
+           print(value)
+           print(new_value)
+
+        .. code-block:: bash
+
+            >> This is a multiline sentence,
+               there is no reason to worry!
+            >> This is a multiline sentence, there is no reason to worry!
+
+        Example 3
+        ---------
+        An example that shows the different way boolean values can be read into
+        memory.  A value of True, on, or yes will equate to True and values of
+        False, off, no will equate to False.  The values in the yaml-like
+        file are case insensitive.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           true_value = reader.read_key_value('bool test1:', bool, 2)
+           yes_value = reader.read_key_value('bool test4:', bool, 2)
+           on_value = reader.read_key_value('bool test5:', bool, 2)
+           false_value = reader.read_key_value('bool test2:', bool, 2)
+           no_value = reader.read_key_value('bool test3:', bool, 2)
+           off_value = reader.read_key_value('bool test6:', bool, 2)
+
+        .. code-block:: bash
+
+           >> True
+           >> True
+           >> True
+           >> False
+           >> False
+           >> False
+        """
+        yaml_docs = "\n".join(self.__lines).split("---")
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(
+                f"""Document index {document_index} out of range.
+                              File contains {len(yaml_docs)} documents."""
+            )
+
+        lines = yaml_docs[document_index].split("\n")
+        for i, line in enumerate(lines):
+            stripped_line = line.lstrip()
+            if stripped_line.startswith(keyword):
+                keyword_indent = len(line) - len(stripped_line)
+                value_str = stripped_line[len(keyword) :].strip()
+                return self._parse_value(
+                    value_str, lines[i + 1 :], keyword_indent, data_type
+                )
+
+        raise ValueError(f"Keyword '{keyword}' not found in the specified document")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_yaml_list(
+        self, keyword: str, data_type: type, document_index: int = 0
+    ) -> list[Any]:
+        """
+        :param keyword: The keyword associated with the value to be read in. Unlike
+                        a pure YAML file, this value does not have to end with a :
+                        symbol.
+        :param data_type: The data type of the value to be read in
+        :param document_index: The number of the yaml document in the yaml file.
+        :return value: The list associated with a keyword
+        :raise ValueError: If the value can not be cast to the user defined type
+
+        This method can be used to read a key-value pair from a yaml or yaml-like
+        file where the value is a list of values.  This method will rcognize the
+        >, ^, and | symbols that symbolize strings that either start on the next
+        line, or multiline strings.
+
+        Example 1
+        ---------
+        An example of a python code to read a list of integer values from the
+        1st yaml document.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           list_values = reader.read_yaml_list('First List:', int, 1)
+           print(list_values)
+
+        .. code-block:: bash
+
+            >> [1.1, 2.2, 3.3, 4.4]
+
+        Example 2
+        ---------
+        This method will also read string values from the list that may use the
+        ^, > or | symbols that signify the string as starting on the next line,
+        a multi-line string that should be read into one line, or a multiline
+        string that should be read as a multiline string.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           list_values = reader.read_yaml_list('Numbers:', int, 1)
+           print(list_values)
+
+        .. code-block:: text
+
+            >> ['Hello World
+                 This is Jon',
+                'This',
+                'Is',
+                'Correct']
+        """
+        yaml_docs = "\n".join(self.__lines).split("---")
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(f"Document index {document_index} out of range.")
+
+        lines = yaml_docs[document_index].split("\n")
+        values = []
+        is_reading_list = False
+        keyword_indent = None
+
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            stripped_line = line.lstrip()
+            current_indent = len(line) - len(stripped_line)
+
+            if stripped_line.startswith(keyword):
+                is_reading_list = True
+                keyword_indent = current_indent
+                i += 1  # Move to the next line
+                continue
+
+            if is_reading_list:
+                if current_indent <= keyword_indent:
+                    break
+
+                if stripped_line.startswith("-"):
+                    dash_indent = current_indent
+                    value_str = stripped_line[1:].strip()  # Remove "-" and leading spaces
+
+                    # Check for complex string types
+                    if value_str in ["^", ">", "|"]:
+                        complex_str = value_str
+                        value_str = ""
+                        i += 1
+                        while i < len(lines):
+                            next_line = lines[i]
+                            next_indent = len(next_line) - len(next_line.lstrip())
+                            if next_indent <= dash_indent:
+                                i -= (
+                                    1  # Step back to let the outer loop process this line
+                                )
+                                break
+
+                            if complex_str == "^":
+                                value_str = next_line.strip()
+                                break
+                            elif complex_str == "|":
+                                value_str += next_line.strip() + "\n"
+                            elif complex_str == ">":
+                                next_line_content = next_line[dash_indent:].lstrip()
+                                value_str += next_line_content + " "
+                            i += 1
+
+                        if complex_str == ">":
+                            value_str = value_str.rstrip()
+
+                    values.append(
+                        self._parse_value(value_str, [], dash_indent, data_type)
+                    )
+
+            i += 1
+
+        if not is_reading_list:
+            msg = f"Keyword '{keyword}' not found or it is "
+            msg += "not a list in the specified document."
+            raise ValueError(msg)
+
+        return values
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_yaml_dict(
+        self,
+        keyword: str,
+        key_data_type: type,
+        value_data_type: type,
+        document_index: int = 0,
+    ) -> dict:
+        """
+        :param keyword: The keyword associated with the value to be read in. Unlike
+                        a pure YAML file, this value does not have to end with a :
+                        symbol.
+        :param key_data_type: The data type of the key value.
+        :param value_data_type: The data type of the value to be read in
+        :param document_index: The number of the yaml document in the yaml file.
+        :return value: The dictionary associated with a keyword
+        :raise ValueError: If the value can not be cast to the user defined type
+
+        This method can be used to read a key-value pair from a yaml or yaml-like
+        file where the value is a dictionary of values.  This method will recognize
+        the >, ^, and | symbols that symbolize strings that either start on the next
+        line, or multiline strings. **NOTE:** This method assumes a flat
+        (i.e. not nested) dictionary structure.
+
+        Example 1
+        ---------
+        An example of a python code to read a list of integer values from the
+        1st yaml document.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           value = reader.read_yaml_dict('Ages:', 'str', 'int', 2)
+           print(value)
+
+        .. code-block:: text
+
+            >> {'Jon': 44. 'Jill': 32, 'Bob': 12}
+        """
+        yaml_docs = "\n".join(self.__lines).split("---")
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(f"Document index {document_index} out of range.")
+
+        lines = yaml_docs[document_index].split("\n")
+        found_dict = {}
+        is_reading_dict = False
+        keyword_indent = None
+        val_str = ""
+
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            stripped_line = line.lstrip()
+            current_indent = len(line) - len(stripped_line)
+
+            if stripped_line.startswith(keyword):
+                is_reading_dict = True
+                keyword_indent = current_indent
+                i += 1  # Move to the next line
+                continue
+
+            if is_reading_dict:
+                if current_indent <= keyword_indent:
+                    break
+
+                # Ensure this line is part of the dict
+                if ":" in stripped_line:
+                    key_str, value_str = map(str.strip, stripped_line.split(":", 1))
+                    key = self._parse_value(key_str, [], current_indent, key_data_type)
+
+                    if value_str in ["^", ">", "|"]:
+                        value_str = ""
+                        i += 1
+                        while i < len(lines):
+                            next_line = lines[i]
+                            next_indent = len(next_line) - len(next_line.lstrip())
+                            if next_indent <= current_indent:
+                                i -= 1
+                                break
+                            value_str += next_line + "\n"  # Add the line to value_str
+                            i += 1
+                        # Remove trailing newline and pass all lines for parsing
+                        val_str = value_str
+                        value_str = value_str.rstrip("\n")
+                        value = self._parse_value(
+                            value_str,
+                            value_str.split("\n"),
+                            current_indent,
+                            value_data_type,
+                        )
+                        value = self._remove_uniform_indent(value)
+                    else:
+                        value = self._parse_value(
+                            value_str, [], current_indent, value_data_type
+                        )
+                    if val_str in [">", "|"]:
+                        print("YES")
+                        value = self._remove_uniform_indent(value)
+
+                    found_dict[key] = value
+
+            i += 1
+        msg = f"Keyword '{keyword}' not found or it is not a "
+        msg += " dictionary in the specified document."
+        if not is_reading_dict:
+            raise ValueError(msg)
+
+        return found_dict
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_full_yaml(self, safe_read: bool = True) -> Any:
+        """
+        Reads the full YAML file and returns it as a PyYAML object.
+
+        :params safe_read: Whether to read the file in a safe more or not.
+                           Defaulted to True
+        :return Any: The full content of the YAML file as a PyYAML object. This method
+                     assumes the possibility of multiple documents in one file. The
+                     result is returned as a list
+
+        Unlike other methods in this class, this method will read an entire yaml file
+        into memory and return a PyYaml object.  This is not as memory efficient as the
+        other methods, but this will make the accessing of data quicker for larger
+        files.  In addition, the user must adhere to the strict rules of YAML
+        when using this method.  The rules for a PyYaml class can be
+        found at `PyYaml <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.
+
+        Example 1
+        ---------
+        An example of a python code to read a list of integer values from the
+        1st yaml document.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           data = reader.read_full_yaml()  # Read in as safe mode
+           print(data[1]['Ages'])
+
+        .. code-block:: text
+
+            >> {'Jon': 44. 'Jill': 32, 'Bob': 12}
+        """
+        with open(self._file_name) as file:
+            if safe_read:
+                return list(yaml.safe_load_all(file))
+            else:
+                return list(yaml.load_all(file))
+
+    # ==========================================================================================
+    # PRIVATE-LIKE methods
+
+    def _read_lines(self):
+        """
+        This private method will read in all lines from the text file
+        """
+        with open(self._file_name) as file:
+            lines = [line.rstrip() for line in file]
+        return lines
+
+    # ------------------------------------------------------------------------------------------
+
+    def _remove_uniform_indent(self, multi_line_str: str) -> str:
+        lines = multi_line_str.split("\n")
+
+        # Calculate the minimum number of leading white spaces
+        min_indent = float("inf")  # Set to infinity initially
+        for line in lines:
+            stripped_line = line.lstrip()
+            if stripped_line:  # Ignore empty lines
+                indent = len(line) - len(stripped_line)
+                min_indent = min(min_indent, indent)
+
+        # Remove the minimum indent from each line
+        lines = [line[min_indent:] for line in lines]
+
+        return "\n".join(lines)
+
+    # ------------------------------------------------------------------------------------------
+
+    def _parse_value(
+        self, value_str: str, subsequent_lines: list, keyword_indent: int, data_type: type
+    ) -> Any:
+        if data_type == bool:
+            value_str = value_str.lower()
+            if value_str.upper() in ["TRUE", "YES", "ON"]:
+                return True
+            elif value_str.upper() in ["FALSE", "NO", "OFF"]:
+                return False
+            else:
+                raise ValueError("Invalid boolean value")
+
+        if data_type == str and value_str in ["^", ">", "|"]:
+            complex_str = value_str
+            value_str = ""
+            i = 0
+            while i < len(subsequent_lines):
+                next_line = subsequent_lines[i]
+                next_indent = len(next_line) - len(next_line.lstrip())
+                if next_indent <= keyword_indent:
+                    break
+
+                next_line_content = next_line[next_indent:].lstrip()
+                if complex_str == "^":
+                    value_str = next_line_content.strip()
+                    break
+                elif complex_str == "|":
+                    value_str += next_line_content + "\n"
+                elif complex_str == ">":
+                    value_str += next_line_content + " "
+                i += 1
+
+            if complex_str == ">":
+                value_str = value_str.rstrip()
+            if complex_str == "|":
+                value_str = value_str.rstrip("\n")
+
+        try:
+            return data_type(value_str)
+        except ValueError:
+            raise ValueError("Invalid value")
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
 class ReadKeyWords:
     """
     This class can be used by a read to read a text based config file.  The methods
@@ -72,13 +559,17 @@ class ReadKeyWords:
 
     # ------------------------------------------------------------------------------------------
 
-    def read_variable(self, keyword: str, data_type: type) -> Any:
+    def read_variable(
+        self, keyword: str, data_type: type, document_index: int = 0
+    ) -> Any:
         """
         Search each line for the specified keyword and read the variable to the
         right of the keyword as the specified data type
 
         :param keyword: The keyword to search for in each line.
         :param data_type: The data type to be used in order to casy the variable
+        :param document_index: The document number if the file is a yaml file with
+                               multiple documents in the file
         :return: The float variable to the right of the keyword.
         :raises ValueError: If the keyword is not found or if the variable cannot
                             be parsed as a float.
@@ -86,6 +577,8 @@ class ReadKeyWords:
         .. code-block:: python
 
            import numpy as np
+           from cobralib.io import ReadKeyWords
+
            # Instantiate the class
            reader = ReadKeyWords("test_key_words.txt")
            value = reader.read_variable("Double Value:", np.float32)
@@ -101,6 +594,7 @@ class ReadKeyWords:
 
         .. code-block:: python
 
+           from cobralib.io import ReadKeyWords
            # Instantiate the class
            reader = ReadKeyWords("test_key_words.txt")
            value = reader.read_variable("String:", str)
@@ -109,24 +603,56 @@ class ReadKeyWords:
 
            >> "Hello"
            >> str
+
+        This method also works with yaml files.  Assume a .yaml or .yml file with the
+        following content.
+
+        .. literalinclude:: ../../../data/test/read_yaml.yaml
+          :language: text
+
+        .. code-block:: python
+
+           from cobralib.io import ReadKeyWords
+
+           # Instantiate the class
+           reader = ReadKeyWords("read_yaml.yaml")
+           value = reader.read_variable("age:", int, 1)
+           print(value)
+           print(type(value))
+
+           >> 30
+           >> int
         """
-        for line in self.__lines:
+        # Split the file contents into separate YAML documents based on '---'
+        yaml_docs = "\n".join(self.__lines).split("---")
+
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(
+                f"""Document index {document_index} out of range.
+                              File contains {len(yaml_docs)} documents."""
+            )
+
+        # Iterate over lines in the specified YAML document
+        for line in yaml_docs[document_index].split("\n"):
             if line.startswith(keyword):
                 value_str = line[len(keyword) :].strip()
                 try:
                     return data_type(value_str)
                 except ValueError:
-                    raise ValueError(f"Invalid float value found for {keyword}")
-        raise ValueError(f"Keyword '{keyword}' not found in the file")
+                    raise ValueError(f"Invalid value found for {keyword}")
+
+        raise ValueError(f"Keyword '{keyword}' not found in the specified document")
 
     # ------------------------------------------------------------------------------------------
 
-    def read_string_variable(self, keyword: str) -> str:
+    def read_string_variable(self, keyword: str, document_index: int = 0) -> str:
         """
         Search each line for the specified keyword and read the string variable
         to the right of the keyword.
 
         :param keyword: The keyword to search for in each line.
+        :param document_index: The document number if the file is a yaml file with
+                               multiple documents in the file
         :return: The string variable to the right of the keyword.
         :raises ValueError: If the keyword is not found.
 
@@ -141,9 +667,44 @@ class ReadKeyWords:
            >> Hello # Comment to be read
            >> str
         """
-        for line in self.__lines:
+
+        # Split the file contents into separate YAML documents based on '---'
+        yaml_docs = "\n".join(self.__lines).split("---")
+
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(
+                f"""Document index {document_index} out of range.
+                              File contains {len(yaml_docs)} documents."""
+            )
+
+        lines = yaml_docs[document_index].split("\n")
+
+        for i, line in enumerate(lines):
             if line.startswith(keyword):
-                return line[len(keyword) :].strip()
+                value = line[len(keyword) :].strip()
+
+                if value == "^" and i + 1 < len(lines):
+                    return lines[i + 1].strip()
+
+                if value == "|":
+                    multiline_values = []
+                    # Determine the indentation of the current keyword line
+                    indentation = len(line) - len(line.lstrip())
+                    print(indentation)
+                    # Start reading lines from the next line after '|'
+                    for subsequent_line in lines[i + 1 :]:
+                        # If we encounter a line with equal or lesser indentation,
+                        # we've found the end of the multiline string.
+                        if (
+                            len(subsequent_line) - len(subsequent_line.lstrip())
+                            <= indentation
+                        ):
+                            break
+                        multiline_values.append(subsequent_line)
+                    return "\n".join(multiline_values)
+
+                return value
+
         raise ValueError(f"Keyword '{keyword}' not found in the file")
 
     # ------------------------------------------------------------------------------------------
@@ -1351,51 +1912,6 @@ def read_pdf_columns_by_index(
 # ==========================================================================================
 # ==========================================================================================
 # READ AND WRITE TO YAML
-
-
-def read_yaml_file(file_path: str, safe: bool = False, **kwargs) -> list[Any]:
-    """
-    This function can be used to read in the contents of a single yaml file, or
-    a yaml file with multiple documents.  In order to accomodate thea reading
-    of several documents, the contents are returned as a list, with each
-    index representing a different document.  **NOTE** Under the hood, this
-    funtion is using the pyyaml library and has all of its attributes.
-
-    :param file_name: The file name to be read including the path length
-    :param print_lines: The number of lines to be printed to the screen if the
-                        user prints an instance of the class. Defaulted to 50
-    :raises FileNotFoundError: If the file does not exist
-
-    Example file titled test_file.yaml
-
-    .. literalinclude:: ../../../data/test/test_file.yaml
-       :language: text
-
-    .. code-block:: python
-
-       from cobralib.io import read_yaml_file
-
-       data = read_yaml_file('test_file.yaml', safe=True)
-       print(data)
-       >> [{'name': 'John Doe', 'age': 25, 'occupation': 'Developer', 'hobbies':
-          ['Reading', 'Coding', 'Playing guitar']}, {'name': 'Alice Smith',
-           'age': 30, 'occupation': 'Designer', 'hobbies':
-           ['Painting', 'Traveling', 'Hiking']}]
-
-    """
-
-    try:
-        with open(file_path) as file:
-            if safe:
-                documents = list(yaml.safe_load_all(file, **kwargs))
-            else:
-                documents = list(yaml.load_all(file, Loader=yaml.Loader, **kwargs))
-        return [doc for sublist in documents for doc in sublist]
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File '{file_path}' not found.")
-
-
-# ------------------------------------------------------------------------------------------
 
 
 def write_yaml_file(file_path: str, data: dict, append: bool = False) -> None:

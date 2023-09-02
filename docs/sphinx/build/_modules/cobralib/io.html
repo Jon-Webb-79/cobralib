@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cobralib.io &mdash; cobralib 0.1.0 documentation</title>
+  <title>cobralib.io &mdash; cobralib 0.1.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
 
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=dff88ec8"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -97,6 +97,485 @@
 <span class="c1"># Insert Code here</span>
 
 
+<div class="viewcode-block" id="ReadYAML"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadYAML">[docs]</a><span class="k">class</span> <span class="nc">ReadYAML</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param file_name: The name and path length for the file with the yaml-like</span>
+<span class="sd">                      format</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist.</span>
+
+<span class="sd">    This class can be used to read a file woith a YAML-like format.  This class is</span>
+<span class="sd">    tailoered to read basic YAML files, but with looser requirements on how</span>
+<span class="sd">    key words are formatted, and stricter requirements on data typing. The methods</span>
+<span class="sd">    within this class can be used to read scalar variables from key-variable pairs,</span>
+<span class="sd">    lists, and flat dictionaries.  This class also enforces type casting for all</span>
+<span class="sd">    variables read into memory.</span>
+
+<span class="sd">    All code examples described in the documentation for this class reference</span>
+<span class="sd">    the read_yaml.yaml file shown below.</span>
+
+<span class="sd">    .. literalinclude:: ../../../data/test/read_yaml.yaml</span>
+<span class="sd">       :language: text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadYAML.read_key_value"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadYAML.read_key_value">[docs]</a>    <span class="k">def</span> <span class="nf">read_key_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+        <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param keyword: The keyword associated with the value to be read in. Unlike a</span>
+<span class="sd">                        pure YAML file this value does not have to end with a :</span>
+<span class="sd">                        symbol</span>
+<span class="sd">        :param data_type: The data type of the value to be read in</span>
+<span class="sd">        :param document_index: The number of the yaml document in the yaml file.</span>
+<span class="sd">        :return value: The value associated with a keyword</span>
+<span class="sd">        :raise ValueError: If the value can not be cast to the user defined type</span>
+
+<span class="sd">        This method can be used to read a key-value pair from a yaml or yaml-like</span>
+<span class="sd">        file.  This method will rcognize the &gt;, ^, and | symbols that symbolize</span>
+<span class="sd">        strings that either start on the next line, or multiline strings.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example of a python code to read an float value from the</span>
+<span class="sd">        1st yaml document.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           value = reader.read_key_value(&#39;key:&#39;, float, 1)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           &gt;&gt; 4.387</span>
+
+<span class="sd">        Example 2</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example to read a multiline string value from the second yaml document</span>
+<span class="sd">        in the file</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           value = reader.read_key_value(&#39;Multi Sentence:&#39;, str, 2)</span>
+<span class="sd">           new_value = reader.read_key_value(&#39;Second Mult Sentence:&#39;, str, 2)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           print(new_value)</span>
+
+<span class="sd">        .. code-block:: bash</span>
+
+<span class="sd">            &gt;&gt; This is a multiline sentence,</span>
+<span class="sd">               there is no reason to worry!</span>
+<span class="sd">            &gt;&gt; This is a multiline sentence, there is no reason to worry!</span>
+
+<span class="sd">        Example 3</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example that shows the different way boolean values can be read into</span>
+<span class="sd">        memory.  A value of True, on, or yes will equate to True and values of</span>
+<span class="sd">        False, off, no will equate to False.  The values in the yaml-like</span>
+<span class="sd">        file are case insensitive.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           true_value = reader.read_key_value(&#39;bool test1:&#39;, bool, 2)</span>
+<span class="sd">           yes_value = reader.read_key_value(&#39;bool test4:&#39;, bool, 2)</span>
+<span class="sd">           on_value = reader.read_key_value(&#39;bool test5:&#39;, bool, 2)</span>
+<span class="sd">           false_value = reader.read_key_value(&#39;bool test2:&#39;, bool, 2)</span>
+<span class="sd">           no_value = reader.read_key_value(&#39;bool test3:&#39;, bool, 2)</span>
+<span class="sd">           off_value = reader.read_key_value(&#39;bool test6:&#39;, bool, 2)</span>
+
+<span class="sd">        .. code-block:: bash</span>
+
+<span class="sd">           &gt;&gt; True</span>
+<span class="sd">           &gt;&gt; True</span>
+<span class="sd">           &gt;&gt; True</span>
+<span class="sd">           &gt;&gt; False</span>
+<span class="sd">           &gt;&gt; False</span>
+<span class="sd">           &gt;&gt; False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
+<span class="s2">                              File contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents.&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">keyword_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped_line</span><span class="p">)</span>
+                <span class="n">value_str</span> <span class="o">=</span> <span class="n">stripped_line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">value_str</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">keyword_indent</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the specified document&quot;</span><span class="p">)</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadYAML.read_yaml_list"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadYAML.read_yaml_list">[docs]</a>    <span class="k">def</span> <span class="nf">read_yaml_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+        <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param keyword: The keyword associated with the value to be read in. Unlike</span>
+<span class="sd">                        a pure YAML file, this value does not have to end with a :</span>
+<span class="sd">                        symbol.</span>
+<span class="sd">        :param data_type: The data type of the value to be read in</span>
+<span class="sd">        :param document_index: The number of the yaml document in the yaml file.</span>
+<span class="sd">        :return value: The list associated with a keyword</span>
+<span class="sd">        :raise ValueError: If the value can not be cast to the user defined type</span>
+
+<span class="sd">        This method can be used to read a key-value pair from a yaml or yaml-like</span>
+<span class="sd">        file where the value is a list of values.  This method will rcognize the</span>
+<span class="sd">        &gt;, ^, and | symbols that symbolize strings that either start on the next</span>
+<span class="sd">        line, or multiline strings.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example of a python code to read a list of integer values from the</span>
+<span class="sd">        1st yaml document.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           list_values = reader.read_yaml_list(&#39;First List:&#39;, int, 1)</span>
+<span class="sd">           print(list_values)</span>
+
+<span class="sd">        .. code-block:: bash</span>
+
+<span class="sd">            &gt;&gt; [1.1, 2.2, 3.3, 4.4]</span>
+
+<span class="sd">        Example 2</span>
+<span class="sd">        ---------</span>
+<span class="sd">        This method will also read string values from the list that may use the</span>
+<span class="sd">        ^, &gt; or | symbols that signify the string as starting on the next line,</span>
+<span class="sd">        a multi-line string that should be read into one line, or a multiline</span>
+<span class="sd">        string that should be read as a multiline string.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           list_values = reader.read_yaml_list(&#39;Numbers:&#39;, int, 1)</span>
+<span class="sd">           print(list_values)</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            &gt;&gt; [&#39;Hello World</span>
+<span class="sd">                 This is Jon&#39;,</span>
+<span class="sd">                &#39;This&#39;,</span>
+<span class="sd">                &#39;Is&#39;,</span>
+<span class="sd">                &#39;Correct&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">is_reading_list</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">keyword_indent</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">current_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped_line</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">is_reading_list</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">keyword_indent</span> <span class="o">=</span> <span class="n">current_indent</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Move to the next line</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">is_reading_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">current_indent</span> <span class="o">&lt;=</span> <span class="n">keyword_indent</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
+                    <span class="n">dash_indent</span> <span class="o">=</span> <span class="n">current_indent</span>
+                    <span class="n">value_str</span> <span class="o">=</span> <span class="n">stripped_line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Remove &quot;-&quot; and leading spaces</span>
+
+                    <span class="c1"># Check for complex string types</span>
+                    <span class="k">if</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">]:</span>
+                        <span class="n">complex_str</span> <span class="o">=</span> <span class="n">value_str</span>
+                        <span class="n">value_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                            <span class="n">next_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">next_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
+                            <span class="k">if</span> <span class="n">next_indent</span> <span class="o">&lt;=</span> <span class="n">dash_indent</span><span class="p">:</span>
+                                <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># Step back to let the outer loop process this line</span>
+                                <span class="k">break</span>
+
+                            <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;^&quot;</span><span class="p">:</span>
+                                <span class="n">value_str</span> <span class="o">=</span> <span class="n">next_line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                                <span class="k">break</span>
+                            <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
+                                <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                                <span class="n">next_line_content</span> <span class="o">=</span> <span class="n">next_line</span><span class="p">[</span><span class="n">dash_indent</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                                <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line_content</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                        <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                            <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+                    <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">value_str</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dash_indent</span><span class="p">,</span> <span class="n">data_type</span><span class="p">))</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_reading_list</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found or it is &quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;not a list in the specified document.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="ReadYAML.read_yaml_dict"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadYAML.read_yaml_dict">[docs]</a>    <span class="k">def</span> <span class="nf">read_yaml_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">key_data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+        <span class="n">value_data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+        <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param keyword: The keyword associated with the value to be read in. Unlike</span>
+<span class="sd">                        a pure YAML file, this value does not have to end with a :</span>
+<span class="sd">                        symbol.</span>
+<span class="sd">        :param key_data_type: The data type of the key value.</span>
+<span class="sd">        :param value_data_type: The data type of the value to be read in</span>
+<span class="sd">        :param document_index: The number of the yaml document in the yaml file.</span>
+<span class="sd">        :return value: The dictionary associated with a keyword</span>
+<span class="sd">        :raise ValueError: If the value can not be cast to the user defined type</span>
+
+<span class="sd">        This method can be used to read a key-value pair from a yaml or yaml-like</span>
+<span class="sd">        file where the value is a dictionary of values.  This method will recognize</span>
+<span class="sd">        the &gt;, ^, and | symbols that symbolize strings that either start on the next</span>
+<span class="sd">        line, or multiline strings. **NOTE:** This method assumes a flat</span>
+<span class="sd">        (i.e. not nested) dictionary structure.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example of a python code to read a list of integer values from the</span>
+<span class="sd">        1st yaml document.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           value = reader.read_yaml_dict(&#39;Ages:&#39;, &#39;str&#39;, &#39;int&#39;, 2)</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            &gt;&gt; {&#39;Jon&#39;: 44. &#39;Jill&#39;: 32, &#39;Bob&#39;: 12}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">found_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">is_reading_dict</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">keyword_indent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">val_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">current_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped_line</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="n">is_reading_dict</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">keyword_indent</span> <span class="o">=</span> <span class="n">current_indent</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Move to the next line</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">is_reading_dict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">current_indent</span> <span class="o">&lt;=</span> <span class="n">keyword_indent</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># Ensure this line is part of the dict</span>
+                <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">stripped_line</span><span class="p">:</span>
+                    <span class="n">key_str</span><span class="p">,</span> <span class="n">value_str</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">key_str</span><span class="p">,</span> <span class="p">[],</span> <span class="n">current_indent</span><span class="p">,</span> <span class="n">key_data_type</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">]:</span>
+                        <span class="n">complex_str</span> <span class="o">=</span> <span class="n">value_str</span>
+                        <span class="n">value_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                            <span class="n">next_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">next_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
+                            <span class="k">if</span> <span class="n">next_indent</span> <span class="o">&lt;=</span> <span class="n">current_indent</span><span class="p">:</span>
+                                <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+                                <span class="k">break</span>
+                            <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># Add the line to value_str</span>
+                            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="c1"># Remove trailing newline and pass all lines for parsing</span>
+                        <span class="n">val_str</span> <span class="o">=</span> <span class="n">value_str</span>
+                        <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">value_str</span><span class="p">,</span> <span class="n">value_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">),</span>
+                                                  <span class="n">current_indent</span><span class="p">,</span> <span class="n">value_data_type</span><span class="p">)</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_uniform_indent</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">value_str</span><span class="p">,</span> <span class="p">[],</span>
+                                                  <span class="n">current_indent</span><span class="p">,</span> <span class="n">value_data_type</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">val_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;YES&quot;</span><span class="p">)</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_uniform_indent</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+                    <span class="n">found_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found or it is not a &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; dictionary in the specified document.&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_reading_dict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">found_dict</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadYAML.read_full_yaml"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadYAML.read_full_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">safe_read</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the full YAML file and returns it as a PyYAML object.</span>
+
+<span class="sd">        :params safe_read: Whether to read the file in a safe more or not.</span>
+<span class="sd">                           Defaulted to True</span>
+<span class="sd">        :return Any: The full content of the YAML file as a PyYAML object.</span>
+
+<span class="sd">        Unlike other methods in this class, this method will read an entire yaml file</span>
+<span class="sd">        into memory and return a PyYaml object.  This is not as memory efficient as the</span>
+<span class="sd">        other methods, but this will make the accessing of data quicker for larger</span>
+<span class="sd">        files.  In addition, the user must adhere to the strict rules of YAML</span>
+<span class="sd">        when using this method.  The rules for a PyYaml class can be</span>
+<span class="sd">        found at `PyYaml &lt;https://pyyaml.org/wiki/PyYAMLDocumentation&gt;`_.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+<span class="sd">        An example of a python code to read a list of integer values from the</span>
+<span class="sd">        1st yaml document.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadYAML</span>
+
+<span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
+<span class="sd">           data = reader.read_full_yaml()  # Read in as safe mode</span>
+<span class="sd">           print(data[1][&#39;Ages&#39;])</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            &gt;&gt; {&#39;Jon&#39;: 44. &#39;Jill&#39;: 32, &#39;Bob&#39;: 12}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">safe_read</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></div>
+
+<span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE methods</span>
+
+    <span class="k">def</span> <span class="nf">_read_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This private method will read in all lines from the text file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_remove_uniform_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_line_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">multi_line_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the minimum number of leading white spaces</span>
+        <span class="n">min_indent</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>  <span class="c1"># Set to infinity initially</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">stripped_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stripped_line</span><span class="p">:</span>  <span class="c1"># Ignore empty lines</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped_line</span><span class="p">)</span>
+                <span class="n">min_indent</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_indent</span><span class="p">,</span> <span class="n">indent</span><span class="p">)</span>
+
+        <span class="c1"># Remove the minimum indent from each line</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="n">min_indent</span><span class="p">:]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+<span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_parse_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">value_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">subsequent_lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">keyword_indent</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">value_str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="s2">&quot;ON&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">value_str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;FALSE&quot;</span><span class="p">,</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;OFF&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid boolean value&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">]:</span>
+            <span class="n">complex_str</span> <span class="o">=</span> <span class="n">value_str</span>
+            <span class="n">value_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequent_lines</span><span class="p">):</span>
+                <span class="n">next_line</span> <span class="o">=</span> <span class="n">subsequent_lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">next_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">next_indent</span> <span class="o">&lt;=</span> <span class="n">keyword_indent</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">next_line_content</span> <span class="o">=</span> <span class="n">next_line</span><span class="p">[</span><span class="n">next_indent</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;^&quot;</span><span class="p">:</span>
+                    <span class="n">value_str</span> <span class="o">=</span> <span class="n">next_line_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
+                    <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line_content</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                    <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line_content</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
+                <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data_type</span><span class="p">(</span><span class="n">value_str</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+
+
 <div class="viewcode-block" id="ReadKeyWords"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords">[docs]</a><span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class can be used by a read to read a text based config file.  The methods</span>
@@ -144,13 +623,15 @@
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the variable to the</span>
 <span class="sd">        right of the keyword as the specified data type</span>
 
 <span class="sd">        :param keyword: The keyword to search for in each line.</span>
 <span class="sd">        :param data_type: The data type to be used in order to casy the variable</span>
+<span class="sd">        :param document_index: The document number if the file is a yaml file with</span>
+<span class="sd">                               multiple documents in the file</span>
 <span class="sd">        :return: The float variable to the right of the keyword.</span>
 <span class="sd">        :raises ValueError: If the keyword is not found or if the variable cannot</span>
 <span class="sd">                            be parsed as a float.</span>
@@ -158,6 +639,8 @@
 <span class="sd">        .. code-block:: python</span>
 
 <span class="sd">           import numpy as np</span>
+<span class="sd">           from cobralib.io import ReadKeyWords</span>
+
 <span class="sd">           # Instantiate the class</span>
 <span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
 <span class="sd">           value = reader.read_variable(&quot;Double Value:&quot;, np.float32)</span>
@@ -173,6 +656,7 @@
 
 <span class="sd">        .. code-block:: python</span>
 
+<span class="sd">           from cobralib.io import ReadKeyWords</span>
 <span class="sd">           # Instantiate the class</span>
 <span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
 <span class="sd">           value = reader.read_variable(&quot;String:&quot;, str)</span>
@@ -181,24 +665,54 @@
 
 <span class="sd">           &gt;&gt; &quot;Hello&quot;</span>
 <span class="sd">           &gt;&gt; str</span>
+
+<span class="sd">        This method also works with yaml files.  Assume a .yaml or .yml file with the</span>
+<span class="sd">        following content.</span>
+
+<span class="sd">        .. literalinclude:: ../../../data/test/read_yaml.yaml</span>
+<span class="sd">          :language: text</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadKeyWords</span>
+
+<span class="sd">           # Instantiate the class</span>
+<span class="sd">           reader = ReadKeyWords(&quot;read_yaml.yaml&quot;)</span>
+<span class="sd">           value = reader.read_variable(&quot;age:&quot;, int, 1)</span>
+<span class="sd">           print(value)</span>
+<span class="sd">           print(type(value))</span>
+
+<span class="sd">           &gt;&gt; 30</span>
+<span class="sd">           &gt;&gt; int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+        <span class="c1"># Split the file contents into separate YAML documents based on &#39;---&#39;</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
+<span class="s2">                              File contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents.&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Iterate over lines in the specified YAML document</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">value_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">value_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">data_type</span><span class="p">(</span><span class="n">value_str</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid float value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the specified document&quot;</span><span class="p">)</span></div>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-<div class="viewcode-block" id="ReadKeyWords.read_string_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_string_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadKeyWords.read_string_variable"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords.read_string_variable">[docs]</a>    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the string variable</span>
 <span class="sd">        to the right of the keyword.</span>
 
 <span class="sd">        :param keyword: The keyword to search for in each line.</span>
+<span class="sd">        :param document_index: The document number if the file is a yaml file with</span>
+<span class="sd">                               multiple documents in the file</span>
 <span class="sd">        :return: The string variable to the right of the keyword.</span>
 <span class="sd">        :raises ValueError: If the keyword is not found.</span>
 
@@ -213,9 +727,39 @@
 <span class="sd">           &gt;&gt; Hello # Comment to be read</span>
 <span class="sd">           &gt;&gt; str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+
+       <span class="c1"># Split the file contents into separate YAML documents based on &#39;---&#39;</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
+<span class="s2">                              File contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents.&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;^&quot;</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
+                    <span class="n">multiline_values</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="c1"># Determine the indentation of the current keyword line</span>
+                    <span class="n">indentation</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">indentation</span><span class="p">)</span>
+                    <span class="c1"># Start reading lines from the next line after &#39;|&#39;</span>
+                    <span class="k">for</span> <span class="n">subsequent_line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]:</span>
+                        <span class="c1"># If we encounter a line with equal or lesser indentation,</span>
+                        <span class="c1"># we&#39;ve found the end of the multiline string.</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequent_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequent_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="n">indentation</span><span class="p">:</span>
+                            <span class="k">break</span>
+                        <span class="n">multiline_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsequent_line</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multiline_values</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">value</span>
+
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span></div>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
@@ -1423,51 +1967,6 @@
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># READ AND WRITE TO YAML</span>
-
-
-<div class="viewcode-block" id="read_yaml_file"><a class="viewcode-back" href="../../io.html#cobralib.io.read_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">safe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function can be used to read in the contents of a single yaml file, or</span>
-<span class="sd">    a yaml file with multiple documents.  In order to accomodate thea reading</span>
-<span class="sd">    of several documents, the contents are returned as a list, with each</span>
-<span class="sd">    index representing a different document.  **NOTE** Under the hood, this</span>
-<span class="sd">    funtion is using the pyyaml library and has all of its attributes.</span>
-
-<span class="sd">    :param file_name: The file name to be read including the path length</span>
-<span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
-<span class="sd">                        user prints an instance of the class. Defaulted to 50</span>
-<span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
-
-<span class="sd">    Example file titled test_file.yaml</span>
-
-<span class="sd">    .. literalinclude:: ../../../data/test/test_file.yaml</span>
-<span class="sd">       :language: text</span>
-
-<span class="sd">    .. code-block:: python</span>
-
-<span class="sd">       from cobralib.io import read_yaml_file</span>
-
-<span class="sd">       data = read_yaml_file(&#39;test_file.yaml&#39;, safe=True)</span>
-<span class="sd">       print(data)</span>
-<span class="sd">       &gt;&gt; [{&#39;name&#39;: &#39;John Doe&#39;, &#39;age&#39;: 25, &#39;occupation&#39;: &#39;Developer&#39;, &#39;hobbies&#39;:</span>
-<span class="sd">          [&#39;Reading&#39;, &#39;Coding&#39;, &#39;Playing guitar&#39;]}, {&#39;name&#39;: &#39;Alice Smith&#39;,</span>
-<span class="sd">           &#39;age&#39;: 30, &#39;occupation&#39;: &#39;Designer&#39;, &#39;hobbies&#39;:</span>
-<span class="sd">           [&#39;Painting&#39;, &#39;Traveling&#39;, &#39;Hiking&#39;]}]</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">safe</span><span class="p">:</span>
-                <span class="n">documents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load_all</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">documents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">doc</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">documents</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span></div>
-
-
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
 
 
 <div class="viewcode-block" id="write_yaml_file"><a class="viewcode-back" href="../../io.html#cobralib.io.write_yaml_file">[docs]</a><span class="k">def</span> <span class="nf">write_yaml_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

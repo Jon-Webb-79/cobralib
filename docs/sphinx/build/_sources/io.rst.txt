@@ -36,15 +36,15 @@ The following functions can be used to read columnar data from ``.txt``, ``.csv`
 
 YAML Files
 ==========
-The following functions are wrappers are in essence created as a wrapper
-around the PyYaml package and can be used to read from and write to yaml
-files.  The total functionality enabled by these function can
-be explored in the `PyYaml <https://pyyaml.org/wiki/PyYAMLDocumentation>`_ documentation.
+This class can be used to read a YAML file or a file with a YAML like structure.
 
+.. autoclass:: cobralib.io.ReadYAML
+   :members:
 
-.. autofunction:: cobralib.io.read_yaml_file
-
-.. autofunction:: cobralib.io.write_yaml_file
+.. The following functions are wrappers are in essence created as a wrapper
+.. around the PyYaml package and can be used to read from and write to yaml
+.. files.  The total functionality enabled by these function can
+.. be explored in the `PyYaml <https://pyyaml.org/wiki/PyYAMLDocumentation>`_ documentation.
 
 Logger
 ======
@@ -53,3 +53,5 @@ to truncate a log file to a user specified number of log values.
 
 .. autoclass:: cobralib.io.Logger
    :members:
+
+.. autofunction:: cobralib.io.write_yaml_file
