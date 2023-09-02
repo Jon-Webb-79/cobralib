@@ -63,9 +63,9 @@ This package is loaded on the PyPi repository and can be installed via the follo
 #. If you are using a Python instance installed via a package manager such as brew, yum, pacman,
    or directly installed from the wheel, install with the command ``pip install cobralib``
 #. If you wish to use extra dependencies for SQL-Server or MySQL databases insall with one of the following commands.
-   #. ``pip install 'cobralib[mysql]'``
-   #. ``pip install 'cobralib[postgresql]'``
-   #. ``pip install 'cobralib[mysql, postresql]'``
+   - ``pip install 'cobralib[mysql]'``
+   - ``pip install 'cobralib[postgresql]'``
+   - ``pip install 'cobralib[mysql, postresql]'``
 
 To install todo_six application as a developer, follow these steps.
 

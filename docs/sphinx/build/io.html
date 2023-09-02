@@ -499,7 +499,6 @@ String Test:
   3: |
     This is multiline
     two
-
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadKeyWords</span>
@@ -1549,7 +1548,6 @@ String Test:
   3: |
     This is multiline
     two
-
 </pre></div>
 </div>
 <dl class="py method">
@@ -1562,7 +1560,9 @@ String Test:
 Defaulted to True</p>
 </dd>
 <dt class="field-even">Return Any<span class="colon">:</span></dt>
-<dd class="field-even"><p>The full content of the YAML file as a PyYAML object.</p>
+<dd class="field-even"><p>The full content of the YAML file as a PyYAML object. This method
+assumes the possibility of multiple documents in one file. The
+result is returned as a list</p>
 </dd>
 </dl>
 <p>Unlike other methods in this class, this method will read an entire yaml file
