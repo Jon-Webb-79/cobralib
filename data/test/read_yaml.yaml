@@ -5,6 +5,7 @@ list values:
   - 2
   - 3
   - 4
+Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
 
 ---
 name: John Doe
@@ -60,3 +61,13 @@ String Test:
   3: |
     This is multiline
     two
+
+  Dict to List:
+    List One:
+      - 1
+      - 2
+      - 3
+    List Two:
+      - 4
+      - 5
+      - 6

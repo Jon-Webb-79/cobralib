@@ -280,7 +280,7 @@ def test_read_yaml_doc_one_keyword():
     to read a float variable
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("key:", float, 1)
+    value = reader.read_key_value("key:", float, 0)
     assert value == 4.387
     assert type(value) == float
 
@@ -295,7 +295,7 @@ def test_read_yaml_doc_two_keyword():
     to read an integer
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("age:", int, 2)
+    value = reader.read_key_value("age:", int, 1)
     assert value == 30
     assert type(value) == int
 
@@ -309,9 +309,9 @@ def test_read_yaml_bool_true():
     Test to ensure method can read in all equivalent true values
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value1 = reader.read_key_value("bool test1:", bool, 2)
-    value2 = reader.read_key_value("bool test4:", bool, 2)
-    value3 = reader.read_key_value("bool test5:", bool, 2)
+    value1 = reader.read_key_value("bool test1:", bool, 1)
+    value2 = reader.read_key_value("bool test4:", bool, 1)
+    value3 = reader.read_key_value("bool test5:", bool, 1)
     assert value1 is True
     assert value2 is True
     assert value3 is True
@@ -329,9 +329,9 @@ def test_read_yaml_bool_false():
     Test to ensure method can read in all equivalent false values
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value1 = reader.read_key_value("bool test2:", bool, 2)
-    value2 = reader.read_key_value("bool test3:", bool, 2)
-    value3 = reader.read_key_value("bool test6:", bool, 2)
+    value1 = reader.read_key_value("bool test2:", bool, 1)
+    value2 = reader.read_key_value("bool test3:", bool, 1)
+    value3 = reader.read_key_value("bool test6:", bool, 1)
     assert value1 is False
     assert value2 is False
     assert value3 is False
@@ -349,7 +349,7 @@ def test_read_yaml_inline_string():
     This also tests the ability to read an inline string
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("String Value:", str, 2)
+    value = reader.read_key_value("String Value:", str, 1)
     assert value == "Hello Again World!"
     assert type(value) == str
 
@@ -363,7 +363,7 @@ def test_read_yaml_next_indent_string():
     This also tests the ability to read a next line string
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("Sentence:", str, 2)
+    value = reader.read_key_value("Sentence:", str, 1)
     assert value == "Hello world"
     assert type(value) == str
 
@@ -377,7 +377,7 @@ def test_read_yaml_next_multiline_string():
     This also tests the ability to read a next line string
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("Multi Sentence:", str, 2)
+    value = reader.read_key_value("Multi Sentence:", str, 1)
     string = """This is a multiline sentence,
 there is no reason to worry!"""
     assert value == string
@@ -393,7 +393,7 @@ def test_read_yaml_next_connected_string():
     This also tests the ability to read a next line string
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_key_value("Second Mult Sentence:", str, 2)
+    value = reader.read_key_value("Second Mult Sentence:", str, 1)
     string = "This is a multiline sentence, there is no reason to worry!"
     assert value == string
     assert type(value) == str
@@ -408,7 +408,7 @@ def test_read_yaml_list():
     This also tests the ability to read a list into memory
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_yaml_list("First List:", float, 2)
+    value = reader.read_yaml_list("First List:", float, 1)
     expected = [1.1, 2.2, 3.3, 4.4]
     assert expected == value
     for i, j in zip(value, expected):
@@ -424,10 +424,26 @@ def test_read_yaml_list_string():
     This also tests the ability to read a list of strings into memory
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_yaml_list("Numbers:", str, 2)
-    print(value)
+    value = reader.read_yaml_list("Numbers:", str, 1)
     expected = ["Hello World\nThis is Jon\n", "This", "Is", "Correct"]
     assert value == expected
+    expected = [1.1, 2.2, 3.3, 4.4]
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.readyaml
+def test_read_yaml_inline_list():
+    """
+    This also tests the ability to read a list of strings into memory
+    """
+    reader = ReadYAML("../data/test/read_yaml.yaml")
+    value = reader.read_yaml_list("Inline List:", float, 0)
+    expected = [1.1, 2.2, 3.3, 4.4]
+    assert expected == value
+    for i, j in zip(value, expected):
+        type(i) == type(j)
 
 
 # ------------------------------------------------------------------------------------------
@@ -439,7 +455,7 @@ def test_read_yaml_dict():
     This also tests the ability to read a dictionary
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_yaml_dict("Ages:", str, int, 2)
+    value = reader.read_yaml_dict("Ages:", str, int, 1)
     expected = {"Jon": 44, "Jill": 32, "Bob": 12}
     assert value == expected
 
@@ -453,7 +469,7 @@ def test_read_yaml_dict_strings():
     This also tests the ability to read a dictionary
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
-    value = reader.read_yaml_dict("String Test:", int, str, 2)
+    value = reader.read_yaml_dict("String Test:", int, str, 1)
     expected = {
         0: "String One",
         1: "Another String",
@@ -473,7 +489,8 @@ def test_read_full_yaml():
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
     data = reader.read_full_yaml()
-    print(data[1]["Ages"])
+    expected = {"Jon": 44, "Jill": 32, "Bob": 12}
+    assert data[1]["Ages"] == expected
 
 
 # ==========================================================================================

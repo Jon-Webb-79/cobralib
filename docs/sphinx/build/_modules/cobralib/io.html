@@ -109,7 +109,8 @@
 <span class="sd">    key words are formatted, and stricter requirements on data typing. The methods</span>
 <span class="sd">    within this class can be used to read scalar variables from key-variable pairs,</span>
 <span class="sd">    lists, and flat dictionaries.  This class also enforces type casting for all</span>
-<span class="sd">    variables read into memory.</span>
+<span class="sd">    variables read into memory. This class is more meory efficient than using</span>
+<span class="sd">    PyYAML, since it only reads the requested lines to memory.</span>
 
 <span class="sd">    All code examples described in the documentation for this class reference</span>
 <span class="sd">    the read_yaml.yaml file shown below.</span>
@@ -152,7 +153,7 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           value = reader.read_key_value(&#39;key:&#39;, float, 1)</span>
+<span class="sd">           value = reader.read_key_value(&#39;key:&#39;, float, 0)</span>
 <span class="sd">           print(value)</span>
 <span class="sd">           &gt;&gt; 4.387</span>
 
@@ -166,8 +167,8 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           value = reader.read_key_value(&#39;Multi Sentence:&#39;, str, 2)</span>
-<span class="sd">           new_value = reader.read_key_value(&#39;Second Mult Sentence:&#39;, str, 2)</span>
+<span class="sd">           value = reader.read_key_value(&#39;Multi Sentence:&#39;, str, 1)</span>
+<span class="sd">           new_value = reader.read_key_value(&#39;Second Mult Sentence:&#39;, str, 1)</span>
 <span class="sd">           print(value)</span>
 <span class="sd">           print(new_value)</span>
 
@@ -189,12 +190,12 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           true_value = reader.read_key_value(&#39;bool test1:&#39;, bool, 2)</span>
-<span class="sd">           yes_value = reader.read_key_value(&#39;bool test4:&#39;, bool, 2)</span>
-<span class="sd">           on_value = reader.read_key_value(&#39;bool test5:&#39;, bool, 2)</span>
-<span class="sd">           false_value = reader.read_key_value(&#39;bool test2:&#39;, bool, 2)</span>
-<span class="sd">           no_value = reader.read_key_value(&#39;bool test3:&#39;, bool, 2)</span>
-<span class="sd">           off_value = reader.read_key_value(&#39;bool test6:&#39;, bool, 2)</span>
+<span class="sd">           true_value = reader.read_key_value(&#39;bool test1:&#39;, bool, 1)</span>
+<span class="sd">           yes_value = reader.read_key_value(&#39;bool test4:&#39;, bool, 1)</span>
+<span class="sd">           on_value = reader.read_key_value(&#39;bool test5:&#39;, bool, 1)</span>
+<span class="sd">           false_value = reader.read_key_value(&#39;bool test2:&#39;, bool, 1)</span>
+<span class="sd">           no_value = reader.read_key_value(&#39;bool test3:&#39;, bool, 1)</span>
+<span class="sd">           off_value = reader.read_key_value(&#39;bool test6:&#39;, bool, 1)</span>
 
 <span class="sd">        .. code-block:: bash</span>
 
@@ -205,7 +206,8 @@
 <span class="sd">           &gt;&gt; False</span>
 <span class="sd">           &gt;&gt; False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
@@ -253,7 +255,7 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           list_values = reader.read_yaml_list(&#39;First List:&#39;, int, 1)</span>
+<span class="sd">           list_values = reader.read_yaml_list(&#39;First List:&#39;, int, 0)</span>
 <span class="sd">           print(list_values)</span>
 
 <span class="sd">        .. code-block:: bash</span>
@@ -272,7 +274,7 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           list_values = reader.read_yaml_list(&#39;Numbers:&#39;, int, 1)</span>
+<span class="sd">           list_values = reader.read_yaml_list(&#39;Numbers:&#39;, int, 0)</span>
 <span class="sd">           print(list_values)</span>
 
 <span class="sd">        .. code-block:: text</span>
@@ -283,14 +285,15 @@
 <span class="sd">                &#39;Is&#39;,</span>
 <span class="sd">                &#39;Correct&#39;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.&quot;</span><span class="p">)</span>
 
         <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">is_reading_list</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">keyword_indent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">keyword_indent</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
@@ -299,8 +302,20 @@
             <span class="n">current_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripped_line</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">is_reading_list</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">keyword_indent</span> <span class="o">=</span> <span class="n">current_indent</span>
+                <span class="n">is_reading_list</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="c1"># Check for an inline list</span>
+                <span class="n">rest_of_line</span> <span class="o">=</span> <span class="n">stripped_line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">rest_of_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rest_of_line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">):</span>
+                    <span class="n">inline_list</span> <span class="o">=</span> <span class="n">rest_of_line</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inline_list</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">values</span>
+
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Move to the next line</span>
                 <span class="k">continue</span>
 
@@ -308,11 +323,11 @@
                 <span class="k">if</span> <span class="n">current_indent</span> <span class="o">&lt;=</span> <span class="n">keyword_indent</span><span class="p">:</span>
                     <span class="k">break</span>
 
+                <span class="c1"># Add list items</span>
                 <span class="k">if</span> <span class="n">stripped_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
-                    <span class="n">dash_indent</span> <span class="o">=</span> <span class="n">current_indent</span>
                     <span class="n">value_str</span> <span class="o">=</span> <span class="n">stripped_line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Remove &quot;-&quot; and leading spaces</span>
 
-                    <span class="c1"># Check for complex string types</span>
+                    <span class="c1"># Check for special string types</span>
                     <span class="k">if</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">]:</span>
                         <span class="n">complex_str</span> <span class="o">=</span> <span class="n">value_str</span>
                         <span class="n">value_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -320,10 +335,8 @@
                         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
                             <span class="n">next_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                             <span class="n">next_indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
-                            <span class="k">if</span> <span class="n">next_indent</span> <span class="o">&lt;=</span> <span class="n">dash_indent</span><span class="p">:</span>
-                                <span class="n">i</span> <span class="o">-=</span> <span class="p">(</span>
-                                    <span class="mi">1</span>  <span class="c1"># Step back to let the outer loop process this line</span>
-                                <span class="p">)</span>
+                            <span class="k">if</span> <span class="n">next_indent</span> <span class="o">&lt;=</span> <span class="n">current_indent</span><span class="p">:</span>
+                                <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># Step back to let the outer loop process this line</span>
                                 <span class="k">break</span>
 
                             <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;^&quot;</span><span class="p">:</span>
@@ -332,22 +345,22 @@
                             <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
                                 <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
                             <span class="k">elif</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
-                                <span class="n">next_line_content</span> <span class="o">=</span> <span class="n">next_line</span><span class="p">[</span><span class="n">dash_indent</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                                <span class="n">next_line_content</span> <span class="o">=</span> <span class="n">next_line</span><span class="p">[</span><span class="n">current_indent</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
                                 <span class="n">value_str</span> <span class="o">+=</span> <span class="n">next_line_content</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
                             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
                         <span class="k">if</span> <span class="n">complex_str</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
                             <span class="n">value_str</span> <span class="o">=</span> <span class="n">value_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
 
-                    <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_value</span><span class="p">(</span><span class="n">value_str</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dash_indent</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_type</span><span class="p">(</span><span class="n">value_str</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value&quot;</span><span class="p">)</span>
 
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found or it is &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;not a list in the specified document.&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_reading_list</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found or it is &quot;</span>
-            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;not a list in the specified document.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">values</span></div>
@@ -387,14 +400,16 @@
 <span class="sd">           from cobralib.io import ReadYAML</span>
 
 <span class="sd">           reader = ReadYAML(&#39;read_yaml.yaml&#39;)</span>
-<span class="sd">           value = reader.read_yaml_dict(&#39;Ages:&#39;, &#39;str&#39;, &#39;int&#39;, 2)</span>
+<span class="sd">           value = reader.read_yaml_dict(&#39;Ages:&#39;, &#39;str&#39;, &#39;int&#39;, 1)</span>
 <span class="sd">           print(value)</span>
 
 <span class="sd">        .. code-block:: text</span>
 
 <span class="sd">            &gt;&gt; {&#39;Jon&#39;: 44. &#39;Jill&#39;: 32, &#39;Bob&#39;: 12}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
+        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)))</span>
+
         <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.&quot;</span><span class="p">)</span>
 

@@ -444,6 +444,7 @@ list values:
   - 2
   - 3
   - 4
+Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
 
 ---
 name: John Doe
@@ -499,6 +500,16 @@ String Test:
   3: |
     This is multiline
     two
+
+  Dict to List:
+    List One:
+      - 1
+      - 2
+      - 3
+    List Two:
+      - 4
+      - 5
+      - 6
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadKeyWords</span>
@@ -1483,7 +1494,8 @@ tailoered to read basic YAML files, but with looser requirements on how
 key words are formatted, and stricter requirements on data typing. The methods
 within this class can be used to read scalar variables from key-variable pairs,
 lists, and flat dictionaries.  This class also enforces type casting for all
-variables read into memory.</p>
+variables read into memory. This class is more meory efficient than using
+PyYAML, since it only reads the requested lines to memory.</p>
 <p>All code examples described in the documentation for this class reference
 the read_yaml.yaml file shown below.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>---
@@ -1493,6 +1505,7 @@ list values:
   - 2
   - 3
   - 4
+Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
 
 ---
 name: John Doe
@@ -1548,6 +1561,16 @@ String Test:
   3: |
     This is multiline
     two
+
+  Dict to List:
+    List One:
+      - 1
+      - 2
+      - 3
+    List Two:
+      - 4
+      - 5
+      - 6
 </pre></div>
 </div>
 <dl class="py method">
@@ -1618,7 +1641,7 @@ strings that either start on the next line, or multiline strings.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;key:&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;key:&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="mf">4.387</span>
 </pre></div>
@@ -1631,8 +1654,8 @@ in the file</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;Multi Sentence:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;Second Mult Sentence:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;Multi Sentence:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;Second Mult Sentence:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
 </pre></div>
@@ -1652,12 +1675,12 @@ file are case insensitive.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">true_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test1:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">yes_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test4:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">on_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test5:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">false_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test2:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">no_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test3:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">off_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test6:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">true_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test1:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">yes_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test4:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">on_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test5:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">false_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test2:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">no_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test3:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">off_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s1">&#39;bool test6:&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>True
@@ -1704,7 +1727,7 @@ line, or multiline strings. <strong>NOTE:</strong> This method assumes a flat
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_dict</span><span class="p">(</span><span class="s1">&#39;Ages:&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_dict</span><span class="p">(</span><span class="s1">&#39;Ages:&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1745,7 +1768,7 @@ line, or multiline strings.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">list_values</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_list</span><span class="p">(</span><span class="s1">&#39;First List:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">list_values</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_list</span><span class="p">(</span><span class="s1">&#39;First List:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">list_values</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1762,7 +1785,7 @@ string that should be read as a multiline string.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
 
 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
-<span class="n">list_values</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_list</span><span class="p">(</span><span class="s1">&#39;Numbers:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">list_values</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_list</span><span class="p">(</span><span class="s1">&#39;Numbers:&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">list_values</span><span class="p">)</span>
 </pre></div>
 </div>

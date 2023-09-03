@@ -37,7 +37,8 @@ class ReadYAML:
     key words are formatted, and stricter requirements on data typing. The methods
     within this class can be used to read scalar variables from key-variable pairs,
     lists, and flat dictionaries.  This class also enforces type casting for all
-    variables read into memory.
+    variables read into memory. This class is more meory efficient than using
+    PyYAML, since it only reads the requested lines to memory.
 
     All code examples described in the documentation for this class reference
     the read_yaml.yaml file shown below.
@@ -80,7 +81,7 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           value = reader.read_key_value('key:', float, 1)
+           value = reader.read_key_value('key:', float, 0)
            print(value)
            >> 4.387
 
@@ -94,8 +95,8 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           value = reader.read_key_value('Multi Sentence:', str, 2)
-           new_value = reader.read_key_value('Second Mult Sentence:', str, 2)
+           value = reader.read_key_value('Multi Sentence:', str, 1)
+           new_value = reader.read_key_value('Second Mult Sentence:', str, 1)
            print(value)
            print(new_value)
 
@@ -117,12 +118,12 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           true_value = reader.read_key_value('bool test1:', bool, 2)
-           yes_value = reader.read_key_value('bool test4:', bool, 2)
-           on_value = reader.read_key_value('bool test5:', bool, 2)
-           false_value = reader.read_key_value('bool test2:', bool, 2)
-           no_value = reader.read_key_value('bool test3:', bool, 2)
-           off_value = reader.read_key_value('bool test6:', bool, 2)
+           true_value = reader.read_key_value('bool test1:', bool, 1)
+           yes_value = reader.read_key_value('bool test4:', bool, 1)
+           on_value = reader.read_key_value('bool test5:', bool, 1)
+           false_value = reader.read_key_value('bool test2:', bool, 1)
+           no_value = reader.read_key_value('bool test3:', bool, 1)
+           off_value = reader.read_key_value('bool test6:', bool, 1)
 
         .. code-block:: bash
 
@@ -133,7 +134,9 @@ class ReadYAML:
            >> False
            >> False
         """
-        yaml_docs = "\n".join(self.__lines).split("---")
+        yaml_docs = list(
+            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+        )
         if document_index >= len(yaml_docs) or document_index < 0:
             raise ValueError(
                 f"""Document index {document_index} out of range.
@@ -181,7 +184,7 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           list_values = reader.read_yaml_list('First List:', int, 1)
+           list_values = reader.read_yaml_list('First List:', int, 0)
            print(list_values)
 
         .. code-block:: bash
@@ -200,7 +203,7 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           list_values = reader.read_yaml_list('Numbers:', int, 1)
+           list_values = reader.read_yaml_list('Numbers:', int, 0)
            print(list_values)
 
         .. code-block:: text
@@ -211,14 +214,16 @@ class ReadYAML:
                 'Is',
                 'Correct']
         """
-        yaml_docs = "\n".join(self.__lines).split("---")
+        yaml_docs = list(
+            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+        )
         if document_index >= len(yaml_docs) or document_index < 0:
             raise ValueError(f"Document index {document_index} out of range.")
 
         lines = yaml_docs[document_index].split("\n")
         values = []
         is_reading_list = False
-        keyword_indent = None
+        keyword_indent = 0
 
         i = 0
         while i < len(lines):
@@ -227,8 +232,20 @@ class ReadYAML:
             current_indent = len(line) - len(stripped_line)
 
             if stripped_line.startswith(keyword):
-                is_reading_list = True
                 keyword_indent = current_indent
+                is_reading_list = True
+
+                # Check for an inline list
+                rest_of_line = stripped_line[len(keyword) :].strip()
+                if rest_of_line.startswith("[") and rest_of_line.endswith("]"):
+                    inline_list = rest_of_line[1:-1].split(",")
+                    for x in inline_list:
+                        try:
+                            values.append(data_type(x.strip()))
+                        except ValueError:
+                            raise ValueError("Invalid value")
+                    return values
+
                 i += 1  # Move to the next line
                 continue
 
@@ -236,11 +253,11 @@ class ReadYAML:
                 if current_indent <= keyword_indent:
                     break
 
+                # Add list items
                 if stripped_line.startswith("-"):
-                    dash_indent = current_indent
                     value_str = stripped_line[1:].strip()  # Remove "-" and leading spaces
 
-                    # Check for complex string types
+                    # Check for special string types
                     if value_str in ["^", ">", "|"]:
                         complex_str = value_str
                         value_str = ""
@@ -248,7 +265,7 @@ class ReadYAML:
                         while i < len(lines):
                             next_line = lines[i]
                             next_indent = len(next_line) - len(next_line.lstrip())
-                            if next_indent <= dash_indent:
+                            if next_indent <= current_indent:
                                 i -= (
                                     1  # Step back to let the outer loop process this line
                                 )
@@ -260,22 +277,22 @@ class ReadYAML:
                             elif complex_str == "|":
                                 value_str += next_line.strip() + "\n"
                             elif complex_str == ">":
-                                next_line_content = next_line[dash_indent:].lstrip()
+                                next_line_content = next_line[current_indent:].lstrip()
                                 value_str += next_line_content + " "
                             i += 1
 
                         if complex_str == ">":
                             value_str = value_str.rstrip()
 
-                    values.append(
-                        self._parse_value(value_str, [], dash_indent, data_type)
-                    )
+                    try:
+                        values.append(data_type(value_str))
+                    except ValueError:
+                        raise ValueError("Invalid value")
 
             i += 1
-
+        msg = f"Keyword '{keyword}' not found or it is "
+        msg += "not a list in the specified document."
         if not is_reading_list:
-            msg = f"Keyword '{keyword}' not found or it is "
-            msg += "not a list in the specified document."
             raise ValueError(msg)
 
         return values
@@ -315,14 +332,17 @@ class ReadYAML:
            from cobralib.io import ReadYAML
 
            reader = ReadYAML('read_yaml.yaml')
-           value = reader.read_yaml_dict('Ages:', 'str', 'int', 2)
+           value = reader.read_yaml_dict('Ages:', 'str', 'int', 1)
            print(value)
 
         .. code-block:: text
 
             >> {'Jon': 44. 'Jill': 32, 'Bob': 12}
         """
-        yaml_docs = "\n".join(self.__lines).split("---")
+        yaml_docs = list(
+            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+        )
+
         if document_index >= len(yaml_docs) or document_index < 0:
             raise ValueError(f"Document index {document_index} out of range.")
 
