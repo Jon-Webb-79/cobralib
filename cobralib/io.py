@@ -568,6 +568,7 @@ class ReadYAML:
         return len(line) - len(line.lstrip())
 
     # ------------------------------------------------------------------------------------------
+
     def _parse_block_scalar(self, lines: iter, current_indent: int, complex_str: str):
         value_str = ""
         lines_iter = iter(lines)
@@ -628,55 +629,6 @@ class ReadYAML:
             return data_type(value_str)
         except ValueError:
             raise ValueError("Invalid value")
-        # if data_type == bool:
-        #    value_str = value_str.lower()
-        #    if value_str.upper() in ["TRUE", "YES", "ON"]:
-        #        return True
-        #    elif value_str.upper() in ["FALSE", "NO", "OFF"]:
-        #        return False
-        #    else:
-        #        raise ValueError("Invalid boolean value")
-
-        # if data_type == str and value_str in ["^", ">", "|"]:
-        #    complex_str = value_str
-        #    value_str = ""
-        #    i = 0
-        #    while i < len(subsequent_lines):
-        #        next_line = subsequent_lines[i]
-        #        next_indent = len(next_line) - len(next_line.lstrip())
-        #        if next_indent <= keyword_indent:
-        #            break
-
-        #        next_line_content = next_line[next_indent:].lstrip()
-        #        if complex_str == "^":
-        #            value_str = next_line_content.strip()
-        #            break
-        #        elif complex_str == "|":
-        #            lines = []
-        #            while i < len(subsequent_lines):
-        #                next_line = subsequent_lines[i]
-        #                next_indent = len(next_line) - len(next_line.lstrip())
-        #                if next_indent <= keyword_indent:
-        #                    break
-
-        #                next_line_content = next_line[next_indent:].lstrip()
-        #                lines.append(next_line_content)
-        #                i += 1
-        #            value_str = '\n'.join(lines)
-        #            #value_str += next_line_content + "\n"
-        #        elif complex_str == ">":
-        #            value_str += next_line_content + " "
-        #        i += 1
-
-        #    if complex_str == ">":
-        #        value_str = value_str.rstrip()
-        #    if complex_str == "|":
-        #        value_str = value_str.rstrip("\n")
-
-        # try:
-        #    return data_type(value_str)
-        # except ValueError:
-        #    raise ValueError("Invalid value")
 
 
 # ==========================================================================================

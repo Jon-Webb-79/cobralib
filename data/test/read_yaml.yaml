@@ -22,7 +22,6 @@ Str Dict List:
     - Two
     - ^
       Hello
-
 ---
 name: John Doe
 age: 30
