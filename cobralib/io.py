@@ -635,6 +635,185 @@ class ReadYAML:
 # ==========================================================================================
 
 
+class ReadJSON:
+    """
+
+    :param file_name: The name and path length for the file with the yaml-like
+                      format
+    :raises FileNotFoundError: If the file does not exist.
+
+    This class can be used to read a file woith a JSON-like format.  This class is
+    tailoered to read basic JSON files, but with looser requirements on how
+    key words are formatted, and stricter requirements on data typing. The methods
+    within this class can be used to read scalar variables from key-variable pairs,
+    lists, and flat dictionaries.
+
+    All code examples described in the documentation for this class reference
+    the read_yaml.yaml file shown below.
+
+    """
+
+    def __init__(self, file_name: str):
+        if not os.path.isfile(file_name):
+            raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
+        self._file_name = file_name
+        self.__lines = self._read_lines()
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_json(self, keyword: str) -> dict:
+        """
+        Search each line for the specified keyword and read the JSON data
+        to the right of the keyword until the termination of brackets.
+
+        :param keyword: The keyword to search for in each line.
+        :return: The JSON data as a dictionary.
+        :raises ValueError: If the keyword is not found or if the JSON data is not valid.
+
+        Example 1
+        ---------
+        This example shows a file that mixes YAML and JSON data types.  In order
+        to delinate the file type that contains mixed data, it is recommended that
+        the .jwc file format be used; however, it is not required.
+
+        .. code-block:: text
+
+            Yaml Dict:
+                - 1
+                - 2
+                - 3
+            Yaml Key: Test String
+            Yaml Dict:
+                One: 1.1
+                Two: 2.2
+                Three: 3.3
+            Json Book Data: {"book": "History of the World", "year": 1976}
+
+        .. code-block:: python
+
+           # Instantiate the class
+           reader = ReadKeyWords("test_key_words.jwc")
+           value = reader.read_json("JSON Book Data:")
+           print(value)
+
+           >> {"book": "History of the World", "year": 1976}
+        """
+        found_keyword = False
+        json_data = ""
+        for line in self.__lines:
+            if line.startswith(keyword):
+                found_keyword = True
+                json_data += line.split(keyword)[-1].strip()
+                if json_data.startswith("{") and json_data.endswith("}"):
+                    try:
+                        return json.loads(json_data)
+                    except json.JSONDecodeError:
+                        raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
+
+        if not found_keyword:
+            raise ValueError(f"Keyword '{keyword}' not found in the file")
+        else:
+            raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
+
+    # ------------------------------------------------------------------------------------------
+
+    def read_full_json(self, keyword: str = None) -> Union[dict, list]:
+        """
+        Read the entire contents of the file as JSON data.
+        If a keyword is provided, search for that keyword and return the nested
+        dictionaries beneath it.
+
+        :param keyword: The keyword to search for in the file. If None,
+                        returns the entire JSON data.
+        :return: The JSON data as a dictionary or list.
+        :raises ValueError: If the keyword is specified but not found
+                            in the file.
+
+        Unlike the read_json method, this method assumes the entire file is
+        formatted as a .json file.  This method will allow a user to read
+        in the entire contents of the json file as a dictionary, or it
+        will read in the dictionaries nested under a specific key word.
+        If you assume the input file titled example.json has the following
+        format
+
+        .. code-block:: json
+
+           {
+            "key1": "value1",
+            "key2": {
+                "subkey1": "subvalue1",
+                "subkey2": {
+                    "subsubkey1": "subsubvalue1",
+                    "subsubkey2": "subsubvalue2"
+                 }
+              }
+           }
+
+        The code to extract data would look like:
+
+        .. code-block:: python
+
+           reader = ReadKeyWords("example.json")
+           value = reader.read_full_json()
+           print(value)
+
+           >> {
+               "key1": "value1",
+               "key2": {
+                   "subkey1": "subvalue1",
+                   "subkey2": {
+                       "subsubkey1": "subsubvalue1",
+                       "subsubkey2": "subsubvalue2"
+                   }
+               }
+           }
+
+           new_value = reader.read_full_json("subkey2")
+           print(new_value)
+           >> {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"}
+        """
+        json_data = json.loads("\n".join(self.__lines))
+
+        if keyword is None:
+            return json_data
+
+        def find_nested_dictionaries(data, keyword):
+            if isinstance(data, dict):
+                if keyword in data:
+                    return data[keyword]
+                for value in data.values():
+                    result = find_nested_dictionaries(value, keyword)
+                    if result is not None:
+                        return result
+            elif isinstance(data, list):
+                for item in data:
+                    result = find_nested_dictionaries(item, keyword)
+                    if result is not None:
+                        return result
+            return None
+
+        result = find_nested_dictionaries(json_data, keyword)
+        if result is not None:
+            return result
+        else:
+            raise ValueError(f"Keyword '{keyword}' not found in the JSON data")
+
+    # ==========================================================================================
+    # PRIVATE-LIKE METHODS
+
+    def _read_lines(self):
+        """
+        This private method will read in all lines from the text file
+        """
+        with open(self._file_name) as file:
+            lines = [line.rstrip() for line in file]
+        return lines
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
 class ReadKeyWords:
     """
     This class can be used by a read to read a text based config file.  The methods

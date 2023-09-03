@@ -46,16 +46,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">io</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#readkeywords">ReadKeyWords</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadKeyWords"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_full_json"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_full_json()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_full_xml"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_full_xml()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_json"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_json()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_list"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_string_variable"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_string_variable()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_variable"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_variable()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadKeyWords.read_xml"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords.read_xml()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadKeyWords"><code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#read-columnar-data">Read Columnar Data</a><ul>
@@ -69,13 +60,18 @@
 <li class="toctree-l3"><a class="reference internal" href="#cobralib.io.read_excel_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_excel_columns_by_index()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#yaml-files">YAML Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-readers">File Readers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadYAML"><code class="docutils literal notranslate"><span class="pre">ReadYAML</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_full_yaml"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_full_yaml()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_key_value"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_key_value()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_dict"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_dict_of_list"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_dict_of_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_list"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_list()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadJSON"><code class="docutils literal notranslate"><span class="pre">ReadJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadJSON.read_full_json"><code class="docutils literal notranslate"><span class="pre">ReadJSON.read_full_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadJSON.read_json"><code class="docutils literal notranslate"><span class="pre">ReadJSON.read_json()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -122,11 +118,12 @@
 <p>The io module contains several functions and classes that can be used to read
 various ASCII based files.</p>
 <section id="readkeywords">
-<h2>ReadKeyWords<a class="headerlink" href="#readkeywords" title="Permalink to this heading"></a></h2>
+<span id="read-key-words"></span><h2>ReadKeyWords<a class="headerlink" href="#readkeywords" title="Permalink to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code> class is mean to allow a user to read any ASCII based text
 file, look for keywords and read in the value to the right of th ekey word.  In
 essense this enables a user to use a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file as a basic configuration file.</p>
-<dl class="py class">
+<blockquote>
+<div><dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.ReadKeyWords">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadKeyWords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords" title="Permalink to this definition"></a></dt>
 <dd><p>This class can be used by a read to read a text based config file.  The methods
@@ -177,392 +174,13 @@ XML Data: &lt;root&gt;
 </div>
 <p>The user can also adjust the print_lines attribute after instantiation
 if they wish to change the number of printed lines</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_full_json">
-<span class="sig-name descname"><span class="pre">read_full_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_full_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_full_json" title="Permalink to this definition"></a></dt>
-<dd><p>Read the entire contents of the file as JSON data.
-If a keyword is provided, search for that keyword and return the nested
-dictionaries beneath it.</p>
+</dd></dl>
+
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in the file. If None,
-returns the entire JSON data.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The JSON data as a dictionary or list.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is specified but not found
-in the file.</p>
-</dd>
+<dt class="field-odd">members<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
 </dl>
-<p>Unlike the read_json method, this method assumes the entire file is
-formatted as a .json file.  This method will allow a user to read
-in the entire contents of the json file as a dictionary, or it
-will read in the dictionaries nested under a specific key word.
-If you assume the input file titled example.json has the following
-format</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w"> </span><span class="nt">&quot;key1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value1&quot;</span><span class="p">,</span>
-<span class="w"> </span><span class="nt">&quot;key2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="nt">&quot;subkey1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
-<span class="w">     </span><span class="nt">&quot;subkey2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;subsubkey1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;subsubkey2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subsubvalue2&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The code to extract data would look like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;example.json&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">{</span>
-    <span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">(</span><span class="s2">&quot;subkey2&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span> <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span><span class="p">}</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_full_xml">
-<span class="sig-name descname"><span class="pre">read_full_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_full_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_full_xml" title="Permalink to this definition"></a></dt>
-<dd><p>Read the XML data. If a keyword is provided, search for the specified
-keyword in the XML data and return the nested elements beneath it.
-If no keyword is provided, return the full XML data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in the XML data.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The XML data as a dictionary object or the nested elements
-as an ElementTree object if a keyword is provided.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is specified but not found in the XML data.</p>
-</dd>
-</dl>
-<p>If you assume the input file titled example.xml has the following format:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;root&gt;</span>
-<span class="w">    </span><span class="nt">&lt;key1&gt;</span>value1<span class="nt">&lt;/key1&gt;</span>
-<span class="w">    </span><span class="nt">&lt;key2&gt;</span>
-<span class="w">        </span><span class="nt">&lt;subkey1&gt;</span>subvalue1<span class="nt">&lt;/subkey1&gt;</span>
-<span class="w">        </span><span class="nt">&lt;subkey2&gt;</span>
-<span class="w">            </span><span class="nt">&lt;subsubkey1&gt;</span>subsubvalue1<span class="nt">&lt;/subsubvalue1&gt;</span>
-<span class="w">            </span><span class="nt">&lt;subsubkey2&gt;</span>subsubvalue2<span class="nt">&lt;/subsubvalue2&gt;</span>
-<span class="w">        </span><span class="nt">&lt;/subkey2&gt;</span>
-<span class="w">    </span><span class="nt">&lt;/key2&gt;</span>
-<span class="nt">&lt;/root&gt;</span>
-</pre></div>
-</div>
-<p>The code to extract data would look like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;example.xml&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_xml</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">{</span>
-    <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_xml</span><span class="p">(</span><span class="s2">&quot;subkey2&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="p">{</span>
-    <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_json">
-<span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_json" title="Permalink to this definition"></a></dt>
-<dd><p>Search each line for the specified keyword and read the JSON data
-to the right of the keyword until the termination of brackets.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in each line.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The JSON data as a dictionary.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the JSON data is not valid.</p>
-</dd>
-</dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;JSON Data:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;History of the World&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">1976</span><span class="p">}</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_list">
-<span class="sig-name descname"><span class="pre">read_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_list" title="Permalink to this definition"></a></dt>
-<dd><p>Search each line for the specified keyword and read the values after the keyword
-as a list of the user-defined data type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>keyword</strong> – The keyword to search for in each line.</p></li>
-<li><p><strong>data_type</strong> – The data type to which the values should be transformed.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The list of values after the keyword, transformed into the specified
-data type.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found.</p>
-</dd>
-</dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_list</span><span class="p">(</span><span class="s2">&quot;Float List:&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">[</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">4.4</span> <span class="p">]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_string_variable">
-<span class="sig-name descname"><span class="pre">read_string_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_string_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_string_variable" title="Permalink to this definition"></a></dt>
-<dd><p>Search each line for the specified keyword and read the string variable
-to the right of the keyword.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>keyword</strong> – The keyword to search for in each line.</p></li>
-<li><p><strong>document_index</strong> – The document number if the file is a yaml file with
-multiple documents in the file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The string variable to the right of the keyword.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found.</p>
-</dd>
-</dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_variable</span><span class="p">(</span><span class="s2">&quot;String:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-
-<span class="o">&gt;&gt;</span> <span class="n">Hello</span> <span class="c1"># Comment to be read</span>
-<span class="o">&gt;&gt;</span> <span class="nb">str</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_variable">
-<span class="sig-name descname"><span class="pre">read_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_variable" title="Permalink to this definition"></a></dt>
-<dd><p>Search each line for the specified keyword and read the variable to the
-right of the keyword as the specified data type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>keyword</strong> – The keyword to search for in each line.</p></li>
-<li><p><strong>data_type</strong> – The data type to be used in order to casy the variable</p></li>
-<li><p><strong>document_index</strong> – The document number if the file is a yaml file with
-multiple documents in the file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The float variable to the right of the keyword.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the variable cannot
-be parsed as a float.</p>
-</dd>
-</dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>import numpy as np
-from cobralib.io import ReadKeyWords
-
-# Instantiate the class
-reader = ReadKeyWords(&quot;test_key_words.txt&quot;)
-value = reader.read_variable(&quot;Double Value:&quot;, np.float32)
-print(value)
-print(type(value))
-
-&gt;&gt; 1.11111187
-&gt;&gt; &lt;class &#39;numpy.float32&#39;&gt;
-</pre></div>
-</div>
-<p>However, be carefult with strings.  This method will only read the first
-character array following the key word. In order to read in the entire
-line as a string, use the read_string_variable method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadKeyWords</span>
-<span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_variable</span><span class="p">(</span><span class="s2">&quot;String:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-
-<span class="o">&gt;&gt;</span> <span class="s2">&quot;Hello&quot;</span>
-<span class="o">&gt;&gt;</span> <span class="nb">str</span>
-</pre></div>
-</div>
-<p>This method also works with yaml files.  Assume a .yaml or .yml file with the
-following content.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>---
-key: 4.387
-list values:
-  - 1
-  - 2
-  - 3
-  - 4
-Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
-Dict List:
-    One:
-      - 1
-      - 2
-      - 3
-    Two: [3, 4, 5]
-    Three: [6, 7, 8]
-Str Dict List:
-  One: [One, Two, Three]
-  Two:
-    - |
-      Multi Line
-      list
-    - Two
-    - ^
-      Hello
-
----
-name: John Doe
-age: 30
-First List:
-  - 1.1
-  - 2.2
-  - 3.3
-  - 4.4
-Numbers:
-  - |
-    Hello World
-    This is Jon
-  - ^
-    This
-  - ^
-    Is
-  - Correct
-Sentence: ^
-  Hello world
-Multi Sentence: |
-  This is a multiline sentence,
-  there is no reason to worry!
-Second Mult Sentence: &gt;
-  This is a multiline sentence,
-    there is no reason to worry!
-String Value: Hello Again World!
-
-bool test1: TRUE
-
-bool test2: False
-
-bool test3: no
-
-bool test4: yes
-
-bool test5: on
-
-bool test6: Off
-
-Ages:
-  Jon: 44
-  Jill: 32
-  Bob: 12
-
-String Test:
-  0: String One
-  1: ^
-    Another String
-  2: &gt;
-    This is multiline
-     one
-  3: |
-    This is multiline
-    two
-
-  Dict to List:
-    List One:
-      - 1
-      - 2
-      - 3
-    List Two:
-      - 4
-      - 5
-      - 6
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadKeyWords</span>
-
-<span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;read_yaml.yaml&quot;</span><span class="p">)</span>
-<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_variable</span><span class="p">(</span><span class="s2">&quot;age:&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-
-<span class="o">&gt;&gt;</span> <span class="mi">30</span>
-<span class="o">&gt;&gt;</span> <span class="nb">int</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cobralib.io.ReadKeyWords.read_xml">
-<span class="sig-name descname"><span class="pre">read_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords.read_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords.read_xml" title="Permalink to this definition"></a></dt>
-<dd><p>Search each line for the specified keyword and read the XML data
-to the right of the keyword until the termination of tags.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in each line.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The XML data as a dictionary.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the XML data is not valid.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</div></blockquote>
 </section>
 <section id="read-columnar-data">
 <h2>Read Columnar Data<a class="headerlink" href="#read-columnar-data" title="Permalink to this heading"></a></h2>
@@ -1491,9 +1109,10 @@ headers are not on the first line.  For instance, assume the following csv file;
 </dd></dl>
 
 </section>
-<section id="yaml-files">
-<h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this heading"></a></h2>
-<p>This class can be used to read a YAML file or a file with a YAML like structure.</p>
+<section id="file-readers">
+<h2>File Readers<a class="headerlink" href="#file-readers" title="Permalink to this heading"></a></h2>
+<p>The following classes are inherited by the <a class="reference internal" href="#read-key-words"><span class="std std-ref">ReadKeyWords</span></a> class;
+however, they can be independently used</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.ReadYAML">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadYAML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadYAML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadYAML" title="Permalink to this definition"></a></dt>
@@ -1539,7 +1158,6 @@ Str Dict List:
     - Two
     - ^
       Hello
-
 ---
 name: John Doe
 age: 30
@@ -1873,6 +1491,125 @@ string that should be read as a multiline string.</p>
 </pre></div>
 </div>
 </section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.io.ReadJSON">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadJSON" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> – The name and path length for the file with the yaml-like
+format</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist.</p>
+</dd>
+</dl>
+<p>This class can be used to read a file woith a JSON-like format.  This class is
+tailoered to read basic JSON files, but with looser requirements on how
+key words are formatted, and stricter requirements on data typing. The methods
+within this class can be used to read scalar variables from key-variable pairs,
+lists, and flat dictionaries.</p>
+<p>All code examples described in the documentation for this class reference
+the read_yaml.yaml file shown below.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadJSON.read_full_json">
+<span class="sig-name descname"><span class="pre">read_full_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadJSON.read_full_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadJSON.read_full_json" title="Permalink to this definition"></a></dt>
+<dd><p>Read the entire contents of the file as JSON data.
+If a keyword is provided, search for that keyword and return the nested
+dictionaries beneath it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in the file. If None,
+returns the entire JSON data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The JSON data as a dictionary or list.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is specified but not found
+in the file.</p>
+</dd>
+</dl>
+<p>Unlike the read_json method, this method assumes the entire file is
+formatted as a .json file.  This method will allow a user to read
+in the entire contents of the json file as a dictionary, or it
+will read in the dictionaries nested under a specific key word.
+If you assume the input file titled example.json has the following
+format</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w"> </span><span class="nt">&quot;key1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value1&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;key2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">&quot;subkey1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;subkey2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;subsubkey1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;subsubkey2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;subsubvalue2&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The code to extract data would look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;example.json&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="p">{</span>
+    <span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">(</span><span class="s2">&quot;subkey2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span> <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadJSON.read_json">
+<span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadJSON.read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadJSON.read_json" title="Permalink to this definition"></a></dt>
+<dd><p>Search each line for the specified keyword and read the JSON data
+to the right of the keyword until the termination of brackets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in each line.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The JSON data as a dictionary.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the JSON data is not valid.</p>
+</dd>
+</dl>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Yaml Dict:
+    - 1
+    - 2
+    - 3
+Yaml Key: Test String
+Yaml Dict:
+    One: 1.1
+    Two: 2.2
+    Three: 3.3
+Json Book Data: {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;JSON Book Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;History of the World&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">1976</span><span class="p">}</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>

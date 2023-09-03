@@ -119,6 +119,7 @@ testpaths = ["tests"]
 console_output_style = "progress"
 markers = [
     "readyaml: Marks tests that involve ReayYaml class",
+	"readjson: Marks tests that involve ReadJSON class",
     "readkeywords: Marks tests that involve ReadKeyWords class",
 	"read_columnar: Marks tests that read columnar data",
 	"read_yaml: Marks tests for read_yaml functions",

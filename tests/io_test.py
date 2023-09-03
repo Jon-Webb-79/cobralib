@@ -9,6 +9,7 @@ from pandas.testing import assert_frame_equal
 
 from cobralib.io import (
     Logger,
+    ReadJSON,
     ReadYAML,
     read_csv_columns_by_headers,
     read_csv_columns_by_index,
@@ -516,6 +517,48 @@ def test_read_dict_list_string():
     values = reader.read_yaml_dict_of_list("Str Dict List:", str, str, 0)
     expected = {"One": ["One", "Two", "Three"], "Two": ["Multi Line\nlist", "Hello"]}
     assert expected == values
+
+
+# ==========================================================================================
+# ==========================================================================================
+# Test ReadJSON class
+
+
+@pytest.mark.readjson
+def test_read_json_variable_nested_values(sample_file3):
+    """
+    Test to ensure that the class will properly read in json data inserted after
+    a key word
+    """
+    reader = ReadJSON(sample_file3)
+    json_data = reader.read_json("JSON Data:")
+    expected_data = {
+        "key1": "value1",
+        "key2": {
+            "subkey1": "subvalue1",
+            "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
+        },
+    }
+    assert json_data == expected_data
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.readjson
+def test_read_full_json(sample_file4):
+    """
+    Ensure that the class will read in a .json file
+    """
+    reader = ReadJSON(sample_file4)
+    full_json = reader.read_full_json()
+    assert full_json == {
+        "key1": "value1",
+        "key2": {
+            "subkey1": "subvalue1",
+            "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
+        },
+    }
 
 
 # ==========================================================================================
