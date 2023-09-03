@@ -454,6 +454,117 @@ class ReadYAML:
             else:
                 return list(yaml.load_all(file))
 
+    # ------------------------------------------------------------------------------------------
+
+    def read_yaml_dict_of_list(
+        self,
+        keyword: str,
+        key_data_type: type,
+        list_data_type: type,
+        document_index: int = 0,
+    ) -> dict:
+        """
+        :param keyword: The keyword associated with the value to be read in. Unlike
+                        a pure YAML file, this value does not have to end with a :
+                        symbol.
+        :param key_data_type: The data type of the key value.
+        :param list_data_type: The data type of the value to be read in
+        :param document_index: The number of the yaml document in the yaml file.
+        :return value: The dictionary associated with a keyword
+        :raise ValueError: If the value can not be cast to the user defined type
+
+        This method can be used to read a key-value pair from a yaml or yaml-like
+        file where the value is a dictionary of lists.  This method will recognize
+        the >, ^, and | symbols that symbolize strings that either start on the next
+        line, or multiline strings. **NOTE:** This method assumes a flat
+        (i.e. not nested) dictionary structure.
+
+        Example 1
+        ---------
+        An example of a python code to read a dictionary of integer list values
+        from the 1st yaml document.
+
+        .. code-block:: python
+
+           from cobralib.io import ReadYAML
+
+           reader = ReadYAML('read_yaml.yaml')
+           value = reader.read_yaml_dict('Dict List:', 'str', 'int', 0)
+           print(value)
+
+        .. code-block:: text
+
+            >> {'One': [1, 2, 3], 'Two': [3, 4, 5], 'Three': [6, 7, 8]}
+        """
+        yaml_docs = list(
+            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+        )
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(f"Document index {document_index} out of range.")
+
+        lines = iter(yaml_docs[document_index].split("\n"))  # Convert to an iterator
+        is_reading_dict = False
+        keyword_indent = None
+        current_dict = {}
+        current_list = None
+
+        for line in lines:
+            stripped_line = line.lstrip()
+            current_indent = len(line) - len(stripped_line)
+
+            if stripped_line.startswith(keyword):
+                is_reading_dict = True
+                keyword_indent = current_indent
+                continue
+
+            if is_reading_dict:
+                if current_indent <= keyword_indent:
+                    break
+
+                if ":" in stripped_line:
+                    key, value = map(str.strip, stripped_line.split(":", 1))
+                    key = key_data_type(key)
+
+                    if value.startswith("[") and value.endswith("]"):
+                        current_list = [
+                            list_data_type(v.strip()) for v in value[1:-1].split(",")
+                        ]
+                        current_dict[key] = current_list
+                        current_list = None
+                    else:
+                        current_list = []
+                        current_dict[key] = current_list
+                elif stripped_line.startswith("-"):
+                    value_str = stripped_line[1:].strip()
+                    complex_str = None
+                    if value_str in ["^", ">", "|"]:
+                        complex_str = value_str
+                        value_str = ""
+                        while True:
+                            line = next(lines).rstrip()  # Get next line from iterator
+                            line_content = line[current_indent:].lstrip()
+                            if complex_str == "^":
+                                value_str = line_content.strip()
+                                break
+                            elif complex_str == "|":
+                                value_str += line_content + "\n"
+                            elif complex_str == ">":
+                                value_str += line_content + " "
+                            if not line_content:
+                                break
+                        if complex_str == ">":
+                            value_str = value_str.rstrip()
+                        if complex_str == "|":
+                            value_str = value_str.rstrip("\n")
+
+                    current_list.append(list_data_type(value_str))
+        msg = f"Keyword '{keyword}' not found or it is not "
+        msg += "dictionary of lists in the specified document."
+        if not is_reading_dict:
+            raise ValueError(msg)
+
+        return current_dict
+
     # ==========================================================================================
     # PRIVATE-LIKE methods
 

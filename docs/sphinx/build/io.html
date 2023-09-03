@@ -74,6 +74,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_full_yaml"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_full_yaml()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_key_value"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_key_value()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_dict"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_dict_of_list"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_dict_of_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_list"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_list()</span></code></a></li>
 </ul>
 </li>
@@ -445,6 +446,22 @@ list values:
   - 3
   - 4
 Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
+Dict List:
+    One:
+      - 1
+      - 2
+      - 3
+    Two: [3, 4, 5]
+    Three: [6, 7, 8]
+Str Dict List:
+  One: [One, Two, Three]
+  Two:
+    - |
+      Multi Line
+      list
+    - Two
+    - ^
+      Hello
 
 ---
 name: John Doe
@@ -575,8 +592,8 @@ and <code class="docutils literal notranslate"><span class="pre">str</span></cod
 it does not, then it is not a true .csv file and should be transformed
 to a text function and read by the read_text_columns_by_headers function.
 Assume we have a .csv file titled <code class="docutils literal notranslate"><span class="pre">test.csv</span></code> with the following format.</p>
-<table class="docutils align-default" id="id5">
-<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id6">
+<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -629,8 +646,8 @@ Assume we have a .csv file titled <code class="docutils literal notranslate"><sp
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id6">
-<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id7">
+<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -717,8 +734,8 @@ each column</p></li>
 it does not, then it is not a true .csv file and should be transformed
 to a text function and read by the xx function.  Assume we have a .csv
 file titled <code class="docutils literal notranslate"><span class="pre">test.csv</span></code> with the following format.</p>
-<table class="docutils align-default" id="id7">
-<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -765,8 +782,8 @@ file titled <code class="docutils literal notranslate"><span class="pre">test.cs
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id8">
-<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -852,8 +869,8 @@ should be a .csv file extension.</p></li>
 <p>This function assumes the file has a space delimiter, if
 Assume we have a .csv file titled <code class="docutils literal notranslate"><span class="pre">test.txt</span></code> with the following
 format.</p>
-<table class="docutils align-default" id="id9">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id10" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -906,8 +923,8 @@ format.</p>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id10">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id10" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id11" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -996,8 +1013,8 @@ should be a .csv file extension.</p></li>
 </dd>
 </dl>
 <p>Assume we have a .txt file titled <code class="docutils literal notranslate"><span class="pre">test.txt</span></code> with the following format.</p>
-<table class="docutils align-default" id="id11">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id11" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id12" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -1044,8 +1061,8 @@ should be a .csv file extension.</p></li>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id12">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id12" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id13">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id13" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -1217,8 +1234,8 @@ and <code class="docutils literal notranslate"><span class="pre">str</span></cod
 </dl>
 <p>Assume we have a .xls file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format
 in a tab titled <code class="docutils literal notranslate"><span class="pre">primary</span></code>.</p>
-<table class="docutils align-default" id="id13">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id13" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id14">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id14" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -1270,8 +1287,8 @@ in a tab titled <code class="docutils literal notranslate"><span class="pre">pri
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id14">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id14" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id15">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id15" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -1359,8 +1376,8 @@ each column</p></li>
 </dd>
 </dl>
 <p>Assume we have a .txt file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format.</p>
-<table class="docutils align-default" id="id15">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id15" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id16">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id16" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -1408,8 +1425,8 @@ each column</p></li>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id16">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id16" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id17">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id17" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -1506,6 +1523,22 @@ list values:
   - 3
   - 4
 Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
+Dict List:
+    One:
+      - 1
+      - 2
+      - 3
+    Two: [3, 4, 5]
+    Three: [6, 7, 8]
+Str Dict List:
+  One: [One, Two, Three]
+  Two:
+    - |
+      Multi Line
+      list
+    - Two
+    - ^
+      Hello
 
 ---
 name: John Doe
@@ -1738,6 +1771,49 @@ line, or multiline strings. <strong>NOTE:</strong> This method assumes a flat
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadYAML.read_yaml_dict_of_list">
+<span class="sig-name descname"><span class="pre">read_yaml_dict_of_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadYAML.read_yaml_dict_of_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadYAML.read_yaml_dict_of_list" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyword</strong> – The keyword associated with the value to be read in. Unlike
+a pure YAML file, this value does not have to end with a :
+symbol.</p></li>
+<li><p><strong>key_data_type</strong> – The data type of the key value.</p></li>
+<li><p><strong>list_data_type</strong> – The data type of the value to be read in</p></li>
+<li><p><strong>document_index</strong> – The number of the yaml document in the yaml file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return value<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dictionary associated with a keyword</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the value can not be cast to the user defined type</p>
+</dd>
+</dl>
+<p>This method can be used to read a key-value pair from a yaml or yaml-like
+file where the value is a dictionary of lists.  This method will recognize
+the &gt;, ^, and | symbols that symbolize strings that either start on the next
+line, or multiline strings. <strong>NOTE:</strong> This method assumes a flat
+(i.e. not nested) dictionary structure.</p>
+<section id="id3">
+<h3>Example 1<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<p>An example of a python code to read a dictionary of integer list values
+from the 1st yaml document.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
+
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadYAML</span><span class="p">(</span><span class="s1">&#39;read_yaml.yaml&#39;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_dict</span><span class="p">(</span><span class="s1">&#39;Dict List:&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; {&#39;One&#39;: [1, 2, 3], &#39;Two&#39;: [3, 4, 5], &#39;Three&#39;: [6, 7, 8]}
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cobralib.io.ReadYAML.read_yaml_list">
 <span class="sig-name descname"><span class="pre">read_yaml_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadYAML.read_yaml_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadYAML.read_yaml_list" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -1761,8 +1837,8 @@ symbol.</p></li>
 file where the value is a list of values.  This method will rcognize the
 &gt;, ^, and | symbols that symbolize strings that either start on the next
 line, or multiline strings.</p>
-<section id="id3">
-<h3>Example 1<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<section id="id4">
+<h3>Example 1<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
 <p>An example of a python code to read a list of integer values from the
 1st yaml document.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
@@ -1776,8 +1852,8 @@ line, or multiline strings.</p>
 </pre></div>
 </div>
 </section>
-<section id="id4">
-<h3>Example 2<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<section id="id5">
+<h3>Example 2<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
 <p>This method will also read string values from the list that may use the
 ^, &gt; or | symbols that signify the string as starting on the next line,
 a multi-line string that should be read into one line, or a multiline

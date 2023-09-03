@@ -493,6 +493,37 @@ def test_read_full_yaml():
     assert data[1]["Ages"] == expected
 
 
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.readyaml
+def test_read_yaml_dict_list():
+    """
+    This also tests the ability to read a dictionary of lists
+    """
+    reader = ReadYAML("../data/test/read_yaml.yaml")
+    values = reader.read_yaml_dict_of_list("Dict List:", str, int, 0)
+    expected = {"One": [1, 2, 3], "Two": [3, 4, 5], "Three": [6, 7, 8]}
+    assert expected == values
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.readyaml
+def test_read_dict_list_string():
+    """
+    This also tests the ability to read a dictionary of lists
+    """
+    reader = ReadYAML("../data/test/read_yaml.yaml")
+    values = reader.read_yaml_dict_of_list("Str Dict List:", str, str, 0)
+    expected = {
+        "One": ["One", "Two", "Three"],
+        "Two": ["Multi Line\nlist\n- Two\n- ^\nHello"],
+    }
+    assert expected == values
+
+
 # ==========================================================================================
 # ==========================================================================================
 # Test ReadKeyWords class
