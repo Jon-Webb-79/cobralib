@@ -134,14 +134,8 @@ class ReadYAML:
            >> False
            >> False
         """
-        yaml_docs = list(
-            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
-        )
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(
-                f"""Document index {document_index} out of range.
-                              File contains {len(yaml_docs)} documents."""
-            )
+        yaml_docs = self._read_yaml_documents()
+        self._check_document_length(document_index, yaml_docs)
 
         lines = yaml_docs[document_index].split("\n")
         for i, line in enumerate(lines):
@@ -214,11 +208,8 @@ class ReadYAML:
                 'Is',
                 'Correct']
         """
-        yaml_docs = list(
-            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
-        )
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(f"Document index {document_index} out of range.")
+        yaml_docs = self._read_yaml_documents()
+        self._check_document_length(document_index, yaml_docs)
 
         lines = yaml_docs[document_index].split("\n")
         values = []
@@ -339,12 +330,8 @@ class ReadYAML:
 
             >> {'Jon': 44. 'Jill': 32, 'Bob': 12}
         """
-        yaml_docs = list(
-            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
-        )
-
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(f"Document index {document_index} out of range.")
+        yaml_docs = self._read_yaml_documents()
+        self._check_document_length(document_index, yaml_docs)
 
         lines = yaml_docs[document_index].split("\n")
         found_dict = {}
@@ -496,11 +483,8 @@ class ReadYAML:
 
             >> {'One': [1, 2, 3], 'Two': [3, 4, 5], 'Three': [6, 7, 8]}
         """
-        yaml_docs = list(
-            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
-        )
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(f"Document index {document_index} out of range.")
+        yaml_docs = self._read_yaml_documents()
+        self._check_document_length(document_index, yaml_docs)
 
         lines = iter(yaml_docs[document_index].split("\n"))  # Convert to an iterator
         is_reading_dict = False
@@ -539,24 +523,9 @@ class ReadYAML:
                     complex_str = None
                     if value_str in ["^", ">", "|"]:
                         complex_str = value_str
-                        value_str = ""
-                        while True:
-                            line = next(lines).rstrip()  # Get next line from iterator
-                            line_content = line[current_indent:].lstrip()
-                            if complex_str == "^":
-                                value_str = line_content.strip()
-                                break
-                            elif complex_str == "|":
-                                value_str += line_content + "\n"
-                            elif complex_str == ">":
-                                value_str += line_content + " "
-                            if not line_content:
-                                break
-                        if complex_str == ">":
-                            value_str = value_str.rstrip()
-                        if complex_str == "|":
-                            value_str = value_str.rstrip("\n")
-
+                        value_str = self._parse_block_scalar(
+                            lines, current_indent, complex_str
+                        )
                     current_list.append(list_data_type(value_str))
         msg = f"Keyword '{keyword}' not found or it is not "
         msg += "dictionary of lists in the specified document."
@@ -575,6 +544,48 @@ class ReadYAML:
         with open(self._file_name) as file:
             lines = [line.rstrip() for line in file]
         return lines
+
+    # ------------------------------------------------------------------------------------------
+
+    def _read_yaml_documents(self):
+        yaml_docs = list(
+            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+        )
+        return yaml_docs
+
+    # ------------------------------------------------------------------------------------------
+
+    def _check_document_length(self, document_index, yaml_docs) -> None:
+        if document_index >= len(yaml_docs) or document_index < 0:
+            raise ValueError(
+                f"""Document index {document_index} out of range.
+                              File contains {len(yaml_docs)} documents."""
+            )
+
+    # ------------------------------------------------------------------------------------------
+
+    def _calculate_indent(self, line: str):
+        return len(line) - len(line.lstrip())
+
+    # ------------------------------------------------------------------------------------------
+    def _parse_block_scalar(self, lines: iter, current_indent: int, complex_str: str):
+        value_str = ""
+        lines_iter = iter(lines)
+        while True:
+            line = next(lines_iter, "").rstrip()
+            next_indent = self._calculate_indent(line)
+            if next_indent <= current_indent:
+                break
+
+            line_content = line[next_indent:].lstrip()
+            if complex_str == "^":
+                value_str = line_content.strip()
+                break
+            elif complex_str == "|":
+                value_str += line_content + "\n"
+            elif complex_str == ">":
+                value_str += line_content + " "
+        return value_str.rstrip() if complex_str in ["|", ">"] else value_str
 
     # ------------------------------------------------------------------------------------------
 
@@ -609,34 +620,63 @@ class ReadYAML:
                 raise ValueError("Invalid boolean value")
 
         if data_type == str and value_str in ["^", ">", "|"]:
-            complex_str = value_str
-            value_str = ""
-            i = 0
-            while i < len(subsequent_lines):
-                next_line = subsequent_lines[i]
-                next_indent = len(next_line) - len(next_line.lstrip())
-                if next_indent <= keyword_indent:
-                    break
-
-                next_line_content = next_line[next_indent:].lstrip()
-                if complex_str == "^":
-                    value_str = next_line_content.strip()
-                    break
-                elif complex_str == "|":
-                    value_str += next_line_content + "\n"
-                elif complex_str == ">":
-                    value_str += next_line_content + " "
-                i += 1
-
-            if complex_str == ">":
-                value_str = value_str.rstrip()
-            if complex_str == "|":
-                value_str = value_str.rstrip("\n")
+            value_str = self._parse_block_scalar(
+                subsequent_lines, keyword_indent, value_str
+            )
 
         try:
             return data_type(value_str)
         except ValueError:
             raise ValueError("Invalid value")
+        # if data_type == bool:
+        #    value_str = value_str.lower()
+        #    if value_str.upper() in ["TRUE", "YES", "ON"]:
+        #        return True
+        #    elif value_str.upper() in ["FALSE", "NO", "OFF"]:
+        #        return False
+        #    else:
+        #        raise ValueError("Invalid boolean value")
+
+        # if data_type == str and value_str in ["^", ">", "|"]:
+        #    complex_str = value_str
+        #    value_str = ""
+        #    i = 0
+        #    while i < len(subsequent_lines):
+        #        next_line = subsequent_lines[i]
+        #        next_indent = len(next_line) - len(next_line.lstrip())
+        #        if next_indent <= keyword_indent:
+        #            break
+
+        #        next_line_content = next_line[next_indent:].lstrip()
+        #        if complex_str == "^":
+        #            value_str = next_line_content.strip()
+        #            break
+        #        elif complex_str == "|":
+        #            lines = []
+        #            while i < len(subsequent_lines):
+        #                next_line = subsequent_lines[i]
+        #                next_indent = len(next_line) - len(next_line.lstrip())
+        #                if next_indent <= keyword_indent:
+        #                    break
+
+        #                next_line_content = next_line[next_indent:].lstrip()
+        #                lines.append(next_line_content)
+        #                i += 1
+        #            value_str = '\n'.join(lines)
+        #            #value_str += next_line_content + "\n"
+        #        elif complex_str == ">":
+        #            value_str += next_line_content + " "
+        #        i += 1
+
+        #    if complex_str == ">":
+        #        value_str = value_str.rstrip()
+        #    if complex_str == "|":
+        #        value_str = value_str.rstrip("\n")
+
+        # try:
+        #    return data_type(value_str)
+        # except ValueError:
+        #    raise ValueError("Invalid value")
 
 
 # ==========================================================================================

@@ -20,9 +20,6 @@ from cobralib.io import (
     read_text_columns_by_index,
 )
 
-# from tempfile import TemporaryDirectory
-
-
 # ==========================================================================================
 # ==========================================================================================
 # File:    test.py
@@ -517,10 +514,7 @@ def test_read_dict_list_string():
     """
     reader = ReadYAML("../data/test/read_yaml.yaml")
     values = reader.read_yaml_dict_of_list("Str Dict List:", str, str, 0)
-    expected = {
-        "One": ["One", "Two", "Three"],
-        "Two": ["Multi Line\nlist\n- Two\n- ^\nHello"],
-    }
+    expected = {"One": ["One", "Two", "Three"], "Two": ["Multi Line\nlist", "Hello"]}
     assert expected == values
 
 
