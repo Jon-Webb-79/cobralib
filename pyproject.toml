@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cobralib"
-version = "0.1.4"
+version = "0.2.0"
 description = "A utilities module that contains classes and functions that simplify interfaces with files and databases."
 authors = ["Jon Webb <webbja123@gmail.com>"]
 readme = "README.rst"
@@ -120,6 +120,7 @@ console_output_style = "progress"
 markers = [
     "readyaml: Marks tests that involve ReayYaml class",
 	"readjson: Marks tests that involve ReadJSON class",
+	"readxml: Marks tests that involve ReadXML class",
     "readkeywords: Marks tests that involve ReadKeyWords class",
 	"read_columnar: Marks tests that read columnar data",
 	"read_yaml: Marks tests for read_yaml functions",

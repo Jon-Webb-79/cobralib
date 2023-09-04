@@ -3,6 +3,7 @@ import json
 import logging
 import logging.handlers
 import os
+import re
 import xml.etree.ElementTree as ET
 from collections import deque
 from typing import Any, Union
@@ -51,7 +52,7 @@ class ReadYAML:
         if not os.path.isfile(file_name):
             raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
         self._file_name = file_name
-        self.__lines = self._read_lines()
+        self.__yamllines = self._read_yamllines()
 
     # ------------------------------------------------------------------------------------------
 
@@ -537,7 +538,7 @@ class ReadYAML:
     # ==========================================================================================
     # PRIVATE-LIKE methods
 
-    def _read_lines(self):
+    def _read_yamllines(self):
         """
         This private method will read in all lines from the text file
         """
@@ -549,7 +550,7 @@ class ReadYAML:
 
     def _read_yaml_documents(self):
         yaml_docs = list(
-            filter(lambda x: x.strip(), "\n".join(self.__lines).split("---"))
+            filter(lambda x: x.strip(), "\n".join(self.__yamllines).split("---"))
         )
         return yaml_docs
 
@@ -638,26 +639,25 @@ class ReadYAML:
 class ReadJSON:
     """
 
-    :param file_name: The name and path length for the file with the yaml-like
-                      format
+    :param file_name: The name and path length for the file with the json-like
+                      format. While not required, it is recommended that this
+                      file use a .jwc extension.
     :raises FileNotFoundError: If the file does not exist.
 
     This class can be used to read a file woith a JSON-like format.  This class is
     tailoered to read basic JSON files, but with looser requirements on how
     key words are formatted, and stricter requirements on data typing. The methods
     within this class can be used to read scalar variables from key-variable pairs,
-    lists, and flat dictionaries.
-
-    All code examples described in the documentation for this class reference
-    the read_yaml.yaml file shown below.
-
+    lists, and flat dictionaries.  The file containing json data can be a pure
+    .json file, or it can be mixed with yaml like key value pairs.  If the file
+    is mixed, it is recommended that the file be defined with a .jwc extension.
     """
 
     def __init__(self, file_name: str):
         if not os.path.isfile(file_name):
             raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
         self._file_name = file_name
-        self.__lines = self._read_lines()
+        self.__jsonlines = self._read_jsonlines()
 
     # ------------------------------------------------------------------------------------------
 
@@ -691,24 +691,41 @@ class ReadJSON:
 
         .. code-block:: python
 
+           from cobralib.io import ReadJSON
            # Instantiate the class
-           reader = ReadKeyWords("test_key_words.jwc")
+           reader = ReadJSON("test_key_words.jwc")
            value = reader.read_json("JSON Book Data:")
            print(value)
 
+        .. code-block:: text
+
            >> {"book": "History of the World", "year": 1976}
+
         """
         found_keyword = False
         json_data = ""
-        for line in self.__lines:
-            if line.startswith(keyword):
-                found_keyword = True
-                json_data += line.split(keyword)[-1].strip()
-                if json_data.startswith("{") and json_data.endswith("}"):
+        bracket_count = 0
+
+        for line in self.__jsonlines:
+            line = line.strip()  # Remove leading and trailing whitespaces
+
+            if found_keyword or line.startswith(keyword):
+                if not found_keyword:
+                    json_data += line.split(keyword, 1)[-1].lstrip()
+                    found_keyword = True
+                else:
+                    json_data += " " + line  # Add a space to ensure proper formatting
+
+                bracket_count += line.count("{") - line.count("}")
+
+                # If we've found as many closing brackets as opening ones
+                if bracket_count == 0:
                     try:
                         return json.loads(json_data)
-                    except json.JSONDecodeError:
-                        raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
+                    except json.JSONDecodeError as e:
+                        raise ValueError(
+                            f"Invalid JSON data for keyword '{keyword}': {e}"
+                        )
 
         if not found_keyword:
             raise ValueError(f"Keyword '{keyword}' not found in the file")
@@ -736,6 +753,9 @@ class ReadJSON:
         If you assume the input file titled example.json has the following
         format
 
+        Example 1
+        ---------
+
         .. code-block:: json
 
            {
@@ -753,9 +773,14 @@ class ReadJSON:
 
         .. code-block:: python
 
-           reader = ReadKeyWords("example.json")
+           from cobralib.io import ReadJSON
+           reader = ReadJSON("example.json")
            value = reader.read_full_json()
            print(value)
+           new_value = reader.read_full_json("subkey2")
+           print(new_value)
+
+        .. code-block:: text
 
            >> {
                "key1": "value1",
@@ -767,12 +792,10 @@ class ReadJSON:
                    }
                }
            }
-
-           new_value = reader.read_full_json("subkey2")
-           print(new_value)
            >> {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"}
+
         """
-        json_data = json.loads("\n".join(self.__lines))
+        json_data = json.loads("\n".join(self.__jsonlines))
 
         if keyword is None:
             return json_data
@@ -801,7 +824,7 @@ class ReadJSON:
     # ==========================================================================================
     # PRIVATE-LIKE METHODS
 
-    def _read_lines(self):
+    def _read_jsonlines(self):
         """
         This private method will read in all lines from the text file
         """
@@ -814,354 +837,29 @@ class ReadJSON:
 # ==========================================================================================
 
 
-class ReadKeyWords:
+class ReadXML:
     """
-    This class can be used by a read to read a text based config file.  The methods
-    will look for a specific key word that must begin on the first character of each
-    line, and will read in the variable or variables just to the right of the
-    keyword as a user specified data type.  The user can also print the object
-    which will display the user specified number of lines on the screen.
 
-    This class is cabale of reading files that contain text, json and xml
-    data in one file.  In addition, this class can read files that are entirely
-    compriesd of text, json, or xml data.
+    :param file_name: The name and path length for the file with the xml-like
+                      format. While not required, it is recommended that this
+                      file either be an .xml or .jwc file.
+    :raises FileNotFoundError: If the file does not exist.
 
-    :param file_name: The file name to be read including the path length
-    :param print_lines: The number of lines to be printed to the screen if the
-                        user prints an instance of the class. Defaulted to 50
-    :raises FileNotFoundError: If the file does not exist
-
-    Example file titled test_key_words.txt
-
-    .. literalinclude:: ../../../data/test/text_key_words.txt
-       :language: text
-
-    .. code-block:: python
-
-        # Instantiate the class
-        reader = ReadKeyWords("test_key_words.txt", print_lines=2)
-
-        # Print the instance, displaying 2 lines
-        print(reader)
-
-        >> Float Value: 4.387 # Comment line not to be read
-        >> Double Value: 1.11111187 # Comment line not to be read
-
-    The user can also adjust the print_lines attribute after instantiation
-    if they wish to change the number of printed lines
+    This class can be used to read a file woith a XML-like format.  This class is
+    tailoered to read basic XML files, but with looser requirements on how
+    key words are formatted, and stricter requirements on data typing. The methods
+    within this class can be used to read scalar variables from key-variable pairs,
+    lists, and flat dictionaries. The file containing the XML data can contain
+    traditional XML data or yaml-like key value pairs. If the file is mixed,
+    it is recommended that the file be defined with a .jwc extension.
 
     """
 
-    def __init__(self, file_name: str, print_lines: int = 50):
+    def __init__(self, file_name: str):
         if not os.path.isfile(file_name):
             raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
         self._file_name = file_name
-        self.__lines = self._read_lines()
-        self.print_lines = print_lines
-
-    # ------------------------------------------------------------------------------------------
-
-    def read_variable(
-        self, keyword: str, data_type: type, document_index: int = 0
-    ) -> Any:
-        """
-        Search each line for the specified keyword and read the variable to the
-        right of the keyword as the specified data type
-
-        :param keyword: The keyword to search for in each line.
-        :param data_type: The data type to be used in order to casy the variable
-        :param document_index: The document number if the file is a yaml file with
-                               multiple documents in the file
-        :return: The float variable to the right of the keyword.
-        :raises ValueError: If the keyword is not found or if the variable cannot
-                            be parsed as a float.
-
-        .. code-block:: python
-
-           import numpy as np
-           from cobralib.io import ReadKeyWords
-
-           # Instantiate the class
-           reader = ReadKeyWords("test_key_words.txt")
-           value = reader.read_variable("Double Value:", np.float32)
-           print(value)
-           print(type(value))
-
-           >> 1.11111187
-           >> <class 'numpy.float32'>
-
-        However, be carefult with strings.  This method will only read the first
-        character array following the key word. In order to read in the entire
-        line as a string, use the read_string_variable method.
-
-        .. code-block:: python
-
-           from cobralib.io import ReadKeyWords
-           # Instantiate the class
-           reader = ReadKeyWords("test_key_words.txt")
-           value = reader.read_variable("String:", str)
-           print(value)
-           print(type(value))
-
-           >> "Hello"
-           >> str
-
-        This method also works with yaml files.  Assume a .yaml or .yml file with the
-        following content.
-
-        .. literalinclude:: ../../../data/test/read_yaml.yaml
-          :language: text
-
-        .. code-block:: python
-
-           from cobralib.io import ReadKeyWords
-
-           # Instantiate the class
-           reader = ReadKeyWords("read_yaml.yaml")
-           value = reader.read_variable("age:", int, 1)
-           print(value)
-           print(type(value))
-
-           >> 30
-           >> int
-        """
-        # Split the file contents into separate YAML documents based on '---'
-        yaml_docs = "\n".join(self.__lines).split("---")
-
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(
-                f"""Document index {document_index} out of range.
-                              File contains {len(yaml_docs)} documents."""
-            )
-
-        # Iterate over lines in the specified YAML document
-        for line in yaml_docs[document_index].split("\n"):
-            if line.startswith(keyword):
-                value_str = line[len(keyword) :].strip()
-                try:
-                    return data_type(value_str)
-                except ValueError:
-                    raise ValueError(f"Invalid value found for {keyword}")
-
-        raise ValueError(f"Keyword '{keyword}' not found in the specified document")
-
-    # ------------------------------------------------------------------------------------------
-
-    def read_string_variable(self, keyword: str, document_index: int = 0) -> str:
-        """
-        Search each line for the specified keyword and read the string variable
-        to the right of the keyword.
-
-        :param keyword: The keyword to search for in each line.
-        :param document_index: The document number if the file is a yaml file with
-                               multiple documents in the file
-        :return: The string variable to the right of the keyword.
-        :raises ValueError: If the keyword is not found.
-
-        .. code-block:: python
-
-           # Instantiate the class
-           reader = ReadKeyWords("test_key_words.txt")
-           value = reader.read_variable("String:", str)
-           print(value)
-           print(type(value))
-
-           >> Hello # Comment to be read
-           >> str
-        """
-
-        # Split the file contents into separate YAML documents based on '---'
-        yaml_docs = "\n".join(self.__lines).split("---")
-
-        if document_index >= len(yaml_docs) or document_index < 0:
-            raise ValueError(
-                f"""Document index {document_index} out of range.
-                              File contains {len(yaml_docs)} documents."""
-            )
-
-        lines = yaml_docs[document_index].split("\n")
-
-        for i, line in enumerate(lines):
-            if line.startswith(keyword):
-                value = line[len(keyword) :].strip()
-
-                if value == "^" and i + 1 < len(lines):
-                    return lines[i + 1].strip()
-
-                if value == "|":
-                    multiline_values = []
-                    # Determine the indentation of the current keyword line
-                    indentation = len(line) - len(line.lstrip())
-                    print(indentation)
-                    # Start reading lines from the next line after '|'
-                    for subsequent_line in lines[i + 1 :]:
-                        # If we encounter a line with equal or lesser indentation,
-                        # we've found the end of the multiline string.
-                        if (
-                            len(subsequent_line) - len(subsequent_line.lstrip())
-                            <= indentation
-                        ):
-                            break
-                        multiline_values.append(subsequent_line)
-                    return "\n".join(multiline_values)
-
-                return value
-
-        raise ValueError(f"Keyword '{keyword}' not found in the file")
-
-    # ------------------------------------------------------------------------------------------
-
-    def read_list(self, keyword: str, data_type: type) -> list[Any]:
-        """
-        Search each line for the specified keyword and read the values after the keyword
-        as a list of the user-defined data type.
-
-        :param keyword: The keyword to search for in each line.
-        :param data_type: The data type to which the values should be transformed.
-        :return: The list of values after the keyword, transformed into the specified
-                 data type.
-        :raises ValueError: If the keyword is not found.
-
-        .. code-block:: python
-
-           # Instantiate the class
-           reader = ReadKeyWords("test_key_words.txt")
-           value = reader.read_list("Float List:", float)
-           print(value)
-
-           >> [ 1.1, 2.2, 3.3, 4.4 ]
-        """
-        for line in self.__lines:
-            if line.startswith(keyword):
-                tokens = line.split()[2:]  # Skip the keyword and colon
-                try:
-                    values = [data_type(token) for token in tokens]
-                    return values
-                except ValueError:
-                    raise ValueError(
-                        f"Invalid {data_type.__name__} value found for {keyword}"
-                    )
-        raise ValueError(f"Keyword '{keyword}' not found in the file")
-
-    # ------------------------------------------------------------------------------------------
-
-    def read_json(self, keyword: str) -> dict:
-        """
-        Search each line for the specified keyword and read the JSON data
-        to the right of the keyword until the termination of brackets.
-
-        :param keyword: The keyword to search for in each line.
-        :return: The JSON data as a dictionary.
-        :raises ValueError: If the keyword is not found or if the JSON data is not valid.
-
-        .. code-block:: python
-
-           # Instantiate the class
-           reader = ReadKeyWords("test_key_words.txt")
-           value = reader.read_json("JSON Data:")
-           print(value)
-
-           >> {"book": "History of the World", "year": 1976}
-        """
-        found_keyword = False
-        json_data = ""
-        for line in self.__lines:
-            if line.startswith(keyword):
-                found_keyword = True
-                json_data += line.split(keyword)[-1].strip()
-                if json_data.startswith("{") and json_data.endswith("}"):
-                    try:
-                        return json.loads(json_data)
-                    except json.JSONDecodeError:
-                        raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
-
-        if not found_keyword:
-            raise ValueError(f"Keyword '{keyword}' not found in the file")
-        else:
-            raise ValueError(f"Invalid JSON data for keyword '{keyword}'")
-
-    # ------------------------------------------------------------------------------------------
-
-    def read_full_json(self, keyword: str = None) -> Union[dict, list]:
-        """
-        Read the entire contents of the file as JSON data.
-        If a keyword is provided, search for that keyword and return the nested
-        dictionaries beneath it.
-
-        :param keyword: The keyword to search for in the file. If None,
-                        returns the entire JSON data.
-        :return: The JSON data as a dictionary or list.
-        :raises ValueError: If the keyword is specified but not found
-                            in the file.
-
-        Unlike the read_json method, this method assumes the entire file is
-        formatted as a .json file.  This method will allow a user to read
-        in the entire contents of the json file as a dictionary, or it
-        will read in the dictionaries nested under a specific key word.
-        If you assume the input file titled example.json has the following
-        format
-
-        .. code-block:: json
-
-           {
-            "key1": "value1",
-            "key2": {
-                "subkey1": "subvalue1",
-                "subkey2": {
-                    "subsubkey1": "subsubvalue1",
-                    "subsubkey2": "subsubvalue2"
-                 }
-              }
-           }
-
-        The code to extract data would look like:
-
-        .. code-block:: python
-
-           reader = ReadKeyWords("example.json")
-           value = reader.read_full_json()
-           print(value)
-
-           >> {
-               "key1": "value1",
-               "key2": {
-                   "subkey1": "subvalue1",
-                   "subkey2": {
-                       "subsubkey1": "subsubvalue1",
-                       "subsubkey2": "subsubvalue2"
-                   }
-               }
-           }
-
-           new_value = reader.read_full_json("subkey2")
-           print(new_value)
-           >> {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"}
-        """
-        json_data = json.loads("\n".join(self.__lines))
-
-        if keyword is None:
-            return json_data
-
-        def find_nested_dictionaries(data, keyword):
-            if isinstance(data, dict):
-                if keyword in data:
-                    return data[keyword]
-                for value in data.values():
-                    result = find_nested_dictionaries(value, keyword)
-                    if result is not None:
-                        return result
-            elif isinstance(data, list):
-                for item in data:
-                    result = find_nested_dictionaries(item, keyword)
-                    if result is not None:
-                        return result
-            return None
-
-        result = find_nested_dictionaries(json_data, keyword)
-        if result is not None:
-            return result
-        else:
-            raise ValueError(f"Keyword '{keyword}' not found in the JSON data")
+        self.__xmllines = self._read_xml_lines()
 
     # ------------------------------------------------------------------------------------------
 
@@ -1173,21 +871,75 @@ class ReadKeyWords:
         :param keyword: The keyword to search for in each line.
         :return: The XML data as a dictionary.
         :raises ValueError: If the keyword is not found or if the XML data is not valid.
+
+        Example 1
+        ---------
+
+        .. code-block:: text
+
+            Yaml Dict:
+                - 1
+                - 2
+                - 3
+            Yaml Key: Test String
+            Yaml Dict:
+                One: 1.1
+                Two: 2.2
+                Three: 3.3
+            XML Book Data: <root>
+                              <book>"History of the World"</book>
+                              <Year>1976</Year>
+                           </root>
+
+        .. code-block:: python
+
+           from cobralib.io import ReadXML
+           reader = ReadXML("example.jwc")
+           value = reader.read_xml("XML Book Data")
+           print(value)
+
+        .. code-block:: text
+
+           >> {"book": "History of the World", "year": 1976}
         """
         found_keyword = False
         xml_data = ""
-        for line in self.__lines:
+        collect_lines = False
+        root_tag = None  # Root tag of the XML data
+
+        for line in self.__xmllines:
             if line.startswith(keyword):
                 found_keyword = True
-                xml_data += line.split(keyword)[-1].strip()
-                if xml_data.startswith("<") and xml_data.endswith(">"):
-                    try:
-                        return xmltodict.parse(xml_data)
-                    except xmltodict.ParsingInterrupted:
-                        raise ValueError(f"Invalid XML data for keyword '{keyword}'")
+                collect_lines = True  # Start collecting lines
+                remaining_line = line.split(keyword)[-1].strip()
+                xml_data += remaining_line
+
+                # Try to find the root tag from this line
+                match = re.search("<([^/> ]+)", remaining_line)
+                if match:
+                    root_tag = match.group(1)
+
+            elif collect_lines:
+                xml_data += line.strip()  # Add line to xml_data
+
+                # If root_tag is still None, try to find it from this line
+                if root_tag is None:
+                    match = re.search("<([^/> ]+)", line)
+                    if match:
+                        root_tag = match.group(1)
+
+                # Stop collecting lines if we find the closing root tag
+                if root_tag is not None and f"</{root_tag}>" in line:
+                    break
 
         if not found_keyword:
             raise ValueError(f"Keyword '{keyword}' not found in the file")
+
+        if xml_data.startswith("<") and xml_data.endswith(">"):
+            try:
+                return xmltodict.parse(xml_data)
+            except Exception:  # Catch any XML parsing errors
+                raise ValueError(f"Invalid XML data for keyword '{keyword}'")
         else:
             raise ValueError(f"Invalid XML data for keyword '{keyword}'")
 
@@ -1206,6 +958,9 @@ class ReadKeyWords:
 
         If you assume the input file titled example.xml has the following format:
 
+        Example 1
+        ---------
+
         .. code-block:: xml
 
            <root>
@@ -1223,7 +978,8 @@ class ReadKeyWords:
 
         .. code-block:: python
 
-           reader = ReadKeyWords("example.xml")
+           from cobralib.io import ReadXML
+           reader = ReadXML("example.xml")
            value = reader.read_full_xml()
            print(value)
 
@@ -1242,6 +998,9 @@ class ReadKeyWords:
 
            new_value = reader.read_full_xml("subkey2")
            print(new_value)
+
+        .. code-block:: text
+
            >> {
                "subkey1": "subvalue1",
                "subkey2": {
@@ -1262,6 +1021,217 @@ class ReadKeyWords:
                 return xmltodict.parse(xml_string)
             else:
                 raise ValueError(f"Keyword '{keyword}' not found in the XML data")
+
+    # ==========================================================================================
+    # PRIVATE-LIKE METHODS
+
+    def _read_xml_lines(self):
+        """
+        This private method will read in all lines from the text file
+        """
+        with open(self._file_name) as file:
+            lines = [line.rstrip() for line in file]
+        return lines
+
+
+# ==========================================================================================
+# ==========================================================================================
+
+
+class ReadKeyWords(ReadYAML, ReadJSON, ReadXML):
+    """
+    This class is a container for the ReadYAML, ReadJSON, and ReadXML classes.  This
+    class is developed specifically to read .jwc file types, which can mix JSON,
+    XML, and YAML formats.  Thsi file can be used to read a straight XML, JSON,
+    or YAML file.
+
+    :param file_name: The file name to be read including the path length
+    :param print_lines: The number of lines to be printed to the screen if the
+                        user prints an instance of the class. Defaulted to 50
+    :raises FileNotFoundError: If the file does not exist
+
+    Example File
+    ------------
+
+    .. code-block:: text
+
+       ---
+       # First document in file
+
+       Float Value: 4.387
+       Double Value: 1.11111187
+       integer: 6
+       String: Hello
+       Float List: [1.1 2.2 3.3 4.4]
+       Yaml Block List:
+           - 1
+           - 2
+           - 3
+           - 4
+       Yaml Dict:
+           First Key: 3.3
+           Second Key: 4.4
+           Third Key: 5.5
+           Fourth Key: 6.6
+       String List Hello World How are you
+       JSON Data: {"book": "History of the World, "Year": 1976}
+       XML Data: <root>
+                    <book>"History of the World"</book>
+                    <Year>1976</Year>
+                 </root>
+
+       ---
+       # Second document in file
+
+       # Notice that a : character is not required
+       Another Int 3
+
+    Instantiation Example
+    ---------------------
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        reader = ReadKeyWords("test_key_words.jwc", print_lines=2)
+
+        # Print the instance, displaying 2 lines
+        print(reader)
+
+    .. code-block:: bash
+
+        >> Float Value: 4.387 # Comment line not to be read
+        >> Double Value: 1.11111187 # Comment line not to be read
+
+    The user can also adjust the print_lines attribute after instantiation
+    if they wish to change the number of printed lines
+
+    Read Scalar Values
+    ------------------
+
+    This class can be used to read in key value pairs.
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        reader = ReadKeyWords("test_key_words.jwc")
+        int_value = reader.read_key_value("integer:", int)
+        double_value = reader.read_key_value("Double Value:", np.float64)
+        # Read from second document in file
+        second_doc = reader.read_key_value("Another Int", int, 1)
+        print("Integer Value: ", int_value)
+        print(type)
+        print("Double Value: ", double_value)
+        print(type)
+        print(second_doc)
+
+    .. code-block:: bash
+
+       >> Integer Value: 6
+       >> int
+       >> Double Value: 1.11111187
+       >> np.float64
+       >> 3
+
+    Read List Values
+    ----------------
+
+    This class can be used to read in lists stored inline or in block
+    formats
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        reader = ReadKeyWords("test_key_words.jwc")
+        inline_list = reader.read_key_value("Float List:", float)
+        block_list = reader.read_key_value("Yaml Block List:", int)
+        print("Inline List: ", inline_list)
+        print("Block List: ", block_list)
+
+    .. code-block:: bash
+
+       >> Inline List: [ 1.1, 2.2, 3.3, 4.4 ]
+       >> Block List: [ 1, 2, 3, 4 ]
+
+    Read JSON and XML
+    -----------------
+
+    This class can be used to read JSON and XML data associated with key words
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        reader = ReadKeyWords("test_key_words.jwc")
+        json_data = reader.read_json("JSON Data:")
+        xml_data = reader.read_xml("XML Data:")
+        print("JSON Data: ", json_data)
+        print("XML Data: ", xml_data)
+
+    .. code-block:: bash
+
+       >> JSON Data: {"book": "History of the World", "Year", 1976}
+       >> XML Data: {"book": "History of the World", "Year", 1976}
+
+    Read YAML Dictionaries
+    ----------------------
+
+    This class can be used to read dictionaries encoded in YAML formats.  Unlike
+    JSON and XML, dictionaries read in from a YAML format must be flat
+    (i.e. no nested dictionaries) and of a uniform data type.
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        reader = ReadKeyWords("test_key_words.jwc")
+        yaml_dict = reader.read_yaml_dict("Yaml Dict:", str, float)
+        print("YAML Dictionary: ", yaml_dict)
+
+    .. code-block:: bash
+
+       >> YAML Dictionary: {"First Key": 3.3, "Second Key": 4.4,
+                            "Third Key": 5.5, "Fourth Key": 6.6}
+
+    **Note:** In order to read in a ditionary of lists, use the ``read_yaml_dict_of_list``
+    method.
+
+    YAML, JSON, and XML Files
+    -------------------------
+
+    If you wish to read a .yaml, .josn, or .xml file that does not contain
+    mixed data, you can use one of these three methods.
+
+    .. code-block:: python
+
+        # Instantiate the class
+        from io.cobralib import ReadKey Words
+        yaml_reader = ReadKeyWords("test_key_words.yaml")
+        yaml_data = yaml_reader.read_full_yaml()
+
+        json_reader = ReadKeyWords("test_key_words.json")
+        json_data = json_reader.read_full.json()
+
+        xml_reader = ReadKeyWords("test_key_words.xml")
+        xml_data = xml_reader.read_full_xml()
+    """
+
+    def __init__(self, file_name: str, print_lines: int = 50):
+        # Verify file exists)
+        if not os.path.isfile(file_name):
+            raise FileNotFoundError(f"FATAL ERROR: {file_name} does not exist")
+
+        # Instantiate inherited classes
+        ReadYAML.__init__(self, file_name)
+        ReadJSON.__init__(self, file_name)
+        ReadXML.__init__(self, file_name)
+
+        # Read in data
+        self._file_name = file_name
+        self.__lines = self._read_lines()
+        self.print_lines = print_lines
 
     # ==========================================================================================
     # PRIVATE-LIKE methods

@@ -1,0 +1,35 @@
+---
+# First document in file
+
+Float Value: 4.387
+Double Value: 1.11111187
+integer: 6
+String: Hello
+Float List: [ 1.1, 2.2, 3.3, 4.4 ]
+Yaml Block List:
+    - 1
+	- 2
+	- 3
+	- 4
+Yaml Dict:
+  First Key: 3.3
+  Second Key: 4.4
+  Third Key: 5.5
+  Fourth Key: 6.6
+String List Hello World How are you
+JSON Data: {"book": "History of the World", "Year": 1976}
+JSON: {"employees": [
+    {"name":"Shyam", "email":"shyamjaiswal@gmail.com"},
+    {"name":"Bob", "email":"bob32@gmail.com"},
+    {"name":"Jai", "email":"jai87@gmail.com"}
+]}
+
+XML Data: <root>
+            <book>"History of the World"</book>
+			<Year>1976</Year>
+		  </root>
+---
+# Second document in file
+
+# Notice that a : character is not required
+Another Int 3

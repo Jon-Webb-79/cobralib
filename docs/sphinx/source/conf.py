@@ -22,7 +22,7 @@ copyright = "2023, Jonathan A. Webb"
 author = "Jonathan A. Webb"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.4"
+release = "0.2.0"
 
 
 # -- General configuration ---------------------------------------------------

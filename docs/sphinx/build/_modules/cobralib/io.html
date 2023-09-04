@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cobralib.io &mdash; cobralib 0.1.4 documentation</title>
+  <title>cobralib.io &mdash; cobralib 0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,7 +12,7 @@
 
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=dff88ec8"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b1f64a84"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -83,6 +83,7 @@
 <span class="kn">import</span> <span class="nn">pdfplumber</span>
 <span class="kn">import</span> <span class="nn">xmltodict</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
@@ -123,7 +124,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__yamllines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_yamllines</span><span class="p">()</span>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
@@ -609,7 +610,7 @@
     <span class="c1"># ==========================================================================================</span>
     <span class="c1"># PRIVATE-LIKE methods</span>
 
-    <span class="k">def</span> <span class="nf">_read_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_read_yamllines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This private method will read in all lines from the text file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -621,7 +622,7 @@
 
     <span class="k">def</span> <span class="nf">_read_yaml_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">yaml_docs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">))</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__yamllines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">))</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">yaml_docs</span>
 
@@ -707,32 +708,32 @@
 <span class="c1"># ==========================================================================================</span>
 
 
-<span class="k">class</span> <span class="nc">ReadJSON</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadJSON"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadJSON">[docs]</a><span class="k">class</span> <span class="nc">ReadJSON</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">    :param file_name: The name and path length for the file with the yaml-like</span>
-<span class="sd">                      format</span>
+<span class="sd">    :param file_name: The name and path length for the file with the json-like</span>
+<span class="sd">                      format. While not required, it is recommended that this</span>
+<span class="sd">                      file use a .jwc extension.</span>
 <span class="sd">    :raises FileNotFoundError: If the file does not exist.</span>
 
 <span class="sd">    This class can be used to read a file woith a JSON-like format.  This class is</span>
 <span class="sd">    tailoered to read basic JSON files, but with looser requirements on how</span>
 <span class="sd">    key words are formatted, and stricter requirements on data typing. The methods</span>
 <span class="sd">    within this class can be used to read scalar variables from key-variable pairs,</span>
-<span class="sd">    lists, and flat dictionaries.</span>
-
-<span class="sd">    All code examples described in the documentation for this class reference</span>
-<span class="sd">    the read_yaml.yaml file shown below.</span>
-
+<span class="sd">    lists, and flat dictionaries.  The file containing json data can be a pure</span>
+<span class="sd">    .json file, or it can be mixed with yaml like key value pairs.  If the file</span>
+<span class="sd">    is mixed, it is recommended that the file be defined with a .jwc extension.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__jsonlines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_jsonlines</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ReadJSON.read_json"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadJSON.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the JSON data</span>
 <span class="sd">        to the right of the keyword until the termination of brackets.</span>
@@ -740,6 +741,12 @@
 <span class="sd">        :param keyword: The keyword to search for in each line.</span>
 <span class="sd">        :return: The JSON data as a dictionary.</span>
 <span class="sd">        :raises ValueError: If the keyword is not found or if the JSON data is not valid.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+<span class="sd">        This example shows a file that mixes YAML and JSON data types.  In order</span>
+<span class="sd">        to delinate the file type that contains mixed data, it is recommended that</span>
+<span class="sd">        the .jwc file format be used; however, it is not required.</span>
 
 <span class="sd">        .. code-block:: text</span>
 
@@ -756,33 +763,48 @@
 
 <span class="sd">        .. code-block:: python</span>
 
+<span class="sd">           from cobralib.io import ReadJSON</span>
 <span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
+<span class="sd">           reader = ReadJSON(&quot;test_key_words.jwc&quot;)</span>
 <span class="sd">           value = reader.read_json(&quot;JSON Book Data:&quot;)</span>
 <span class="sd">           print(value)</span>
 
+<span class="sd">        .. code-block:: text</span>
+
 <span class="sd">           &gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">json_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">json_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">json_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">json_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">):</span>
+        <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__jsonlines</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Remove leading and trailing whitespaces</span>
+
+            <span class="k">if</span> <span class="n">found_keyword</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
+                    <span class="n">json_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                    <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">json_data</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">line</span>  <span class="c1"># Add a space to ensure proper formatting</span>
+
+                <span class="n">bracket_count</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+
+                <span class="c1"># If we&#39;ve found as many closing brackets as opening ones</span>
+                <span class="k">if</span> <span class="n">bracket_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ------------------------------------------------------------------------------------------</span>
+    <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<div class="viewcode-block" id="ReadJSON.read_full_json"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadJSON.read_full_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the entire contents of the file as JSON data.</span>
 <span class="sd">        If a keyword is provided, search for that keyword and return the nested</span>
@@ -801,6 +823,9 @@
 <span class="sd">        If you assume the input file titled example.json has the following</span>
 <span class="sd">        format</span>
 
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+
 <span class="sd">        .. code-block:: json</span>
 
 <span class="sd">           {</span>
@@ -818,9 +843,14 @@
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">           reader = ReadKeyWords(&quot;example.json&quot;)</span>
+<span class="sd">           from cobralib.io import ReadJSON</span>
+<span class="sd">           reader = ReadJSON(&quot;example.json&quot;)</span>
 <span class="sd">           value = reader.read_full_json()</span>
 <span class="sd">           print(value)</span>
+<span class="sd">           new_value = reader.read_full_json(&quot;subkey2&quot;)</span>
+<span class="sd">           print(new_value)</span>
+
+<span class="sd">        .. code-block:: text</span>
 
 <span class="sd">           &gt;&gt; {</span>
 <span class="sd">               &quot;key1&quot;: &quot;value1&quot;,</span>
@@ -832,12 +862,10 @@
 <span class="sd">                   }</span>
 <span class="sd">               }</span>
 <span class="sd">           }</span>
-
-<span class="sd">           new_value = reader.read_full_json(&quot;subkey2&quot;)</span>
-<span class="sd">           print(new_value)</span>
 <span class="sd">           &gt;&gt; {&quot;subsubkey1&quot;: &quot;subsubvalue1&quot;, &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;}</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">))</span>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__jsonlines</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">json_data</span>
@@ -861,374 +889,51 @@
         <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">result</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the JSON data&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the JSON data&quot;</span><span class="p">)</span></div>
 
-<span class="c1"># ==========================================================================================</span>
-<span class="c1"># PRIVATE-LIKE METHODS</span>
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE METHODS</span>
 
-    <span class="k">def</span> <span class="nf">_read_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_read_jsonlines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This private method will read in all lines from the text file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">lines</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+
 <span class="c1"># ==========================================================================================</span>
 <span class="c1"># ==========================================================================================</span>
 
 
-<span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadXML"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadXML">[docs]</a><span class="k">class</span> <span class="nc">ReadXML</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class can be used by a read to read a text based config file.  The methods</span>
-<span class="sd">    will look for a specific key word that must begin on the first character of each</span>
-<span class="sd">    line, and will read in the variable or variables just to the right of the</span>
-<span class="sd">    keyword as a user specified data type.  The user can also print the object</span>
-<span class="sd">    which will display the user specified number of lines on the screen.</span>
 
-<span class="sd">    This class is cabale of reading files that contain text, json and xml</span>
-<span class="sd">    data in one file.  In addition, this class can read files that are entirely</span>
-<span class="sd">    compriesd of text, json, or xml data.</span>
+<span class="sd">    :param file_name: The name and path length for the file with the xml-like</span>
+<span class="sd">                      format. While not required, it is recommended that this</span>
+<span class="sd">                      file either be an .xml or .jwc file.</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist.</span>
 
-<span class="sd">    :param file_name: The file name to be read including the path length</span>
-<span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
-<span class="sd">                        user prints an instance of the class. Defaulted to 50</span>
-<span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
-
-<span class="sd">    Example file titled test_key_words.txt</span>
-
-<span class="sd">    .. literalinclude:: ../../../data/test/text_key_words.txt</span>
-<span class="sd">       :language: text</span>
-
-<span class="sd">    .. code-block:: python</span>
-
-<span class="sd">        # Instantiate the class</span>
-<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.txt&quot;, print_lines=2)</span>
-
-<span class="sd">        # Print the instance, displaying 2 lines</span>
-<span class="sd">        print(reader)</span>
-
-<span class="sd">        &gt;&gt; Float Value: 4.387 # Comment line not to be read</span>
-<span class="sd">        &gt;&gt; Double Value: 1.11111187 # Comment line not to be read</span>
-
-<span class="sd">    The user can also adjust the print_lines attribute after instantiation</span>
-<span class="sd">    if they wish to change the number of printed lines</span>
+<span class="sd">    This class can be used to read a file woith a XML-like format.  This class is</span>
+<span class="sd">    tailoered to read basic XML files, but with looser requirements on how</span>
+<span class="sd">    key words are formatted, and stricter requirements on data typing. The methods</span>
+<span class="sd">    within this class can be used to read scalar variables from key-variable pairs,</span>
+<span class="sd">    lists, and flat dictionaries. The file containing the XML data can contain</span>
+<span class="sd">    traditional XML data or yaml-like key value pairs. If the file is mixed,</span>
+<span class="sd">    it is recommended that the file be defined with a .jwc extension.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">print_lines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_lines</span> <span class="o">=</span> <span class="n">print_lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__xmllines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_xml_lines</span><span class="p">()</span>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-    <span class="k">def</span> <span class="nf">read_variable</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search each line for the specified keyword and read the variable to the</span>
-<span class="sd">        right of the keyword as the specified data type</span>
-
-<span class="sd">        :param keyword: The keyword to search for in each line.</span>
-<span class="sd">        :param data_type: The data type to be used in order to casy the variable</span>
-<span class="sd">        :param document_index: The document number if the file is a yaml file with</span>
-<span class="sd">                               multiple documents in the file</span>
-<span class="sd">        :return: The float variable to the right of the keyword.</span>
-<span class="sd">        :raises ValueError: If the keyword is not found or if the variable cannot</span>
-<span class="sd">                            be parsed as a float.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           import numpy as np</span>
-<span class="sd">           from cobralib.io import ReadKeyWords</span>
-
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
-<span class="sd">           value = reader.read_variable(&quot;Double Value:&quot;, np.float32)</span>
-<span class="sd">           print(value)</span>
-<span class="sd">           print(type(value))</span>
-
-<span class="sd">           &gt;&gt; 1.11111187</span>
-<span class="sd">           &gt;&gt; &lt;class &#39;numpy.float32&#39;&gt;</span>
-
-<span class="sd">        However, be carefult with strings.  This method will only read the first</span>
-<span class="sd">        character array following the key word. In order to read in the entire</span>
-<span class="sd">        line as a string, use the read_string_variable method.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           from cobralib.io import ReadKeyWords</span>
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
-<span class="sd">           value = reader.read_variable(&quot;String:&quot;, str)</span>
-<span class="sd">           print(value)</span>
-<span class="sd">           print(type(value))</span>
-
-<span class="sd">           &gt;&gt; &quot;Hello&quot;</span>
-<span class="sd">           &gt;&gt; str</span>
-
-<span class="sd">        This method also works with yaml files.  Assume a .yaml or .yml file with the</span>
-<span class="sd">        following content.</span>
-
-<span class="sd">        .. literalinclude:: ../../../data/test/read_yaml.yaml</span>
-<span class="sd">          :language: text</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           from cobralib.io import ReadKeyWords</span>
-
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;read_yaml.yaml&quot;)</span>
-<span class="sd">           value = reader.read_variable(&quot;age:&quot;, int, 1)</span>
-<span class="sd">           print(value)</span>
-<span class="sd">           print(type(value))</span>
-
-<span class="sd">           &gt;&gt; 30</span>
-<span class="sd">           &gt;&gt; int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Split the file contents into separate YAML documents based on &#39;---&#39;</span>
-        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
-<span class="s2">                              File contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents.&quot;&quot;&quot;</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Iterate over lines in the specified YAML document</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">value_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">data_type</span><span class="p">(</span><span class="n">value_str</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the specified document&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-    <span class="k">def</span> <span class="nf">read_string_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">document_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search each line for the specified keyword and read the string variable</span>
-<span class="sd">        to the right of the keyword.</span>
-
-<span class="sd">        :param keyword: The keyword to search for in each line.</span>
-<span class="sd">        :param document_index: The document number if the file is a yaml file with</span>
-<span class="sd">                               multiple documents in the file</span>
-<span class="sd">        :return: The string variable to the right of the keyword.</span>
-<span class="sd">        :raises ValueError: If the keyword is not found.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
-<span class="sd">           value = reader.read_variable(&quot;String:&quot;, str)</span>
-<span class="sd">           print(value)</span>
-<span class="sd">           print(type(value))</span>
-
-<span class="sd">           &gt;&gt; Hello # Comment to be read</span>
-<span class="sd">           &gt;&gt; str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Split the file contents into separate YAML documents based on &#39;---&#39;</span>
-        <span class="n">yaml_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">document_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Document index </span><span class="si">{</span><span class="n">document_index</span><span class="si">}</span><span class="s2"> out of range.</span>
-<span class="s2">                              File contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">yaml_docs</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents.&quot;&quot;&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml_docs</span><span class="p">[</span><span class="n">document_index</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;^&quot;</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;|&quot;</span><span class="p">:</span>
-                    <span class="n">multiline_values</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="c1"># Determine the indentation of the current keyword line</span>
-                    <span class="n">indentation</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">indentation</span><span class="p">)</span>
-                    <span class="c1"># Start reading lines from the next line after &#39;|&#39;</span>
-                    <span class="k">for</span> <span class="n">subsequent_line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span>
-                        <span class="c1"># If we encounter a line with equal or lesser indentation,</span>
-                        <span class="c1"># we&#39;ve found the end of the multiline string.</span>
-                        <span class="k">if</span> <span class="p">(</span>
-                            <span class="nb">len</span><span class="p">(</span><span class="n">subsequent_line</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsequent_line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
-                            <span class="o">&lt;=</span> <span class="n">indentation</span>
-                        <span class="p">):</span>
-                            <span class="k">break</span>
-                        <span class="n">multiline_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsequent_line</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multiline_values</span><span class="p">)</span>
-
-                <span class="k">return</span> <span class="n">value</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search each line for the specified keyword and read the values after the keyword</span>
-<span class="sd">        as a list of the user-defined data type.</span>
-
-<span class="sd">        :param keyword: The keyword to search for in each line.</span>
-<span class="sd">        :param data_type: The data type to which the values should be transformed.</span>
-<span class="sd">        :return: The list of values after the keyword, transformed into the specified</span>
-<span class="sd">                 data type.</span>
-<span class="sd">        :raises ValueError: If the keyword is not found.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
-<span class="sd">           value = reader.read_list(&quot;Float List:&quot;, float)</span>
-<span class="sd">           print(value)</span>
-
-<span class="sd">           &gt;&gt; [ 1.1, 2.2, 3.3, 4.4 ]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">tokens</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>  <span class="c1"># Skip the keyword and colon</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_type</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
-                    <span class="k">return</span> <span class="n">values</span>
-                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Invalid </span><span class="si">{</span><span class="n">data_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> value found for </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Search each line for the specified keyword and read the JSON data</span>
-<span class="sd">        to the right of the keyword until the termination of brackets.</span>
-
-<span class="sd">        :param keyword: The keyword to search for in each line.</span>
-<span class="sd">        :return: The JSON data as a dictionary.</span>
-<span class="sd">        :raises ValueError: If the keyword is not found or if the JSON data is not valid.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           # Instantiate the class</span>
-<span class="sd">           reader = ReadKeyWords(&quot;test_key_words.txt&quot;)</span>
-<span class="sd">           value = reader.read_json(&quot;JSON Data:&quot;)</span>
-<span class="sd">           print(value)</span>
-
-<span class="sd">           &gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">json_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
-                <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">json_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">json_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">json_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">):</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-    <span class="k">def</span> <span class="nf">read_full_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the entire contents of the file as JSON data.</span>
-<span class="sd">        If a keyword is provided, search for that keyword and return the nested</span>
-<span class="sd">        dictionaries beneath it.</span>
-
-<span class="sd">        :param keyword: The keyword to search for in the file. If None,</span>
-<span class="sd">                        returns the entire JSON data.</span>
-<span class="sd">        :return: The JSON data as a dictionary or list.</span>
-<span class="sd">        :raises ValueError: If the keyword is specified but not found</span>
-<span class="sd">                            in the file.</span>
-
-<span class="sd">        Unlike the read_json method, this method assumes the entire file is</span>
-<span class="sd">        formatted as a .json file.  This method will allow a user to read</span>
-<span class="sd">        in the entire contents of the json file as a dictionary, or it</span>
-<span class="sd">        will read in the dictionaries nested under a specific key word.</span>
-<span class="sd">        If you assume the input file titled example.json has the following</span>
-<span class="sd">        format</span>
-
-<span class="sd">        .. code-block:: json</span>
-
-<span class="sd">           {</span>
-<span class="sd">            &quot;key1&quot;: &quot;value1&quot;,</span>
-<span class="sd">            &quot;key2&quot;: {</span>
-<span class="sd">                &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
-<span class="sd">                &quot;subkey2&quot;: {</span>
-<span class="sd">                    &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
-<span class="sd">                    &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
-<span class="sd">                 }</span>
-<span class="sd">              }</span>
-<span class="sd">           }</span>
-
-<span class="sd">        The code to extract data would look like:</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">           reader = ReadKeyWords(&quot;example.json&quot;)</span>
-<span class="sd">           value = reader.read_full_json()</span>
-<span class="sd">           print(value)</span>
-
-<span class="sd">           &gt;&gt; {</span>
-<span class="sd">               &quot;key1&quot;: &quot;value1&quot;,</span>
-<span class="sd">               &quot;key2&quot;: {</span>
-<span class="sd">                   &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
-<span class="sd">                   &quot;subkey2&quot;: {</span>
-<span class="sd">                       &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,</span>
-<span class="sd">                       &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;</span>
-<span class="sd">                   }</span>
-<span class="sd">               }</span>
-<span class="sd">           }</span>
-
-<span class="sd">           new_value = reader.read_full_json(&quot;subkey2&quot;)</span>
-<span class="sd">           print(new_value)</span>
-<span class="sd">           &gt;&gt; {&quot;subsubkey1&quot;: &quot;subsubvalue1&quot;, &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">json_data</span>
-
-        <span class="k">def</span> <span class="nf">find_nested_dictionaries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">result</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">result</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="n">result</span> <span class="o">=</span> <span class="n">find_nested_dictionaries</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">result</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the JSON data&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ------------------------------------------------------------------------------------------</span>
-
-    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="ReadXML.read_xml"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadXML.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search each line for the specified keyword and read the XML data</span>
 <span class="sd">        to the right of the keyword until the termination of tags.</span>
@@ -1236,27 +941,81 @@
 <span class="sd">        :param keyword: The keyword to search for in each line.</span>
 <span class="sd">        :return: The XML data as a dictionary.</span>
 <span class="sd">        :raises ValueError: If the keyword is not found or if the XML data is not valid.</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">            Yaml Dict:</span>
+<span class="sd">                - 1</span>
+<span class="sd">                - 2</span>
+<span class="sd">                - 3</span>
+<span class="sd">            Yaml Key: Test String</span>
+<span class="sd">            Yaml Dict:</span>
+<span class="sd">                One: 1.1</span>
+<span class="sd">                Two: 2.2</span>
+<span class="sd">                Three: 3.3</span>
+<span class="sd">            XML Book Data: &lt;root&gt;</span>
+<span class="sd">                              &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;</span>
+<span class="sd">                              &lt;Year&gt;1976&lt;/Year&gt;</span>
+<span class="sd">                           &lt;/root&gt;</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           from cobralib.io import ReadXML</span>
+<span class="sd">           reader = ReadXML(&quot;example.jwc&quot;)</span>
+<span class="sd">           value = reader.read_xml(&quot;XML Book Data&quot;)</span>
+<span class="sd">           print(value)</span>
+
+<span class="sd">        .. code-block:: text</span>
+
+<span class="sd">           &gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">xml_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+        <span class="n">collect_lines</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">root_tag</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Root tag of the XML data</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__xmllines</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
                 <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">xml_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">):</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">ParsingInterrupted</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                <span class="n">collect_lines</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Start collecting lines</span>
+                <span class="n">remaining_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">xml_data</span> <span class="o">+=</span> <span class="n">remaining_line</span>
+
+                <span class="c1"># Try to find the root tag from this line</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;&lt;([^/&gt; ]+)&#39;</span><span class="p">,</span> <span class="n">remaining_line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">root_tag</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">collect_lines</span><span class="p">:</span>
+                <span class="n">xml_data</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Add line to xml_data</span>
+
+                <span class="c1"># If root_tag is still None, try to find it from this line</span>
+                <span class="k">if</span> <span class="n">root_tag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;&lt;([^/&gt; ]+)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                        <span class="n">root_tag</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Stop collecting lines if we find the closing root tag</span>
+                <span class="k">if</span> <span class="n">root_tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="sa">f</span><span class="s1">&#39;&lt;/</span><span class="si">{</span><span class="n">root_tag</span><span class="si">}</span><span class="s1">&gt;&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">break</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">found_keyword</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the file&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">xml_data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># Catch any XML parsing errors</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XML data for keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
 
     <span class="c1"># ------------------------------------------------------------------------------------------</span>
 
-    <span class="k">def</span> <span class="nf">read_full_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadXML.read_full_xml"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadXML.read_full_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_full_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the XML data. If a keyword is provided, search for the specified</span>
 <span class="sd">        keyword in the XML data and return the nested elements beneath it.</span>
@@ -1268,6 +1027,9 @@
 <span class="sd">        :raises ValueError: If the keyword is specified but not found in the XML data.</span>
 
 <span class="sd">        If you assume the input file titled example.xml has the following format:</span>
+
+<span class="sd">        Example 1</span>
+<span class="sd">        ---------</span>
 
 <span class="sd">        .. code-block:: xml</span>
 
@@ -1286,7 +1048,8 @@
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">           reader = ReadKeyWords(&quot;example.xml&quot;)</span>
+<span class="sd">           from cobralib.io import ReadXML</span>
+<span class="sd">           reader = ReadXML(&quot;example.xml&quot;)</span>
 <span class="sd">           value = reader.read_full_xml()</span>
 <span class="sd">           print(value)</span>
 
@@ -1305,6 +1068,9 @@
 
 <span class="sd">           new_value = reader.read_full_xml(&quot;subkey2&quot;)</span>
 <span class="sd">           print(new_value)</span>
+
+<span class="sd">        .. code-block:: text</span>
+
 <span class="sd">           &gt;&gt; {</span>
 <span class="sd">               &quot;subkey1&quot;: &quot;subvalue1&quot;,</span>
 <span class="sd">               &quot;subkey2&quot;: {</span>
@@ -1324,7 +1090,216 @@
                 <span class="n">xml_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
                 <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the XML data&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; not found in the XML data&quot;</span><span class="p">)</span></div>
+    <span class="c1"># ==========================================================================================</span>
+    <span class="c1"># PRIVATE-LIKE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_read_xml_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This private method will read in all lines from the text file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+
+<span class="c1"># ==========================================================================================</span>
+<span class="c1"># ==========================================================================================</span>
+
+
+<div class="viewcode-block" id="ReadKeyWords"><a class="viewcode-back" href="../../io.html#cobralib.io.ReadKeyWords">[docs]</a><span class="k">class</span> <span class="nc">ReadKeyWords</span><span class="p">(</span><span class="n">ReadYAML</span><span class="p">,</span> <span class="n">ReadJSON</span><span class="p">,</span> <span class="n">ReadXML</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is a container for the ReadYAML, ReadJSON, and ReadXML classes.  This</span>
+<span class="sd">    class is developed specifically to read .jwc file types, which can mix JSON,</span>
+<span class="sd">    XML, and YAML formats.  Thsi file can be used to read a straight XML, JSON,</span>
+<span class="sd">    or YAML file.</span>
+
+<span class="sd">    :param file_name: The file name to be read including the path length</span>
+<span class="sd">    :param print_lines: The number of lines to be printed to the screen if the</span>
+<span class="sd">                        user prints an instance of the class. Defaulted to 50</span>
+<span class="sd">    :raises FileNotFoundError: If the file does not exist</span>
+
+<span class="sd">    Example File</span>
+<span class="sd">    ------------</span>
+
+<span class="sd">    .. code-block:: text</span>
+
+<span class="sd">       ---</span>
+<span class="sd">       # First document in file</span>
+
+<span class="sd">       Float Value: 4.387</span>
+<span class="sd">       Double Value: 1.11111187</span>
+<span class="sd">       integer: 6</span>
+<span class="sd">       String: Hello</span>
+<span class="sd">       Float List: [1.1 2.2 3.3 4.4]</span>
+<span class="sd">       Yaml Block List:</span>
+<span class="sd">           - 1</span>
+<span class="sd">	   - 2</span>
+<span class="sd">	   - 3</span>
+<span class="sd">	   - 4</span>
+<span class="sd">       Yaml Dict:</span>
+<span class="sd">           First Key: 3.3</span>
+<span class="sd">           Second Key: 4.4</span>
+<span class="sd">           Third Key: 5.5</span>
+<span class="sd">           Fourth Key: 6.6</span>
+<span class="sd">       String List Hello World How are you</span>
+<span class="sd">       JSON Data: {&quot;book&quot;: &quot;History of the World, &quot;Year&quot;: 1976}</span>
+<span class="sd">       XML Data: &lt;root&gt;</span>
+<span class="sd">                    &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;</span>
+<span class="sd">		    &lt;Year&gt;1976&lt;/Year&gt;</span>
+<span class="sd">		 &lt;/root&gt;</span>
+
+<span class="sd">       ---</span>
+<span class="sd">       # Second document in file</span>
+
+<span class="sd">       # Notice that a : character is not required</span>
+<span class="sd">       Another Int 3</span>
+
+<span class="sd">    Instantiation Example</span>
+<span class="sd">    ---------------------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.jwc&quot;, print_lines=2)</span>
+
+<span class="sd">        # Print the instance, displaying 2 lines</span>
+<span class="sd">        print(reader)</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">        &gt;&gt; Float Value: 4.387 # Comment line not to be read</span>
+<span class="sd">        &gt;&gt; Double Value: 1.11111187 # Comment line not to be read</span>
+
+<span class="sd">    The user can also adjust the print_lines attribute after instantiation</span>
+<span class="sd">    if they wish to change the number of printed lines</span>
+
+<span class="sd">    Read Scalar Values</span>
+<span class="sd">    ------------------</span>
+
+<span class="sd">    This class can be used to read in key value pairs.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.jwc&quot;)</span>
+<span class="sd">        int_value = reader.read_key_value(&quot;integer:&quot;, int)</span>
+<span class="sd">        double_value = reader.read_key_value(&quot;Double Value:&quot;, np.float64)</span>
+<span class="sd">        # Read from second document in file</span>
+<span class="sd">        second_doc = reader.read_key_value(&quot;Another Int&quot;, int, 1)</span>
+<span class="sd">        print(&quot;Integer Value: &quot;, int_value)</span>
+<span class="sd">        print(type)</span>
+<span class="sd">        print(&quot;Double Value: &quot;, double_value)</span>
+<span class="sd">        print(type)</span>
+<span class="sd">        print(second_doc)</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">       &gt;&gt; Integer Value: 6</span>
+<span class="sd">       &gt;&gt; int</span>
+<span class="sd">       &gt;&gt; Double Value: 1.11111187</span>
+<span class="sd">       &gt;&gt; np.float64</span>
+<span class="sd">       &gt;&gt; 3</span>
+
+<span class="sd">    Read List Values</span>
+<span class="sd">    ----------------</span>
+
+<span class="sd">    This class can be used to read in lists stored inline or in block</span>
+<span class="sd">    formats</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.jwc&quot;)</span>
+<span class="sd">        inline_list = reader.read_key_value(&quot;Float List:&quot;, float)</span>
+<span class="sd">        block_list = reader.read_key_value(&quot;Yaml Block List:&quot;, int)</span>
+<span class="sd">        print(&quot;Inline List: &quot;, inline_list)</span>
+<span class="sd">        print(&quot;Block List: &quot;, block_list)</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">       &gt;&gt; Inline List: [ 1.1, 2.2, 3.3, 4.4 ]</span>
+<span class="sd">       &gt;&gt; Block List: [ 1, 2, 3, 4 ]</span>
+
+<span class="sd">    Read JSON and XML</span>
+<span class="sd">    -----------------</span>
+
+<span class="sd">    This class can be used to read JSON and XML data associated with key words</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.jwc&quot;)</span>
+<span class="sd">        json_data = reader.read_json(&quot;JSON Data:&quot;)</span>
+<span class="sd">        xml_data = reader.read_xml(&quot;XML Data:&quot;)</span>
+<span class="sd">        print(&quot;JSON Data: &quot;, json_data)</span>
+<span class="sd">        print(&quot;XML Data: &quot;, xml_data)</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">       &gt;&gt; JSON Data: {&quot;book&quot;: &quot;History of the World&quot;, &quot;Year&quot;, 1976}</span>
+<span class="sd">       &gt;&gt; XML Data: {&quot;book&quot;: &quot;History of the World&quot;, &quot;Year&quot;, 1976}</span>
+
+<span class="sd">    Read YAML Dictionaries</span>
+<span class="sd">    ----------------------</span>
+
+<span class="sd">    This class can be used to read dictionaries encoded in YAML formats.  Unlike</span>
+<span class="sd">    JSON and XML, dictionaries read in from a YAML format must be flat</span>
+<span class="sd">    (i.e. no nested dictionaries) and of a uniform data type.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        reader = ReadKeyWords(&quot;test_key_words.jwc&quot;)</span>
+<span class="sd">        yaml_dict = reader.read_yaml_dict(&quot;Yaml Dict:&quot;, str, float)</span>
+<span class="sd">        print(&quot;YAML Dictionary: &quot;, yaml_dict)</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">       &gt;&gt; YAML Dictionary: {&quot;First Key&quot;: 3.3, &quot;Second Key&quot;: 4.4,</span>
+<span class="sd">                            &quot;Third Key&quot;: 5.5, &quot;Fourth Key&quot;: 6.6}</span>
+
+<span class="sd">    **Note:** In order to read in a ditionary of lists, use the ``read_yaml_dict_of_list``</span>
+<span class="sd">    method.</span>
+
+<span class="sd">    YAML, JSON, and XML Files</span>
+<span class="sd">    -------------------------</span>
+
+<span class="sd">    If you wish to read a .yaml, .josn, or .xml file that does not contain</span>
+<span class="sd">    mixed data, you can use one of these three methods.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Instantiate the class</span>
+<span class="sd">        from io.cobralib import ReadKey Words</span>
+<span class="sd">        yaml_reader = ReadKeyWords(&quot;test_key_words.yaml&quot;)</span>
+<span class="sd">        yaml_data = yaml_reader.read_full_yaml()</span>
+
+<span class="sd">        json_reader = ReadKeyWords(&quot;test_key_words.json&quot;)</span>
+<span class="sd">        json_data = json_reader.read_full.json()</span>
+
+<span class="sd">        xml_reader = ReadKeyWords(&quot;test_key_words.xml&quot;)</span>
+<span class="sd">        xml_data = xml_reader.read_full_xml()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">print_lines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="c1"># Verify file exists)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATAL ERROR: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Instantiate inherited classes</span>
+        <span class="n">ReadYAML</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">ReadJSON</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">ReadXML</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+
+        <span class="c1"># Read in data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_lines</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_lines</span> <span class="o">=</span> <span class="n">print_lines</span>
 
     <span class="c1"># ==========================================================================================</span>
     <span class="c1"># PRIVATE-LIKE methods</span>
@@ -1345,7 +1320,7 @@
 <span class="sd">        screen and pre-formats the data for printing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">num_lines</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">print_lines</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">))</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[:</span><span class="n">num_lines</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[:</span><span class="n">num_lines</span><span class="p">])</span></div>
 
 
 <span class="c1"># ==========================================================================================</span>

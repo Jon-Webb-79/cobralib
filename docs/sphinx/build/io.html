@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Input / Output (io) &mdash; cobralib 0.1.4 documentation</title>
+  <title>Input / Output (io) &mdash; cobralib 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
 
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=dff88ec8"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b1f64a84"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -60,7 +60,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#cobralib.io.read_excel_columns_by_index"><code class="docutils literal notranslate"><span class="pre">read_excel_columns_by_index()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#file-readers">File Readers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#read-yaml">Read YAML</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadYAML"><code class="docutils literal notranslate"><span class="pre">ReadYAML</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_full_yaml"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_full_yaml()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_key_value"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_key_value()</span></code></a></li>
@@ -69,9 +69,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadYAML.read_yaml_list"><code class="docutils literal notranslate"><span class="pre">ReadYAML.read_yaml_list()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#read-json">Read JSON</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadJSON"><code class="docutils literal notranslate"><span class="pre">ReadJSON</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadJSON.read_full_json"><code class="docutils literal notranslate"><span class="pre">ReadJSON.read_full_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadJSON.read_json"><code class="docutils literal notranslate"><span class="pre">ReadJSON.read_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#read-xml">Read XML</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cobralib.io.ReadXML"><code class="docutils literal notranslate"><span class="pre">ReadXML</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadXML.read_full_xml"><code class="docutils literal notranslate"><span class="pre">ReadXML.read_full_xml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cobralib.io.ReadXML.read_xml"><code class="docutils literal notranslate"><span class="pre">ReadXML.read_xml()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -119,21 +130,22 @@
 various ASCII based files.</p>
 <section id="readkeywords">
 <span id="read-key-words"></span><h2>ReadKeyWords<a class="headerlink" href="#readkeywords" title="Permalink to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code> class is mean to allow a user to read any ASCII based text
-file, look for keywords and read in the value to the right of th ekey word.  In
-essense this enables a user to use a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file as a basic configuration file.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ReadKeyWords</span></code> class is a multi-purpose class that enables a user to read in
+several different configuration file formats, and in addition, it allows a user
+to create a configuration file with a mixture of YAML, JSON, and XML data.
+While this class can read in data of any ASCII based text format, when mixing
+configuration formats it is recommended that the .jwc format be used.  In
+addition this class inherits the <a class="reference internal" href="#read-yaml"><span class="std std-ref">ReadYAML</span></a>, <a class="reference internal" href="#read-json"><span class="std std-ref">ReadJSON</span></a>,
+and <a class="reference internal" href="#read-xml"><span class="std std-ref">ReadXML</span></a> classes.  Further information on the ReadKeyWords
+class can be found in the documentation for the inherited classes.</p>
 <blockquote>
 <div><dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.ReadKeyWords">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadKeyWords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadKeyWords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadKeyWords" title="Permalink to this definition"></a></dt>
-<dd><p>This class can be used by a read to read a text based config file.  The methods
-will look for a specific key word that must begin on the first character of each
-line, and will read in the variable or variables just to the right of the
-keyword as a user specified data type.  The user can also print the object
-which will display the user specified number of lines on the screen.</p>
-<p>This class is cabale of reading files that contain text, json and xml
-data in one file.  In addition, this class can read files that are entirely
-compriesd of text, json, or xml data.</p>
+<dd><p>This class is a container for the ReadYAML, ReadJSON, and ReadXML classes.  This
+class is developed specifically to read .jwc file types, which can mix JSON,
+XML, and YAML formats.  Thsi file can be used to read a straight XML, JSON,
+or YAML file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -146,34 +158,154 @@ user prints an instance of the class. Defaulted to 50</p></li>
 <dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist</p>
 </dd>
 </dl>
-<p>Example file titled test_key_words.txt</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Float Value: 4.387 # Comment line not to be read
-Double Value: 1.11111187 # Comment line not to be read
-integer: 6 # Comment not to be read
-String: Hello # Comment to be read
-Float List: 1.1 2.2 3.3 4.4
-Double List: 1.1, 2.2, 3.3, 4.4
-Integer List: 1, 2, 3, 4
+<section id="example-file">
+<h3>Example File<a class="headerlink" href="#example-file" title="Permalink to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>---
+# First document in file
+
+Float Value: 4.387
+Double Value: 1.11111187
+integer: 6
+String: Hello
+Float List: [1.1 2.2 3.3 4.4]
+Yaml Block List:
+    - 1
+    - 2
+    - 3
+    - 4
+Yaml Dict:
+    First Key: 3.3
+    Second Key: 4.4
+    Third Key: 5.5
+    Fourth Key: 6.6
 String List Hello World How are you
 JSON Data: {&quot;book&quot;: &quot;History of the World, &quot;Year&quot;: 1976}
 XML Data: &lt;root&gt;
-            &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;
-			&lt;Year&gt;1976&lt;/Year&gt;
-		  &lt;/root&gt;
+             &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;
+             &lt;Year&gt;1976&lt;/Year&gt;
+          &lt;/root&gt;
+
+---
+# Second document in file
+
+# Notice that a : character is not required
+Another Int 3
 </pre></div>
 </div>
+</section>
+<section id="instantiation-example">
+<h3>Instantiation Example<a class="headerlink" href="#instantiation-example" title="Permalink to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">,</span> <span class="n">print_lines</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">,</span> <span class="n">print_lines</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># Print the instance, displaying 2 lines</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="n">Float</span> <span class="n">Value</span><span class="p">:</span> <span class="mf">4.387</span> <span class="c1"># Comment line not to be read</span>
-<span class="o">&gt;&gt;</span> <span class="n">Double</span> <span class="n">Value</span><span class="p">:</span> <span class="mf">1.11111187</span> <span class="c1"># Comment line not to be read</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>Float<span class="w"> </span>Value:<span class="w"> </span><span class="m">4</span>.387<span class="w"> </span><span class="c1"># Comment line not to be read</span>
+&gt;&gt;<span class="w"> </span>Double<span class="w"> </span>Value:<span class="w"> </span><span class="m">1</span>.11111187<span class="w"> </span><span class="c1"># Comment line not to be read</span>
 </pre></div>
 </div>
 <p>The user can also adjust the print_lines attribute after instantiation
 if they wish to change the number of printed lines</p>
+</section>
+<section id="read-scalar-values">
+<h3>Read Scalar Values<a class="headerlink" href="#read-scalar-values" title="Permalink to this heading"></a></h3>
+<p>This class can be used to read in key value pairs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">)</span>
+<span class="n">int_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s2">&quot;integer:&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+<span class="n">double_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s2">&quot;Double Value:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="c1"># Read from second document in file</span>
+<span class="n">second_doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s2">&quot;Another Int&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Integer Value: &quot;</span><span class="p">,</span> <span class="n">int_value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Double Value: &quot;</span><span class="p">,</span> <span class="n">double_value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">second_doc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>Integer<span class="w"> </span>Value:<span class="w"> </span><span class="m">6</span>
+&gt;&gt;<span class="w"> </span>int
+&gt;&gt;<span class="w"> </span>Double<span class="w"> </span>Value:<span class="w"> </span><span class="m">1</span>.11111187
+&gt;&gt;<span class="w"> </span>np.float64
+&gt;&gt;<span class="w"> </span><span class="m">3</span>
+</pre></div>
+</div>
+</section>
+<section id="read-list-values">
+<h3>Read List Values<a class="headerlink" href="#read-list-values" title="Permalink to this heading"></a></h3>
+<p>This class can be used to read in lists stored inline or in block
+formats</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">)</span>
+<span class="n">inline_list</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s2">&quot;Float List:&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+<span class="n">block_list</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_key_value</span><span class="p">(</span><span class="s2">&quot;Yaml Block List:&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inline List: &quot;</span><span class="p">,</span> <span class="n">inline_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Block List: &quot;</span><span class="p">,</span> <span class="n">block_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>Inline<span class="w"> </span>List:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>.1,<span class="w"> </span><span class="m">2</span>.2,<span class="w"> </span><span class="m">3</span>.3,<span class="w"> </span><span class="m">4</span>.4<span class="w"> </span><span class="o">]</span>
+&gt;&gt;<span class="w"> </span>Block<span class="w"> </span>List:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">2</span>,<span class="w"> </span><span class="m">3</span>,<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="read-json-and-xml">
+<h3>Read JSON and XML<a class="headerlink" href="#read-json-and-xml" title="Permalink to this heading"></a></h3>
+<p>This class can be used to read JSON and XML data associated with key words</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">)</span>
+<span class="n">json_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;JSON Data:&quot;</span><span class="p">)</span>
+<span class="n">xml_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_xml</span><span class="p">(</span><span class="s2">&quot;XML Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JSON Data: &quot;</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XML Data: &quot;</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>JSON<span class="w"> </span>Data:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;book&quot;</span>:<span class="w"> </span><span class="s2">&quot;History of the World&quot;</span>,<span class="w"> </span><span class="s2">&quot;Year&quot;</span>,<span class="w"> </span><span class="m">1976</span><span class="o">}</span>
+&gt;&gt;<span class="w"> </span>XML<span class="w"> </span>Data:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;book&quot;</span>:<span class="w"> </span><span class="s2">&quot;History of the World&quot;</span>,<span class="w"> </span><span class="s2">&quot;Year&quot;</span>,<span class="w"> </span><span class="m">1976</span><span class="o">}</span>
+</pre></div>
+</div>
+</section>
+<section id="read-yaml-dictionaries">
+<h3>Read YAML Dictionaries<a class="headerlink" href="#read-yaml-dictionaries" title="Permalink to this heading"></a></h3>
+<p>This class can be used to read dictionaries encoded in YAML formats.  Unlike
+JSON and XML, dictionaries read in from a YAML format must be flat
+(i.e. no nested dictionaries) and of a uniform data type.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">)</span>
+<span class="n">yaml_dict</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_yaml_dict</span><span class="p">(</span><span class="s2">&quot;Yaml Dict:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;YAML Dictionary: &quot;</span><span class="p">,</span> <span class="n">yaml_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>YAML<span class="w"> </span>Dictionary:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;First Key&quot;</span>:<span class="w"> </span><span class="m">3</span>.3,<span class="w"> </span><span class="s2">&quot;Second Key&quot;</span>:<span class="w"> </span><span class="m">4</span>.4,
+<span class="w">                     </span><span class="s2">&quot;Third Key&quot;</span>:<span class="w"> </span><span class="m">5</span>.5,<span class="w"> </span><span class="s2">&quot;Fourth Key&quot;</span>:<span class="w"> </span><span class="m">6</span>.6<span class="o">}</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> In order to read in a ditionary of lists, use the <code class="docutils literal notranslate"><span class="pre">read_yaml_dict_of_list</span></code>
+method.</p>
+</section>
+<section id="yaml-json-and-xml-files">
+<h3>YAML, JSON, and XML Files<a class="headerlink" href="#yaml-json-and-xml-files" title="Permalink to this heading"></a></h3>
+<p>If you wish to read a .yaml, .josn, or .xml file that does not contain
+mixed data, you can use one of these three methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
+<span class="kn">from</span> <span class="nn">io.cobralib</span> <span class="kn">import</span> <span class="n">ReadKey</span> <span class="n">Words</span>
+<span class="n">yaml_reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.yaml&quot;</span><span class="p">)</span>
+<span class="n">yaml_data</span> <span class="o">=</span> <span class="n">yaml_reader</span><span class="o">.</span><span class="n">read_full_yaml</span><span class="p">()</span>
+
+<span class="n">json_reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.json&quot;</span><span class="p">)</span>
+<span class="n">json_data</span> <span class="o">=</span> <span class="n">json_reader</span><span class="o">.</span><span class="n">read_full</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="n">xml_reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.xml&quot;</span><span class="p">)</span>
+<span class="n">xml_data</span> <span class="o">=</span> <span class="n">xml_reader</span><span class="o">.</span><span class="n">read_full_xml</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
 </dd></dl>
 
 <dl class="field-list simple">
@@ -210,8 +342,8 @@ and <code class="docutils literal notranslate"><span class="pre">str</span></cod
 it does not, then it is not a true .csv file and should be transformed
 to a text function and read by the read_text_columns_by_headers function.
 Assume we have a .csv file titled <code class="docutils literal notranslate"><span class="pre">test.csv</span></code> with the following format.</p>
-<table class="docutils align-default" id="id6">
-<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id13">
+<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id13" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -264,8 +396,8 @@ Assume we have a .csv file titled <code class="docutils literal notranslate"><sp
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id7">
-<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id14">
+<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id14" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -352,8 +484,8 @@ each column</p></li>
 it does not, then it is not a true .csv file and should be transformed
 to a text function and read by the xx function.  Assume we have a .csv
 file titled <code class="docutils literal notranslate"><span class="pre">test.csv</span></code> with the following format.</p>
-<table class="docutils align-default" id="id8">
-<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id15">
+<caption><span class="caption-text">test.csv</span><a class="headerlink" href="#id15" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -400,8 +532,8 @@ file titled <code class="docutils literal notranslate"><span class="pre">test.cs
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id9">
-<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id16">
+<caption><span class="caption-text">test1.csv</span><a class="headerlink" href="#id16" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -487,8 +619,8 @@ should be a .csv file extension.</p></li>
 <p>This function assumes the file has a space delimiter, if
 Assume we have a .csv file titled <code class="docutils literal notranslate"><span class="pre">test.txt</span></code> with the following
 format.</p>
-<table class="docutils align-default" id="id10">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id10" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id17">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id17" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -541,8 +673,8 @@ format.</p>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id11">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id11" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id18">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id18" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -631,8 +763,8 @@ should be a .csv file extension.</p></li>
 </dd>
 </dl>
 <p>Assume we have a .txt file titled <code class="docutils literal notranslate"><span class="pre">test.txt</span></code> with the following format.</p>
-<table class="docutils align-default" id="id12">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id12" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id19">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id19" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -679,8 +811,8 @@ should be a .csv file extension.</p></li>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id13">
-<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id13" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id20">
+<caption><span class="caption-text">test.txt</span><a class="headerlink" href="#id20" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -852,8 +984,8 @@ and <code class="docutils literal notranslate"><span class="pre">str</span></cod
 </dl>
 <p>Assume we have a .xls file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format
 in a tab titled <code class="docutils literal notranslate"><span class="pre">primary</span></code>.</p>
-<table class="docutils align-default" id="id14">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id14" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id21">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id21" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -905,8 +1037,8 @@ in a tab titled <code class="docutils literal notranslate"><span class="pre">pri
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id15">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id15" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id22">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id22" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -994,8 +1126,8 @@ each column</p></li>
 </dd>
 </dl>
 <p>Assume we have a .txt file titled <code class="docutils literal notranslate"><span class="pre">test.xls</span></code> with the following format.</p>
-<table class="docutils align-default" id="id16">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id16" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id23">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id23" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 21%" />
 <col style="width: 36%" />
@@ -1043,8 +1175,8 @@ each column</p></li>
 </div>
 <p>This function can also use the <cite>skip</cite> attributed read data when the
 headers are not on the first line.  For instance, assume the following csv file;</p>
-<table class="docutils align-default" id="id17">
-<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id17" title="Permalink to this table"></a></caption>
+<table class="docutils align-default" id="id24">
+<caption><span class="caption-text">test.xls</span><a class="headerlink" href="#id24" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 24%" />
@@ -1109,10 +1241,10 @@ headers are not on the first line.  For instance, assume the following csv file;
 </dd></dl>
 
 </section>
-<section id="file-readers">
-<h2>File Readers<a class="headerlink" href="#file-readers" title="Permalink to this heading"></a></h2>
-<p>The following classes are inherited by the <a class="reference internal" href="#read-key-words"><span class="std std-ref">ReadKeyWords</span></a> class;
-however, they can be independently used</p>
+<section id="read-yaml">
+<span id="id1"></span><h2>Read YAML<a class="headerlink" href="#read-yaml" title="Permalink to this heading"></a></h2>
+<p>This class inherited by the <a class="reference internal" href="#read-key-words"><span class="std std-ref">ReadKeyWords</span></a> class;
+however, it can be independently used</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.ReadYAML">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadYAML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadYAML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadYAML" title="Permalink to this definition"></a></dt>
@@ -1285,8 +1417,8 @@ symbol</p></li>
 <p>This method can be used to read a key-value pair from a yaml or yaml-like
 file.  This method will rcognize the &gt;, ^, and | symbols that symbolize
 strings that either start on the next line, or multiline strings.</p>
-<section id="id1">
-<h3>Example 1<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<section id="id2">
+<h3>Example 1<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
 <p>An example of a python code to read an float value from the
 1st yaml document.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
@@ -1371,8 +1503,8 @@ file where the value is a dictionary of values.  This method will recognize
 the &gt;, ^, and | symbols that symbolize strings that either start on the next
 line, or multiline strings. <strong>NOTE:</strong> This method assumes a flat
 (i.e. not nested) dictionary structure.</p>
-<section id="id2">
-<h3>Example 1<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<section id="id3">
+<h3>Example 1<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
 <p>An example of a python code to read a list of integer values from the
 1st yaml document.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
@@ -1414,8 +1546,8 @@ file where the value is a dictionary of lists.  This method will recognize
 the &gt;, ^, and | symbols that symbolize strings that either start on the next
 line, or multiline strings. <strong>NOTE:</strong> This method assumes a flat
 (i.e. not nested) dictionary structure.</p>
-<section id="id3">
-<h3>Example 1<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<section id="id4">
+<h3>Example 1<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
 <p>An example of a python code to read a dictionary of integer list values
 from the 1st yaml document.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
@@ -1455,8 +1587,8 @@ symbol.</p></li>
 file where the value is a list of values.  This method will rcognize the
 &gt;, ^, and | symbols that symbolize strings that either start on the next
 line, or multiline strings.</p>
-<section id="id4">
-<h3>Example 1<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<section id="id5">
+<h3>Example 1<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
 <p>An example of a python code to read a list of integer values from the
 1st yaml document.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadYAML</span>
@@ -1470,8 +1602,8 @@ line, or multiline strings.</p>
 </pre></div>
 </div>
 </section>
-<section id="id5">
-<h3>Example 2<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<section id="id6">
+<h3>Example 2<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
 <p>This method will also read string values from the list that may use the
 ^, &gt; or | symbols that signify the string as starting on the next line,
 a multi-line string that should be read into one line, or a multiline
@@ -1495,13 +1627,19 @@ string that should be read as a multiline string.</p>
 
 </dd></dl>
 
+</section>
+<section id="read-json">
+<span id="id7"></span><h2>Read JSON<a class="headerlink" href="#read-json" title="Permalink to this heading"></a></h2>
+<p>This class inherited by the <a class="reference internal" href="#read-key-words"><span class="std std-ref">ReadKeyWords</span></a> class;
+however, it can be independently used</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cobralib.io.ReadJSON">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadJSON" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_name</strong> – The name and path length for the file with the yaml-like
-format</p>
+<dd class="field-odd"><p><strong>file_name</strong> – The name and path length for the file with the json-like
+format. While not required, it is recommended that this
+file use a .jwc extension.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist.</p>
@@ -1511,9 +1649,9 @@ format</p>
 tailoered to read basic JSON files, but with looser requirements on how
 key words are formatted, and stricter requirements on data typing. The methods
 within this class can be used to read scalar variables from key-variable pairs,
-lists, and flat dictionaries.</p>
-<p>All code examples described in the documentation for this class reference
-the read_yaml.yaml file shown below.</p>
+lists, and flat dictionaries.  The file containing json data can be a pure
+.json file, or it can be mixed with yaml like key value pairs.  If the file
+is mixed, it is recommended that the file be defined with a .jwc extension.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cobralib.io.ReadJSON.read_full_json">
 <span class="sig-name descname"><span class="pre">read_full_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadJSON.read_full_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadJSON.read_full_json" title="Permalink to this definition"></a></dt>
@@ -1539,6 +1677,8 @@ in the entire contents of the json file as a dictionary, or it
 will read in the dictionaries nested under a specific key word.
 If you assume the input file titled example.json has the following
 format</p>
+<section id="id8">
+<h3>Example 1<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w"> </span><span class="nt">&quot;key1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;value1&quot;</span><span class="p">,</span>
 <span class="w"> </span><span class="nt">&quot;key2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1552,26 +1692,28 @@ format</p>
 </pre></div>
 </div>
 <p>The code to extract data would look like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;example.json&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadJSON</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadJSON</span><span class="p">(</span><span class="s2">&quot;example.json&quot;</span><span class="p">)</span>
 <span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">{</span>
-    <span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
 <span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_json</span><span class="p">(</span><span class="s2">&quot;subkey2&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span> <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; {
+    &quot;key1&quot;: &quot;value1&quot;,
+    &quot;key2&quot;: {
+        &quot;subkey1&quot;: &quot;subvalue1&quot;,
+        &quot;subkey2&quot;: {
+            &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,
+            &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;
+        }
+    }
+}
+&gt;&gt; {&quot;subsubkey1&quot;: &quot;subsubvalue1&quot;, &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;}
+</pre></div>
+</div>
+</section>
 </dd></dl>
 
 <dl class="py method">
@@ -1590,6 +1732,11 @@ to the right of the keyword until the termination of brackets.</p>
 <dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the JSON data is not valid.</p>
 </dd>
 </dl>
+<section id="id9">
+<h3>Example 1<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<p>This example shows a file that mixes YAML and JSON data types.  In order
+to delinate the file type that contains mixed data, it is recommended that
+the .jwc file format be used; however, it is not required.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Yaml Dict:
     - 1
     - 2
@@ -1602,14 +1749,157 @@ Yaml Dict:
 Json Book Data: {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the class</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadKeyWords</span><span class="p">(</span><span class="s2">&quot;test_key_words.txt&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadJSON</span>
+<span class="c1"># Instantiate the class</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadJSON</span><span class="p">(</span><span class="s2">&quot;test_key_words.jwc&quot;</span><span class="p">)</span>
 <span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;JSON Book Data:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-<span class="o">&gt;&gt;</span> <span class="p">{</span><span class="s2">&quot;book&quot;</span><span class="p">:</span> <span class="s2">&quot;History of the World&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">1976</span><span class="p">}</span>
 </pre></div>
 </div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="read-xml">
+<span id="id10"></span><h2>Read XML<a class="headerlink" href="#read-xml" title="Permalink to this heading"></a></h2>
+<p>This class inherited by the <a class="reference internal" href="#read-key-words"><span class="std std-ref">ReadKeyWords</span></a> class;
+however, it can be independently used</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cobralib.io.ReadXML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cobralib.io.</span></span><span class="sig-name descname"><span class="pre">ReadXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadXML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadXML" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> – The name and path length for the file with the xml-like
+format. While not required, it is recommended that this
+file either be an .xml or .jwc file.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist.</p>
+</dd>
+</dl>
+<p>This class can be used to read a file woith a XML-like format.  This class is
+tailoered to read basic XML files, but with looser requirements on how
+key words are formatted, and stricter requirements on data typing. The methods
+within this class can be used to read scalar variables from key-variable pairs,
+lists, and flat dictionaries. The file containing the XML data can contain
+traditional XML data or yaml-like key value pairs. If the file is mixed,
+it is recommended that the file be defined with a .jwc extension.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadXML.read_full_xml">
+<span class="sig-name descname"><span class="pre">read_full_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobralib/io.html#ReadXML.read_full_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadXML.read_full_xml" title="Permalink to this definition"></a></dt>
+<dd><p>Read the XML data. If a keyword is provided, search for the specified
+keyword in the XML data and return the nested elements beneath it.
+If no keyword is provided, return the full XML data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in the XML data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The XML data as a dictionary object or the nested elements
+as an ElementTree object if a keyword is provided.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is specified but not found in the XML data.</p>
+</dd>
+</dl>
+<p>If you assume the input file titled example.xml has the following format:</p>
+<section id="id11">
+<h3>Example 1<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;root&gt;</span>
+<span class="w">    </span><span class="nt">&lt;key1&gt;</span>value1<span class="nt">&lt;/key1&gt;</span>
+<span class="w">    </span><span class="nt">&lt;key2&gt;</span>
+<span class="w">        </span><span class="nt">&lt;subkey1&gt;</span>subvalue1<span class="nt">&lt;/subkey1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;subkey2&gt;</span>
+<span class="w">            </span><span class="nt">&lt;subsubkey1&gt;</span>subsubvalue1<span class="nt">&lt;/subsubvalue1&gt;</span>
+<span class="w">            </span><span class="nt">&lt;subsubkey2&gt;</span>subsubvalue2<span class="nt">&lt;/subsubvalue2&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/subkey2&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/key2&gt;</span>
+<span class="nt">&lt;/root&gt;</span>
+</pre></div>
+</div>
+<p>The code to extract data would look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadXML</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadXML</span><span class="p">(</span><span class="s2">&quot;example.xml&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_xml</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="p">{</span>
+    <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;key1&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;key2&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;subkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subvalue1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;subkey2&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;subsubkey1&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;subsubkey2&quot;</span><span class="p">:</span> <span class="s2">&quot;subsubvalue2&quot;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">new_value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_full_xml</span><span class="p">(</span><span class="s2">&quot;subkey2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; {
+    &quot;subkey1&quot;: &quot;subvalue1&quot;,
+    &quot;subkey2&quot;: {
+        &quot;subsubkey1&quot;: &quot;subsubvalue1&quot;,
+        &quot;subsubkey2&quot;: &quot;subsubvalue2&quot;
+    }
+}
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cobralib.io.ReadXML.read_xml">
+<span class="sig-name descname"><span class="pre">read_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/cobralib/io.html#ReadXML.read_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cobralib.io.ReadXML.read_xml" title="Permalink to this definition"></a></dt>
+<dd><p>Search each line for the specified keyword and read the XML data
+to the right of the keyword until the termination of tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keyword</strong> – The keyword to search for in each line.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The XML data as a dictionary.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the keyword is not found or if the XML data is not valid.</p>
+</dd>
+</dl>
+<section id="id12">
+<h3>Example 1<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Yaml Dict:
+    - 1
+    - 2
+    - 3
+Yaml Key: Test String
+Yaml Dict:
+    One: 1.1
+    Two: 2.2
+    Three: 3.3
+XML Book Data: &lt;root&gt;
+                  &lt;book&gt;&quot;History of the World&quot;&lt;/book&gt;
+                  &lt;Year&gt;1976&lt;/Year&gt;
+               &lt;/root&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobralib.io</span> <span class="kn">import</span> <span class="n">ReadXML</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">ReadXML</span><span class="p">(</span><span class="s2">&quot;example.jwc&quot;</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_xml</span><span class="p">(</span><span class="s2">&quot;XML Book Data&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&gt;&gt; {&quot;book&quot;: &quot;History of the World&quot;, &quot;year&quot;: 1976}
+</pre></div>
+</div>
+</section>
 </dd></dl>
 
 </dd></dl>

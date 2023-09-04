@@ -10,6 +10,8 @@ from pandas.testing import assert_frame_equal
 from cobralib.io import (
     Logger,
     ReadJSON,
+    ReadKeyWords,
+    ReadXML,
     ReadYAML,
     read_csv_columns_by_headers,
     read_csv_columns_by_index,
@@ -563,221 +565,122 @@ def test_read_full_json(sample_file4):
 
 # ==========================================================================================
 # ==========================================================================================
+# Test ReadXML class
+
+
+@pytest.mark.readxml
+def test_read_xml_variable_nested_values():
+    """
+    Test to ensure that the class will properly read in XML data inserted after
+    a keyword
+    """
+    file_name = "../data/test/read_key_words.jwc"
+    reader = ReadXML(file_name)
+    xml_data = reader.read_xml("XML Data:")
+    assert int(xml_data["root"]["Year"]) == 1976
+
+
+# ------------------------------------------------------------------------------------------
+
+
+@pytest.mark.readxml
+def test_read_xml_full_data(sample_file5):
+    """
+    Test to ensure the class can properly read in an entire XML file
+    """
+    reader = ReadXML(sample_file5)
+    xml_data = reader.read_full_xml()
+    assert isinstance(xml_data, dict)
+    assert "root" in xml_data
+    root = xml_data["root"]
+    assert isinstance(root, dict)
+
+
+# ==========================================================================================
+# ==========================================================================================
 # Test ReadKeyWords class
 
 
-# @pytest.mark.readkeywords
-# def test_read_keywords_instantiation(sample_file1):
-#     """
-#     Test to ensure correct instantiation of class
-#     """
-#     reader = ReadKeyWords(sample_file1)
-#     assert reader._file_name == sample_file1
-#     assert reader.print_lines == 50
+@pytest.mark.readkeywords
+def test_read_keywords_instantiation():
+    """
+    Test to ensure correct instantiation of class
+    """
+    file_name = "../data/test/read_key_words.jwc"
+    reader = ReadKeyWords(file_name)
+    assert reader._file_name == file_name
+    assert reader.print_lines == 50
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# @pytest.mark.readkeywords
-# def test_read_keywords_printing(sample_file1, capsys):
-#     """
-#     Test to ensure proper print out when object is printed
-#     """
-#     reader = ReadKeyWords(sample_file1, print_lines=2)
-#     print(reader)
-#     captured = capsys.readouterr()
-#     expected_output = "key1 value1\nkey2 value2\n"
-#     assert captured.out == expected_output
+@pytest.mark.readkeywords
+def test_read_variable_existing_keyword():
+    """
+    Test to ensure the class can properly read in a float variable
+    """
+    file_name = "../data/test/read_key_words.jwc"
+    reader = ReadKeyWords(file_name)
+    value = reader.read_key_value("Float Value:", float)
+    assert value == 4.387
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# @pytest.mark.readkeywords
-# def test_read_variable_existing_keyword(sample_file2):
-#     """
-#     Test to ensure the class can properly read in a float variable
-#     """
-#     reader = ReadKeyWords(sample_file2)
-#     value = reader.read_variable("Float Value:", float)
-#     assert value == 4.387
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_yaml_keywords():
-#     reader = ReadYAML("../data/test/read_yaml.yaml")
-#     value = reader.read_yaml_list("Numbers:", str, 2)
-#     print()
-#     print(value)
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_variable_nonexistent_keyword(sample_file2):
-#     """
-#     Test to ensure class fails properly when a value is not found
-#     """
-#     reader = ReadKeyWords(sample_file2)
-#     with pytest.raises(ValueError):
-#         reader.read_variable("Nonexistent Keyword", float)
+@pytest.mark.readkeywords
+def test_read_yaml_block_list():
+    reader = ReadYAML("../data/test/read_key_words.jwc")
+    value = reader.read_yaml_list("Yaml Block List:", int)
+    expected = [1, 2, 3, 4]
+    assert value == expected
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# @pytest.mark.readkeywords
-# def test_read_variable_double(sample_file2):
-#     """
-#     Test to ensure class can handle numpy data types
-#     """
-#     reader = ReadKeyWords(sample_file2)
-#     value = reader.read_variable("Double Value:", np.float32)
-#     assert value == np.float32(1.11111187)
+@pytest.mark.readkeywords
+def test_read_yaml_inline_list_keywords():
+    reader = ReadYAML("../data/test/read_key_words.jwc")
+    value = reader.read_yaml_list("Float List:", float)
+    expected = [1.1, 2.2, 3.3, 4.4]
+    assert value == expected
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# @pytest.mark.readkeywords
-# def test_read_string_variable_existing_keyword(sample_file1):
-#     """
-#     Test to ensure that the read_string_variable method properly reads in a string
-#     """
-#     reader = ReadKeyWords(sample_file1)
-#     value = reader.read_string_variable("String Value:")
-#     assert value == "Hello World"
+@pytest.mark.readkeywords
+def test_read_json():
+    """
+    Test to ensure that the class will properly read in json data inserted after
+    a key word
+    """
+    reader = ReadKeyWords("../data/test/read_key_words.jwc")
+    json_data = reader.read_json("JSON:")
+    expected_data = {
+        "employees": [
+            {"name": "Shyam", "email": "shyamjaiswal@gmail.com"},
+            {"name": "Bob", "email": "bob32@gmail.com"},
+            {"name": "Jai", "email": "jai87@gmail.com"},
+        ]
+    }
+
+    assert json_data == expected_data
 
 
 # ------------------------------------------------------------------------------------------
 
 
-# @pytest.mark.readkeywords
-# def test_read_string_variable_yaml():
-#     reader = ReadKeyWords("../data/test/read_yaml.yaml")
-#     value = reader.read_string_variable("Multi Sentence:", 2)
-#     print(value)
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_list_existing_keyword(sample_file2):
-#     """
-#     Test to ensure that the class will properly read in a list
-#     """
-#     reader = ReadKeyWords(sample_file2)
-#     values = reader.read_list("Int List:", int)
-#     expected_values = [1, 2, 3, 4, 5]
-#     assert values == expected_values
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_json_variable_nested_values(sample_file3):
-#     """
-#     Test to ensure that the class will properly read in json data inserted after
-#     a key word
-#     """
-#     reader = ReadKeyWords(sample_file3)
-#     json_data = reader.read_json("JSON Data:")
-#     expected_data = {
-#         "key1": "value1",
-#         "key2": {
-#             "subkey1": "subvalue1",
-#             "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
-#         },
-#     }
-#     assert json_data == expected_data
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_full_json(sample_file4):
-#     """
-#     Ensure that the class will read in a .json file
-#     """
-#     reader = ReadKeyWords(sample_file4)
-#     full_json = reader.read_full_json()
-#     assert full_json == {
-#         "key1": "value1",
-#         "key2": {
-#             "subkey1": "subvalue1",
-#             "subkey2": {"subsubkey1": "subsubvalue1", "subsubkey2": "subsubvalue2"},
-#         },
-#     }
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_xml_variable_nested_values(xml_file3):
-#     """
-#     Test to ensure that the class will properly read in XML data inserted after
-#     a keyword
-#     """
-#     reader = ReadKeyWords(xml_file3)
-#     xml_data = reader.read_xml("XML Data:")
-#     expected_data = {
-#         "root": {
-#             "element1": {"subelement": "Value1"},
-#             "element2": {"subelement": "Value2"},
-#             "element3": {"subelement": "Value3"},
-#         }
-#     }
-#     assert xml_data == expected_data
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_xml_full_data(sample_file5):
-#     """
-#     Test to ensure the class can properly read in an entire XML file
-#     """
-#     reader = ReadKeyWords(sample_file5)
-#     xml_data = reader.read_full_xml()
-#     assert isinstance(xml_data, dict)
-#     assert "root" in xml_data
-#     root = xml_data["root"]
-#     assert isinstance(root, dict)
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_xml_by_keyword_existing(sample_file5):
-#     """
-#     Test to ensure that the class can read XML data under a specific keyword
-#     """
-#     reader = ReadKeyWords(sample_file5)
-#     xml_data = reader.read_full_xml("element2")
-#     assert isinstance(xml_data, dict)
-#     assert "element2" in xml_data
-#     element2 = xml_data["element2"]
-#     assert isinstance(element2, dict)
-
-
-# ------------------------------------------------------------------------------------------
-
-
-# @pytest.mark.readkeywords
-# def test_read_xml_by_keyword_nonexistent(sample_file5):
-#     """
-#     Test to ensure class fails properly when XML data is not properly formatted
-#     """
-#     reader = ReadKeyWords(sample_file5)
-#     with pytest.raises(ValueError) as error:
-#         reader.read_full_xml("nonexistent")
-#     assert str(error.value) == "Keyword 'nonexistent' not found in the XML data"
+@pytest.mark.readkeywords
+def test_read_xml():
+    """
+    Ensure that the class will read in a .json file
+    """
+    reader = ReadKeyWords("../data/test/read_key_words.jwc")
+    xml_data = reader.read_xml("XML Data:")
+    assert int(xml_data["root"]["Year"]) == 1976
 
 
 # ==========================================================================================
