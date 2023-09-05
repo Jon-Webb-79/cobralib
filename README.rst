@@ -75,6 +75,12 @@ This package can also be installed via pip
 #. Install with all packages ``pip install cobralib``
 #. Install with optional dependencies ``pip install 'cobralib[mysql, postgresql]'``
 
+
+Documentation
+#############
+Documentation for this module can be found from the `ReadtheDocs <https://cobralib.readthedocs.io/en/latest/>`_ website.
+
+
 Bug Report
 ##########
 #. Despite the fact that the test suite passes on Mac and Linux, the Github tests appear to be failing due to a mismatch in libraries.
