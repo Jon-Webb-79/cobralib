@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cobralib.db &mdash; cobralib 0.1.4 documentation</title>
+  <title>cobralib.db &mdash; cobralib 0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,7 +12,7 @@
 
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=dff88ec8"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b1f64a84"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -2968,78 +2968,6 @@
 <span class="sd">        Sanitize column names to include only alphanumeric characters and underscores.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
-
-
-<span class="c1"># ==========================================================================================</span>
-<span class="c1"># ==========================================================================================</span>
-<span class="c1"># Factory pattern for Relational Database Management Systems</span>
-
-
-<div class="viewcode-block" id="relational_database"><a class="viewcode-back" href="../../db.html#cobralib.db.relational_database">[docs]</a><span class="k">def</span> <span class="nf">relational_database</span><span class="p">(</span>
-    <span class="n">db_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">hostname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
-    <span class="n">cert</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;{ODBC Driver 18 for SQL Server}&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelationalDB</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Method will return a relational database object of type RelationalDB</span>
-
-<span class="sd">    :param db_type: A string representing the database management system, can be</span>
-<span class="sd">                    MySQL, MSSQL, PostGres or SQLite. This parameter is case</span>
-<span class="sd">                    insensitive. Case Insensitive</span>
-<span class="sd">    :param database: The database you wish to connect to, defaulted to appropriate</span>
-<span class="sd">                     port number for each database manager</span>
-<span class="sd">    :param username: The username for the database connection.</span>
-<span class="sd">    :param password: The password for the database connection.</span>
-<span class="sd">    :param port: The port number for the database connection. Defaulted to 3306</span>
-<span class="sd">    :param hostname: The hostname for the database connection</span>
-<span class="sd">                     (default is &#39;localhost&#39;).</span>
-<span class="sd">    :param cert: yes to trust certificat and no to not trust certificate</span>
-<span class="sd">                 without authentication. Defaulted to yes</span>
-<span class="sd">    :param driver: The ODBC driver to use for connection. Defaulted to</span>
-<span class="sd">                   &quot;{ODBC Driver 18 for SQL Server}&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MYSQL&quot;</span><span class="p">,</span> <span class="s2">&quot;SQLITE&quot;</span><span class="p">,</span> <span class="s2">&quot;POSTGRES&quot;</span><span class="p">,</span> <span class="s2">&quot;MSSQL&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db_types</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db_type must be one of </span><span class="si">{</span><span class="n">db_types</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;MYSQL&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">port</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">port</span> <span class="o">=</span> <span class="mi">3306</span>
-        <span class="k">return</span> <span class="n">MySQLDB</span><span class="p">(</span>
-            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
-            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
-            <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
-            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
-            <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;POSTGRES&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">port</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">port</span> <span class="o">=</span> <span class="mi">5432</span>
-        <span class="k">return</span> <span class="n">PostGreSQLDB</span><span class="p">(</span>
-            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
-            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
-            <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
-            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
-            <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;MSSQL&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">port</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">port</span> <span class="o">=</span> <span class="mi">1433</span>
-        <span class="k">return</span> <span class="n">SQLServerDB</span><span class="p">(</span>
-            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
-            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
-            <span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">,</span>
-            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
-            <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
-            <span class="n">cert</span><span class="o">=</span><span class="n">cert</span><span class="p">,</span>
-            <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="n">database</span><span class="p">)</span></div>
 
 
 <span class="c1"># ==========================================================================================</span>
